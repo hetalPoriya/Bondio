@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    <string name="app_name">Bondio</string>-->
+<!--    <string name="facebook_app_id">762348625568316</string>-->
+<!--    <string name="fb_login_protocol_scheme">fb762348625568316</string>-->
+<!--    <string name="facebook_client_token">18fb6c2eef5d19efdfc0c101611f901c</string> -->
+
+    <string name="app_name">Bondio</string>
+    <string name="facebook_app_id">754280139332528</string>
+    <string name="fb_login_protocol_scheme">fb754280139332528</string>
+    <string name="facebook_client_token">0392690966cf1d9d783f3a4b1c806701</string>
+</resources>

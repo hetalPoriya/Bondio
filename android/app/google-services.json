@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "155532140901",
+    "project_id": "bondiomeet-bf48a",
+    "storage_bucket": "bondiomeet-bf48a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155532140901:android:d3d39cc001813e4b8bc18c",
+        "android_client_info": {
+          "package_name": "com.app.bondio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "155532140901-2idj6faim75lhk7b6doro2i685pfqjse.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.bondio",
+            "certificate_hash": "7955b53459ecd4b677c28f401d389fecd0239416"
+          }
+        },
+        {
+          "client_id": "155532140901-akkv8ov2spnd6b29vknuuvuh0o9tp3qd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.bondio",
+            "certificate_hash": "8b043e1f8bf2e2ad5ac0fe9718f57e03563c678f"
+          }
+        },
+        {
+          "client_id": "155532140901-jnfkj77jg7h4h4e1ct4i4805vltgdaco.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.bondio",
+            "certificate_hash": "d7eaf81474366673ff28ec0c7a856e2a4b2f1870"
+          }
+        },
+        {
+          "client_id": "155532140901-mreine2p18ko8f938cu5kg8h5cdgpjd3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.bondio",
+            "certificate_hash": "d759a442017362a8ef1ae90de85b8ab439922484"
+          }
+        },
+        {
+          "client_id": "155532140901-oaqh5ht663nq65vni9b5ni84gpdqchdo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHe0Z0GUZRBUliq_OdFGWAPSePB7Mm7mI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "155532140901-e2r8ae31c718qhg3vbhssipafmbekrs7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
