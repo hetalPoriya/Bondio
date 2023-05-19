@@ -1,11 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:bondio/controller/controller.dart';
-import 'package:bondio/model/model.dart';
+
 import 'package:bondio/model/user_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
@@ -31,8 +30,6 @@ class FirebaseController extends GetxController {
           msg: 'Please wait..', toastLength: Toast.LENGTH_LONG);
       TaskSnapshot uploadTask = await reference.putFile(File(image.path));
       String imageUrl = await uploadTask.ref.getDownloadURL();
-
-      log('Image ${imageUrl}');
     } catch (e) {
       log('error occured');
     }

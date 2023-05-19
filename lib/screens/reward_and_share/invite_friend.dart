@@ -1,7 +1,5 @@
-import 'dart:developer';
-
 import 'package:bondio/route_helper/route_helper.dart';
-import 'package:bondio/utils/utils.dart';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
@@ -9,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../controller/controller.dart';
-import '../../utils/app_widget_new.dart';
 
 class InviteFriend extends StatelessWidget {
   InviteFriend({Key? key}) : super(key: key);
@@ -38,12 +35,12 @@ class InviteFriend extends StatelessWidget {
                 homeController.update();
               },
               widget: Align(
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.center,
                 child: Text(
                   AppStrings.inviteFriend,
                   textAlign: TextAlign.start,
-                  style: smallTextStyleWhiteText.copyWith(
-                      fontWeight: FontWeight.w500),
+                  style: AppStyles.smallTextStyle
+                      .copyWith(fontWeight: FontWeight.w500),
                 ),
               ),
             ),
@@ -62,7 +59,7 @@ class InviteFriend extends StatelessWidget {
               child: Text(
                 AppStrings.inviteFriendDec,
                 textAlign: TextAlign.center,
-                style: smallTextStyleGreyText,
+                style: AppStyles.smallTextStyle,
               ),
             ),
             mediumSizedBox,
@@ -102,9 +99,8 @@ class InviteFriend extends StatelessWidget {
                             authController.userModel.value.user?.referCode
                                     .toString() ??
                                 ' ',
-                            style: headerTextStyleBlack.copyWith(
-                              fontSize: 12.sp,
-                            ),
+                            style: AppStyles.smallTextStyle
+                                .copyWith(color: Colors.black),
                           ),
                         ),
                         Container(

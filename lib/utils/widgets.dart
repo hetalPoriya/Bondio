@@ -1,7 +1,7 @@
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
-import 'package:bondio/utils/app_widget_new.dart';
 import 'package:csc_picker/csc_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -46,10 +46,12 @@ class AppWidget {
 
   static AuthController authController = Get.put(AuthController());
 
-  static backIcon(
-      {required VoidCallback onTap,
-      Color? backIconColor,
-      AlignmentGeometry? alignment}) {
+  static SocialLoginController socialLoginController =
+  Get.put(SocialLoginController());
+
+  static backIcon({required VoidCallback onTap,
+    Color? backIconColor,
+    AlignmentGeometry? alignment}) {
     return Align(
       alignment: alignment ?? Alignment.topLeft,
       child: GestureDetector(
@@ -91,12 +93,14 @@ class AppWidget {
               child: child!);
         }))!;
 
-    if (authController.pickedDate.value != null) {
+    if (authController.pickedDate.value
+        .toString()
+        .isNotEmpty) {
       // log(authController.pickedDate.value
       //     .toString()); //pickedDate output format => 2021-03-10 00:00:00.000
 
       authController.dobController.value.text =
-          DateFormat('yyyy-MM-dd').format(authController.pickedDate.value);
+          DateFormat('MM-dd-yyyy').format(authController.pickedDate.value);
 
       // log(authController.dobController.value.text);
       authController.update();
@@ -106,19 +110,18 @@ class AppWidget {
     }
   }
 
-  static textFormFiledWhite(
-          {String? hintText,
-          IconData? icon,
-          TextInputAction? textInputAction,
-          TextInputType? textInputType,
-          bool? obscureText,
-          void Function()? suffixOnTap,
-          void Function()? onTapReadOnly,
-          TextStyle? textStyle,
-          bool? readOnly,
-          bool isIconVisible = false,
-          TextEditingController? textEditingController,
-          String? Function(String?)? validator}) =>
+  static textFormFiledWhite({String? hintText,
+    IconData? icon,
+    TextInputAction? textInputAction,
+    TextInputType? textInputType,
+    bool? obscureText,
+    void Function()? suffixOnTap,
+    void Function()? onTapReadOnly,
+    TextStyle? textStyle,
+    bool? readOnly,
+    bool isIconVisible = false,
+    TextEditingController? textEditingController,
+    String? Function(String?)? validator}) =>
       TextFormField(
         style: AppStyles.smallTextStyle.copyWith(color: Colors.white),
         textInputAction: textInputAction ?? TextInputAction.next,
@@ -138,6 +141,7 @@ class AppWidget {
           errorStyle: textStyle ??
               AppStyles.smallTextStyle
                   .copyWith(color: Colors.white, fontSize: 10.sp),
+          errorMaxLines: 2,
           suffixIcon: Visibility(
             visible: isIconVisible,
             child: GestureDetector(
@@ -148,37 +152,36 @@ class AppWidget {
           contentPadding: paddingAll(paddingAll: 4.w),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(3.w),
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: const BorderSide(color: Colors.white),
               gapPadding: 00),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(3.w),
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: const BorderSide(color: Colors.white),
               gapPadding: 00),
           errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(3.w),
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: const BorderSide(color: Colors.white),
               gapPadding: 00),
           focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(3.w),
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: const BorderSide(color: Colors.white),
               gapPadding: 00),
         ),
         cursorColor: Colors.white,
       );
 
-  static textFormFiled(
-          {String? hintText,
-          IconData? icon,
-          TextInputAction? textInputAction,
-          TextInputType? textInputType,
-          bool? obscureText,
-          void Function()? suffixOnTap,
-          void Function()? onTapReadOnly,
-          TextStyle? textStyle,
-          bool? readOnly,
-          bool isIconVisible = false,
-          TextEditingController? textEditingController,
-          String? Function(String?)? validator}) =>
+  static textFormFiled({String? hintText,
+    IconData? icon,
+    TextInputAction? textInputAction,
+    TextInputType? textInputType,
+    bool? obscureText,
+    void Function()? suffixOnTap,
+    void Function()? onTapReadOnly,
+    TextStyle? textStyle,
+    bool? readOnly,
+    bool isIconVisible = false,
+    TextEditingController? textEditingController,
+    String? Function(String?)? validator}) =>
       TextFormField(
         textInputAction: textInputAction ?? TextInputAction.next,
         keyboardType: textInputType ?? TextInputType.text,
@@ -189,38 +192,49 @@ class AppWidget {
         controller: textEditingController,
         validator: validator,
         decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: textStyle ?? smallTextStyleGreyText,
-          labelStyle: textStyle ?? smallTextStyleGreyText,
-          suffix: Visibility(
-            visible: isIconVisible,
-            child: GestureDetector(
-              onTap: suffixOnTap,
-              child: Icon(icon, color: const Color(0xffFFB574)),
+            hintText: hintText,
+            hintStyle: AppStyles.smallTextStyle,
+            labelStyle: AppStyles.smallTextStyle,
+            labelText: hintText,
+            suffix: Visibility(
+              visible: isIconVisible,
+              child: GestureDetector(
+                onTap: suffixOnTap,
+                child: Icon(icon, color: const Color(0xffFFB574)),
+              ),
             ),
-          ),
-          enabledBorder: UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: ColorConstant.backGroundColorOrange)),
-          focusedBorder: UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: ColorConstant.backGroundColorOrange)),
-        ),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(3.w),
+                borderSide: const BorderSide(color: Colors.white),
+                gapPadding: 00),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(3.w),
+                borderSide: const BorderSide(color: Colors.white),
+                gapPadding: 00),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(3.w),
+                borderSide: const BorderSide(color: Colors.white),
+                gapPadding: 00),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(3.w),
+                borderSide: const BorderSide(color: Colors.white),
+                gapPadding: 00),
+            errorStyle: AppStyles.smallTextStyle.copyWith(fontSize: 9.sp)),
         cursorColor: ColorConstant.backGroundColorOrange,
       );
 
-  static textFormFiledProfilePage(
-          {String? hintText,
-          IconData? icon,
-          TextInputAction? textInputAction,
-          TextInputType? textInputType,
-          bool? obscureText,
-          void Function()? suffixOnTap,
-          void Function()? onTapReadOnly,
-          TextStyle? textStyle,
-          bool? readOnly,
-          TextEditingController? textEditingController,
-          String? Function(String?)? validator}) =>
+  static textFormFiledProfilePage({String? hintText,
+    IconData? icon,
+    TextInputAction? textInputAction,
+    TextInputType? textInputType,
+    bool? obscureText,
+    void Function()? suffixOnTap,
+    void Function()? onTapReadOnly,
+    TextStyle? textStyle,
+    Color? color,
+    bool? readOnly,
+    TextEditingController? textEditingController,
+    String? Function(String?)? validator}) =>
       TextFormField(
         textInputAction: textInputAction ?? TextInputAction.next,
         keyboardType: textInputType ?? TextInputType.text,
@@ -232,8 +246,8 @@ class AppWidget {
         validator: validator,
         decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: textStyle ?? smallTextStyleGreyText,
-            labelStyle: textStyle ?? smallTextStyleGreyText,
+            hintStyle: textStyle ?? AppStyles.smallTextStyle,
+            labelStyle: textStyle ?? AppStyles.smallTextStyle,
             contentPadding: paddingAll(paddingAll: 3.w),
             labelText: hintText,
             suffixIcon: GestureDetector(
@@ -241,22 +255,21 @@ class AppWidget {
               child: Icon(icon, color: const Color(0xffFFB574)),
             ),
             enabledBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: ColorConstant.backGroundColorOrange)),
+                borderSide: BorderSide(
+                    color: color ?? ColorConstant.backGroundColorOrange)),
             focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: ColorConstant.backGroundColorOrange)),
+                borderSide: BorderSide(
+                    color: color ?? ColorConstant.backGroundColorOrange)),
             border: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: ColorConstant.backGroundColorOrange))),
-        cursorColor: ColorConstant.backGroundColorOrange,
+                borderSide: BorderSide(
+                    color: color ?? ColorConstant.backGroundColorOrange))),
+        cursorColor: color ?? ColorConstant.backGroundColorOrange,
       );
 
-  static elevatedButton(
-          {required String text,
-          required void Function()? onTap,
-          bool? loading,
-          Color? progressColor}) =>
+  static elevatedButton({required String text,
+    required void Function()? onTap,
+    bool? loading,
+    Color? progressColor}) =>
       GestureDetector(
         onTap: onTap,
         child: Container(
@@ -265,17 +278,19 @@ class AppWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.w),
-              boxShadow: [BoxShadow(color: Colors.white10, blurRadius: 4)],
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 4)
+              ],
               gradient: LinearGradient(colors: [
-                ColorConstant.backGroundColorLightPink,
                 ColorConstant.backGroundColorOrange,
+                ColorConstant.backGroundColorLightPink,
               ])),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 text,
-                style: smallTextStyleWhiteText,
+                style: AppStyles.smallTextStyle,
               ),
               Visibility(
                   visible: loading ?? false,
@@ -284,7 +299,7 @@ class AppWidget {
                       SizedBox(
                         width: 4.w,
                       ),
-                      progressIndicator(color: progressColor)
+                      progressIndicator(color: progressColor ?? Colors.white)
                     ],
                   )),
             ],
@@ -292,15 +307,156 @@ class AppWidget {
         ),
       );
 
-  static toast({required String text}) => Fluttertoast.showToast(
-      msg: text,
-      backgroundColor: Colors.white,
-      textColor: ColorConstant.mainAppColorNew);
+  static List<String?> socialMedia = [
+    // AppAssets.outlook,
+    AppAssets.linkedIn,
+    AppAssets.google,
+    AppAssets.instagram,
+    AppAssets.facebook,
+    AppAssets.twitter,
+  ];
 
-  static richText(
-          {required String text1,
-          required String text2,
-          void Function()? onTap}) =>
+  static socialLogin() =>
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          margin: paddingSymmetric(horizontalPad: 3.w),
+          height: 7.h,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                socialMedia.length,
+                    (index) =>
+                    GestureDetector(
+                      onTap: () async {
+                        authController.fullNameController.value.text = '';
+                        authController.mobileController.value.text = '';
+                        authController.dobController.value.text = '';
+                        authController.referCodeController.value.text = '';
+                        Get.back();
+                        // if (index == 0) {
+                        //   authController.isGoogle.value = 'Outlook';
+                        //   authController.update();
+                        //
+                        //   await FirebaseAuth.instance.signOut();
+                        //   socialLoginController.signInWithOutlook();
+                        // } else
+
+                        if (index == 0) {
+                          authController.isGoogle.value = 'LinkedIn';
+                          authController.update();
+                          socialLoginController.signInWithLinkedIn();
+                        } else if (index == 1) {
+                          authController.isGoogle.value = 'Google';
+                          authController.update();
+                          socialLoginController.signInWithGoogle();
+                        } else if (index == 2) {
+                          authController.isGoogle.value = 'Instagram';
+                          authController.update();
+                          socialLoginController.signInWithInstagram();
+                        } else if (index == 3) {
+                          authController.isGoogle.value = 'Facebook';
+                          authController.update();
+                          socialLoginController.signInWithFacebook();
+                        } else {
+                          authController.isGoogle.value = 'Twitter';
+                          socialLoginController.signInWithTwitter();
+                          authController.update();
+                        }
+                      },
+                      child: Container(
+                        width: 15.w,
+                        height: 6.h,
+                        padding: paddingAll(paddingAll: 2.w),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                spreadRadius: 2,
+                                blurRadius: 2,
+                                offset: Offset(
+                                    2, 1), // changes position of shadow
+                              ),
+                            ],
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.grey.shade300)),
+                        child: Image.asset(socialMedia[index].toString(),
+                            alignment: Alignment.center),
+                      ),
+                    ),
+              )),
+        ),
+      );
+
+  static elevatedWhiteButton({
+    required String text,
+    required void Function()? onTap,
+    bool? loading,
+  }) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 100.w,
+          height: 6.h,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.w),
+            boxShadow: const [BoxShadow(color: Colors.white10, blurRadius: 4)],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                text,
+                style: AppStyles.mediumTextStyle
+                    .copyWith(color: ColorConstant.backGroundColorOrange),
+              ),
+              Visibility(
+                  visible: loading ?? false,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 4.w,
+                      ),
+                      progressIndicator()
+                    ],
+                  )),
+            ],
+          ),
+        ),
+      );
+
+  static toast({required String text}) =>
+      Fluttertoast.showToast(
+          msg: text,
+          backgroundColor: ColorConstant.mainAppColorNew,
+          textColor: Colors.white);
+
+  static containerIndicator() =>
+      Container(
+        color: Colors.black45,
+        child: Center(
+          child: Material(
+            borderRadius: BorderRadius.circular(2.w),
+            child: Container(
+              height: 12.h,
+              width: 24.w,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2.w),
+                color: Colors.white,
+              ),
+              child: AppWidget.progressIndicator(color: Colors.black),
+            ),
+          ),
+        ),
+      );
+
+  static richText({required String text1,
+    required String text2,
+    void Function()? onTap}) =>
       GestureDetector(
         onTap: onTap,
         child: Row(
@@ -308,27 +464,31 @@ class AppWidget {
           children: [
             RichText(
               text: TextSpan(
-                  style: smallTextStyleOrangeText,
+                  style: AppStyles.smallTextStyle,
                   text: text1,
                   children: [
-                    TextSpan(text: text2, style: smallTextStyleGreyText)
+                    TextSpan(text: text2, style: AppStyles.smallTextStyle)
                   ]),
             )
           ],
         ),
       );
 
-  static bihPolygon({required BuildContext context}) => Container(
+  static bihPolygon({required BuildContext context}) =>
+      Container(
         padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 0.0),
         height: 38.h,
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         decoration: BoxDecoration(
             image: DecorationImage(
-          image: AssetImage(
-            AppAssets.bigPolygon,
-          ),
-          fit: BoxFit.fill,
-        )),
+              image: AssetImage(
+                AppAssets.bigPolygon,
+              ),
+              fit: BoxFit.fill,
+            )),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,10 +503,9 @@ class AppWidget {
         ),
       );
 
-  static searchField(
-          {required TextEditingController controller,
-          void Function(String?)? onChanged,
-          void Function(String?)? onFieldSubmitted}) =>
+  static searchField({required TextEditingController controller,
+    void Function(String?)? onChanged,
+    void Function(String?)? onFieldSubmitted}) =>
       TextFormField(
         cursorColor: ColorConstant.backGroundColorLightPink,
         controller: controller,
@@ -357,7 +516,7 @@ class AppWidget {
             contentPadding: paddingAll(paddingAll: 1.0),
             //🔍
             hintText: 'Search..',
-            hintStyle: smallerTextStyle,
+            hintStyle: AppStyles.smallerTextStyle,
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(2.w),
                 borderSide: const BorderSide(color: Colors.black)),
@@ -367,7 +526,7 @@ class AppWidget {
       );
 
   static bondioTextAndMenu(
-          {VoidCallback? onTapOnMenu, required BuildContext context}) =>
+      {VoidCallback? onTapOnMenu, required BuildContext context}) =>
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -390,7 +549,7 @@ class AppWidget {
       );
 
   static containerWithLinearColor(
-          {double? height, required Widget widget, VoidCallback? onTap}) =>
+      {double? height, required Widget widget, VoidCallback? onTap}) =>
       Container(
           height: height ?? 10.h,
           decoration: BoxDecoration(
@@ -402,23 +561,24 @@ class AppWidget {
             children: [
               Expanded(
                   child: GestureDetector(
-                onTap: onTap ?? () => Get.back(),
-                child: Container(
-                  // color: Colors.red,
-                  height: 8.h,
-                  alignment: Alignment.topCenter,
-                  child: Icon(
-                    Icons.arrow_back_sharp,
-                    color: Colors.white,
-                    size: 10.w,
-                  ),
-                ),
-              )),
+                    onTap: onTap ?? () => Get.back(),
+                    child: Container(
+                      //color: Colors.red,
+                      height: 8.h,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.arrow_back_sharp,
+                        color: Colors.white,
+                        size: 10.w,
+                      ),
+                    ),
+                  )),
               Expanded(flex: 5, child: widget),
             ],
           ));
 
-  static progressIndicator({Color? color}) => Center(
+  static progressIndicator({Color? color}) =>
+      Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(
             color ?? ColorConstant.backGroundColorOrange,
@@ -435,7 +595,8 @@ class AppWidget {
     DrawerText(text: 'Sign Out', routeString: ''),
   ];
 
-  static appbar({required String text, Widget? widget}) => AppBar(
+  static appbar({required String text, Widget? widget}) =>
+      AppBar(
         centerTitle: true,
         title: Text(
           text,
@@ -449,134 +610,141 @@ class AppWidget {
         leading: widget != null
             ? Container()
             : IconButton(
-                padding: EdgeInsets.only(left: 8.w),
-                onPressed: () => Get.back(),
-                icon: Icon(Icons.arrow_back_ios)),
+            padding: EdgeInsets.only(left: 8.w),
+            onPressed: () => Get.back(),
+            icon: const Icon(Icons.arrow_back_ios)),
       );
 
-  static drawerWidget() => Drawer(
-      width: 80.w,
-      child: Container(
-        decoration: BoxDecoration(gradient: ColorConstant.linearColor),
-        child: ListView(children: [
-          Padding(
-            padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 00),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  smallerSizedBox,
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: GestureDetector(
-                        onTap: () => Get.back(),
-                        child: const Icon(Icons.close, color: Colors.white)),
-                  ),
-                  const CircleAvatar(
-                    minRadius: 12,
-                    maxRadius: 50,
-                    backgroundColor: Colors.white54,
-                  ),
-                  smallerSizedBox,
-                  Padding(
-                    padding:
-                        paddingSymmetric(horizontalPad: 1.w, verticalPad: 00),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == false ? 'Guest' : authController.userModel.value.user?.name.toString()}',
-                          style: mediumTextStyleWhiteText,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.back();
-                            Get.toNamed(RouteHelper.profilePage);
-                          },
-                          child: Container(
-                            padding: paddingAll(paddingAll: 1.w),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(2.w),
-                              color: const Color(0xffE42F3B),
-                            ),
-                            child: const Icon(Icons.edit, color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]),
-          ),
-          smallerSizedBox,
-          Container(
-            color: const Color(0xffF0747F),
-            height: 4.h,
-          ),
-          mediumSizedBox,
-          ListView.builder(
-              itemCount: drawerText.length,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: ((context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    if (drawerText[index].text == 'About Us') {
-                      Get.back();
-                      Get.toNamed(RouteHelper.aboutUs);
-                    }
-                    if (index == drawerText.length - 1) {
-                      Get.back();
-                      _showSignOutDialog();
-                    }
-                  },
-                  child: Column(
+  static drawerWidget() =>
+      Drawer(
+          width: 80.w,
+          child: Container(
+            decoration: BoxDecoration(gradient: ColorConstant.linearColor),
+            child: ListView(children: [
+              Padding(
+                padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 00),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 10.w),
-                        child: Text(drawerText[index].text.toString(),
-                            style: mediumTextStyleWhiteText),
+                      smallerSizedBox,
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: GestureDetector(
+                            onTap: () => Get.back(),
+                            child: const Icon(
+                                Icons.close, color: Colors.white)),
+                      ),
+                      const CircleAvatar(
+                        minRadius: 12,
+                        maxRadius: 50,
+                        backgroundColor: Colors.white54,
                       ),
                       smallerSizedBox,
                       Padding(
-                        padding: EdgeInsets.only(right: 15.w),
-                        child: const Divider(color: Colors.white),
+                        padding:
+                        paddingSymmetric(horizontalPad: 1.w, verticalPad: 00),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${SharedPrefClass.getBool(
+                                  SharedPrefStrings.isLogin, false) == false
+                                  ? 'Guest'
+                                  : authController.userModel.value.user?.name
+                                  .toString()}',
+                              style: AppStyles.mediumTextStyle,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Get.back();
+                                Get.toNamed(RouteHelper.profilePage);
+                              },
+                              child: Container(
+                                padding: paddingAll(paddingAll: 1.w),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(2.w),
+                                  color: const Color(0xffE42F3B),
+                                ),
+                                child: const Icon(Icons.edit, color: Colors
+                                    .white),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      smallerSizedBox,
-                    ],
-                  ),
-                );
-              })),
-          largeSizedBox,
-          mediumSizedBox,
-          SizedBox(
-            height: 10.h,
-            child: Image.asset(
-              AppAssets.bondioText,
-            ),
-          ),
-          largeSizedBox,
-        ]),
-      ));
+                    ]),
+              ),
+              smallerSizedBox,
+              Container(
+                color: const Color(0xffF0747F),
+                height: 4.h,
+              ),
+              mediumSizedBox,
+              ListView.builder(
+                  itemCount: drawerText.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemBuilder: ((context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        if (drawerText[index].text == 'About Us') {
+                          Get.back();
+                          Get.toNamed(RouteHelper.aboutUs);
+                        }
+                        if (index == drawerText.length - 1) {
+                          Get.back();
+                          _showSignOutDialog();
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 10.w),
+                            child: Text(drawerText[index].text.toString(),
+                                style: AppStyles.mediumTextStyle),
+                          ),
+                          smallerSizedBox,
+                          Padding(
+                            padding: EdgeInsets.only(right: 15.w),
+                            child: const Divider(color: Colors.white),
+                          ),
+                          smallerSizedBox,
+                        ],
+                      ),
+                    );
+                  })),
+              largeSizedBox,
+              mediumSizedBox,
+              SizedBox(
+                height: 10.h,
+                child: Image.asset(
+                  AppAssets.bondioText,
+                ),
+              ),
+              largeSizedBox,
+            ]),
+          ));
 
   static _showSignOutDialog() {
     AuthController authController = Get.put(AuthController());
     return Get.defaultDialog(
         title: 'Alert!!',
-        titleStyle: headerTextStyleBlack,
+        titleStyle: AppStyles.mediumTextStyle,
         content: Padding(
           padding: paddingSymmetric(horizontalPad: 8.w, verticalPad: 00),
           child: Text(
             'Are you sure you want to sign out?',
             textAlign: TextAlign.center,
-            style: smallTextStyleWhiteText.copyWith(color: Colors.black),
+            style: AppStyles.smallTextStyle.copyWith(color: Colors.black),
           ),
         ),
         actions: [
           Padding(
             padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
             child:
-                AppWidget.elevatedButton(text: 'No', onTap: () => Get.back()),
+            AppWidget.elevatedButton(text: 'No', onTap: () => Get.back()),
           ),
           Padding(
             padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
@@ -592,7 +760,8 @@ class AppWidget {
   }
 
   static cscPiker({required AuthController authController}) =>
-      Obx(() => CSCPicker(
+      Obx(() =>
+          CSCPicker(
             showCities: true,
             showStates: true,
             layout: Layout.vertical,
@@ -612,9 +781,9 @@ class AppWidget {
             // cityDropdownLabel: authController.cityValue.value,
             // countryDropdownLabel: authController.countryValue.value,
             // stateDropdownLabel: authController.stateValue.value,
-            dropdownHeadingStyle: smallTextStyleGreyText,
-            dropdownItemStyle: smallTextStyleGreyText,
-            selectedItemStyle: smallTextStyleGreyText,
+            dropdownHeadingStyle: AppStyles.smallTextStyle,
+            dropdownItemStyle: AppStyles.smallTextStyle,
+            selectedItemStyle: AppStyles.smallTextStyle,
             dropdownDecoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(

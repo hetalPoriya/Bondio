@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:bondio/controller/controller.dart';
-import 'package:bondio/model/user_info.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -14,6 +14,10 @@ class AuthController extends GetxController {
   //token
   RxString facebookToken = ''.obs;
   RxString googleToken = ''.obs;
+  RxString twitterToken = ''.obs;
+  RxString outlookToken = ''.obs;
+  RxString linkedinToken = ''.obs;
+  RxString instagramToken = ''.obs;
 
   //for otp
   RxString otpValue = ''.obs;
@@ -24,11 +28,13 @@ class AuthController extends GetxController {
   RxString isGoogle = ''.obs;
   var token = ''.obs;
 
-  //for login remember
-  var emailLoginController = TextEditingController().obs;
-  var passLoginController = TextEditingController().obs;
+  // //for login remember
+  // var emailLoginController = TextEditingController().obs;
+  // var passLoginController = TextEditingController().obs;
 
   var fullNameController = TextEditingController().obs;
+  var lastNameController = TextEditingController().obs;
+  var imageController = TextEditingController().obs;
   var companyNameController = TextEditingController().obs;
   var dobController = TextEditingController().obs;
   var genderController = TextEditingController().obs;
@@ -107,30 +113,44 @@ class AuthController extends GetxController {
       isLoading(true);
       String? token = await FirebaseMessaging.instance.getToken();
       log('Token $token');
-      SignUpBody signUpBody = SignUpBody(
-        email: emailController.value.text.toString(),
-        mobile:
-            '${countryCodeController.value.text}${mobileController.value.text}',
-        name: fullNameController.value.text.toString(),
-        company: companyNameController.value.text.toString(),
-        dob: dobController.value.text.toString(),
-        password: passController.value.text.toString(),
-        referBy: referCodeController.value.text.toString(),
-        deviceToken: token ?? (await FirebaseMessaging.instance.getToken())!,
-        facebookToken: facebookToken.value.toString(),
-        googleToken: googleToken.value.toString(),
-        aboutMe: ' ',
-        city: ' ',
-        country: ' ',
-        photo: ' ',
-        state: ' ',
-        zipCode: ' ',
-      );
+      log('Token ${linkedinToken.value}');
+      log('Token ${emailController.value.text.toString()}');
 
+      SignUpBody signUpBody = SignUpBody(
+          email: emailController.value.text.toString(),
+          mobile:
+              '${countryCodeController.value.text}${mobileController.value.text}',
+          name: fullNameController.value.text,
+          company: companyNameController.value.text,
+          dob: dobController.value.text,
+          password: passController.value.text.isNotEmpty
+              ? passController.value.text
+              : 'Synram@125',
+          referBy: referCodeController.value.text,
+          deviceToken: token ?? (await FirebaseMessaging.instance.getToken())!,
+          aboutMe: ' ',
+          city: ' ',
+          country: ' ',
+          photo: imageController.value.text.toString(),
+          state: ' ',
+          zipCode: ' ',
+          outlookToken: outlookToken.value,
+          instagramToken: instagramToken.value,
+          linkedinToken: linkedinToken.value,
+          twitterToken: twitterToken.value,
+          facebookToken: facebookToken.value,
+          googleToken: googleToken.value,
+          gender: ' ',
+          referCode: ' ');
+
+      log('API ${ApiConstant.buildUrl(ApiConstant.registerApi)}');
+      log('API ${signUpBodyToMap(signUpBody)}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.registerApi),
         data: signUpBodyToMap(signUpBody),
-        options: NetworkHandler.options,
+        options: Options(headers: {
+          'Accept': 'application/json',
+        }),
       );
       log('RegisterResponse ${response.data}');
       if (response.data['Status'] == true) {
@@ -181,8 +201,8 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
       LoginBody loginBody = LoginBody(
-        email: emailLoginController.value.text.toString(),
-        password: passLoginController.value.text.toString(),
+        email: emailController.value.text.toString(),
+        password: passController.value.text.toString(),
       );
 
       var response = await dio.post(
@@ -212,13 +232,14 @@ class AuthController extends GetxController {
     }
   }
 
-  userExistOrNotApi() async {
+  userExistOrNotApi({required String tokenType, required String token}) async {
     try {
       isLoading(true);
-      log('Email ${emailController.value.text}');
+      log('tokenType ${fullNameController.value.text}');
+
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.isRegisterApi),
-        data: {'email': emailController.value.text},
+        data: {'type': tokenType, 'value': token},
       );
 
       log('UserExistOrNot $response');
@@ -231,6 +252,28 @@ class AuthController extends GetxController {
         Get.offNamedUntil(RouteHelper.homeScreen, (route) => false);
       } else {
         Get.toNamed(RouteHelper.socialSignUpPage);
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  checkInviteCodeApi() async {
+    try {
+      isLoading(true);
+      log('refercode ${referCodeController.value.text}');
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.customerDetailApi),
+        data: {'refer_code': referCodeController.value.text},
+      );
+
+      log('refer code response $response');
+      if (response.data['Status'] == true) {
+        AppWidget.toast(text: 'Code applied successfully');
+        Timer(const Duration(seconds: 2),
+            () => Get.toNamed(RouteHelper.signUpPage));
+      } else {
+        AppWidget.toast(text: 'Entered invite code is not valid');
       }
     } finally {
       isLoading(false);

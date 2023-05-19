@@ -1,5 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bondio/controller/controller.dart';
+import 'package:bondio/model/contact_list.dart';
+import 'package:flutter_contacts/contact.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefClass {
@@ -80,6 +85,11 @@ class SharedPrefClass {
     prefs.setString('currentUser', userData);
   }
 
+  static Future<void> setContactData(String userData) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(SharedPrefStrings.myContacts, userData);
+  }
+
   static Future<String> getUserData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String myModel = pref.getString('currentUser') ?? "";
@@ -87,20 +97,44 @@ class SharedPrefClass {
     return myModel;
   }
 
-  // static Future<void> setMargeModelData(String userData) async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   prefs.setString(AppStrings.margeModel, userData);
-  // }
-  //
-  // static Future<String> getMargeModelData() async {
-  //   SharedPreferences pref = await SharedPreferences.getInstance();
-  //   String myModel = pref.getString(AppStrings.margeModel) ?? "";
-  //   log('MODEL $myModel');
-  //   return myModel;
-  // }
-  // static UserData? getUserDetails() {
-  //   String body = getString(PreferencesKey.userModel);
-  //   UserModel userModel = UserModel.fromJson(jsonDecode(body));
-  //   return userModel.data;
-  // }
+  static Future<void> saveListToSharedPreferences(
+      List<ContactListModel> con) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> jsonList =
+        con.map((contact) => jsonEncode(contact.toMap())).toList();
+    await prefs.setStringList(SharedPrefStrings.myContacts, jsonList);
+    log('Added');
+  }
+
+  // Retrieve the list of objects from SharedPreferences
+  static Future<List<ContactListModel>> getListFromSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? jsonList = prefs.getStringList(SharedPrefStrings.myContacts);
+
+    if (jsonList == null) {
+      return [];
+    }
+
+    List<ContactListModel> persons = jsonList
+        .map((jsonString) => ContactListModel.fromMap(jsonDecode(jsonString)))
+        .toList();
+    return persons;
+  }
+
+// static Future<void> setMargeModelData(String userData) async {
+//   final SharedPreferences prefs = await SharedPreferences.getInstance();
+//   prefs.setString(AppStrings.margeModel, userData);
+// }
+//
+// static Future<String> getMargeModelData() async {
+//   SharedPreferences pref = await SharedPreferences.getInstance();
+//   String myModel = pref.getString(AppStrings.margeModel) ?? "";
+//   log('MODEL $myModel');
+//   return myModel;
+// }
+// static UserData? getUserDetails() {
+//   String body = getString(PreferencesKey.userModel);
+//   UserModel userModel = UserModel.fromJson(jsonDecode(body));
+//   return userModel.data;
+// }
 }

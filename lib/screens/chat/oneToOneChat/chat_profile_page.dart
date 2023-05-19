@@ -14,59 +14,62 @@ class ChatProfilePage extends StatefulWidget {
 class _ChatProfilePageState extends State<ChatProfilePage> {
   @override
   Widget build(BuildContext context) {
-    FirebaseController firebaseController = Get.put(FirebaseController());
     return SafeArea(
         child: Scaffold(
             body: ListView(
-      children: [
-        Stack(children: [
-          Obx(
-            () => Container(
-              height: 35.h,
-              decoration: BoxDecoration(
-                  color: ColorConstant.extraLightPink,
-                  image: DecorationImage(
-                      image: ChatWidget.displayImage(image: ''),
-                      fit: BoxFit.cover,
-                      colorFilter: ColorFilter.mode(
-                          ColorConstant.extraLightPink, BlendMode.modulate))),
-            ),
-          ),
-          Padding(
-            padding: paddingSymmetric(horizontalPad: 6.w, verticalPad: 2.h),
-            child: AppWidget.backIcon(onTap: () => Get.back()),
-          ),
-          Obx(
-            () => Container(
-              height: 16.h,
-              width: 33.w,
-              alignment: Alignment.bottomRight,
-              margin: EdgeInsets.only(top: 26.h, left: 6.w),
-              decoration: BoxDecoration(
-                  color: Colors.black26,
-                  border: Border.all(color: Colors.black, width: 2),
-                  borderRadius: BorderRadius.circular(18.w),
-                  image: DecorationImage(
-                      image: ChatWidget.displayImage(image: ''),
-                      fit: BoxFit.cover)),
-              // child: IconButton(
-              //     onPressed: () =>
-              //         ChatWidget.showDialogForImage(context: context),
-              //     icon: Icon(
-              //       Icons.camera,
-              //       size: 5.h,
-              //     )),
-            ),
-          ),
-          Container(
-              margin: EdgeInsets.only(top: 30.h, left: 50.w),
-              child: Text(
-                '',
-                style: mediumTextStyleWhiteText.copyWith(fontSize: 16.sp),
-                overflow: TextOverflow.ellipsis,
-              ))
-        ]),
-      ],
-    )));
+              children: [
+                Stack(children: [
+                  Obx(
+                        () =>
+                        Container(
+                          height: 35.h,
+                          decoration: BoxDecoration(
+                              color: ColorConstant.extraLightPink,
+                              image: DecorationImage(
+                                  image: ChatWidget.displayImage(image: ''),
+                                  fit: BoxFit.cover,
+                                  colorFilter: ColorFilter.mode(
+                                      ColorConstant.extraLightPink,
+                                      BlendMode.modulate))),
+                        ),
+                  ),
+                  Padding(
+                    padding: paddingSymmetric(
+                        horizontalPad: 6.w, verticalPad: 2.h),
+                    child: AppWidget.backIcon(onTap: () => Get.back()),
+                  ),
+                  Obx(
+                        () =>
+                        Container(
+                          height: 16.h,
+                          width: 33.w,
+                          alignment: Alignment.bottomRight,
+                          margin: EdgeInsets.only(top: 26.h, left: 6.w),
+                          decoration: BoxDecoration(
+                              color: Colors.black26,
+                              border: Border.all(color: Colors.black, width: 2),
+                              borderRadius: BorderRadius.circular(18.w),
+                              image: DecorationImage(
+                                  image: ChatWidget.displayImage(image: ''),
+                                  fit: BoxFit.cover)),
+                          // child: IconButton(
+                          //     onPressed: () =>
+                          //         ChatWidget.showDialogForImage(context: context),
+                          //     icon: Icon(
+                          //       Icons.camera,
+                          //       size: 5.h,
+                          //     )),
+                        ),
+                  ),
+                  Container(
+                      margin: EdgeInsets.only(top: 30.h, left: 50.w),
+                      child: Text(
+                        '',
+                        style: AppStyles.largeTextStyle,
+                        overflow: TextOverflow.ellipsis,
+                      ))
+                ]),
+              ],
+            )));
   }
 }

@@ -12,21 +12,25 @@ class AppStrings {
   static String signInWithOutlook = 'Sign in with Outlook';
   static String signInWithTwitter = 'Sign in with Twitter';
   static String loginWithEmail = 'Log in';
-  static String doYouHaveAnInviteCode = 'Do you have an invite code?';
+  static String doYouHaveAnInviteCode = 'Use an invite code';
   static String createAnAccount = 'Create an account';
   static String enterAsAGuest = 'Enter as a Guest';
   static String acceptPrivacyPolicy =
-      'By continuing you also accept our https://synramdemo.in/bondio/privacy-policy.php and https://synramdemo.in/bondio/term-contitions.php';
+      'By continuing you also accept our http://bondiomeet.com/privacy-policy.php and http://bondiomeet.com/term-contitions.php';
   static String newAccount = 'New account';
   static String login = 'Login';
   static String continueText = 'Continue';
+  static String meetMineCelebrate =
+      'Being miles apart shouldn\'t keep you apart. Meet.Dine.Celebrate!';
 
   //social login
-  static String yourName = 'Hey there! \nWhat\'s your first name?';
+  static String yourName = 'Hey there! \nWhat\'s your First name?';
   static String yourMobileNumber = '\nWhat\'s your phone number?';
+  static String yourEmailAddress = '\nWhat\'s your Email address?';
   static String yourBirthday = 'When is your birthday?';
-  static String yourInviteCode =
-      'If you have any invite code then please enter code';
+  static String yourPassword = 'Password';
+  static String yourInviteCode = 'Enter your invite code';
+  static String dobText = 'Optional, used for in app rewards.';
 
   //profile page
   static String zipCode = 'Zip code *';
@@ -40,7 +44,6 @@ class AppStrings {
   static String mobileNumber = 'Mobile Number *';
   static String password = 'Password *';
   static String rememberMe = 'Remember me? ';
-  static String signIn = 'Sign in';
   static String forgotPass = 'Forgot password?';
   static String notHaveAccount = 'Don’t have an account? ';
 
@@ -48,7 +51,8 @@ class AppStrings {
   static String createAccount = 'Check in with the Concierge ';
   static String signedUp = 'You signed up using ';
   static String signUp = 'Sign Up';
-  static String fullName = 'Full Name *';
+  static String firstName = 'First Name *';
+  static String lastName = 'Last Name *';
   static String companyName = 'Company Name (Opt.) ';
   static String dob = 'DOB';
   static String gender = 'Gender (Opt.)';
@@ -62,6 +66,7 @@ class AppStrings {
   static String verificationEmail = 'A verification code has been sent to';
   static String codeExpireString =
       'Please check your email inbox and type the verification code below to verify your email address. Check spam folder in case it\'s not in your inbox. ';
+
   //'Please check your email inbox and write the verification code below to verify your email address.';
   static String resendCode = 'Resend code';
   static String changeEmail = 'Change email';
@@ -88,7 +93,7 @@ class AppStrings {
       'Just share this code with your friends and ask them to signup and add this code';
 
   //reward
-  static String referAndEarn = 'Refer and earn';
+  static String referAndEarn = 'Refer and Earn';
   static String referAndEarnDec = 'Increase referral earnings by each invite';
 
   //add contact
@@ -98,7 +103,7 @@ class AppStrings {
   static String addPeople = 'Add People';
 
   //contact screen
-  static String inviteYourFriend = 'Discover your friends and start chat';
+  static String inviteYourFriend = 'Discover your friends\nand start chat';
 
   static String copyCode = 'Copy your code, show it with your friends.';
   static String totalRewards = 'Total Rewards Earned';

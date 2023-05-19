@@ -26,8 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Text(
                   authController.userModel.value.user?.name.toString() ??
                       'Guest',
-                  style: mediumTextStyleWhiteText.copyWith(
-                      fontWeight: FontWeight.w500)),
+                  style: AppStyles.mediumTextStyle
+                      .copyWith(fontWeight: FontWeight.w500)),
             ),
           ),
           Expanded(
@@ -76,13 +76,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(
                         'My profile',
-                        style: headerTextStyleBlack.copyWith(fontSize: 20.sp),
+                        style:
+                            AppStyles.mediumTextStyle.copyWith(fontSize: 20.sp),
                       ),
                       smallSizedBox,
                       AppWidget.textFormFiledProfilePage(
                           textEditingController:
                               authController.fullNameController.value,
-                          hintText: AppStrings.fullName,
+                          hintText: AppStrings.firstName,
                           textInputType: TextInputType.name),
                       smallSizedBox,
                       AppWidget.textFormFiledProfilePage(

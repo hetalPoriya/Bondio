@@ -1,14 +1,10 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get/get.dart';
 import 'package:linkedin_login/linkedin_login.dart';
+import 'package:linkwell/linkwell.dart';
 import 'package:sizer/sizer.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../utils/app_widget_new.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
@@ -20,23 +16,25 @@ class IntroScreen extends StatefulWidget {
 class _IntroScreenState extends State<IntroScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  SocialLoginController socialLoginController =
-      Get.put(SocialLoginController());
+
   AuthController authController = Get.put(AuthController());
 
-  List<String?> socialMedia = [
-    AppAssets.google,
-    AppAssets.facebook,
-    AppAssets.linkedIn,
-    AppAssets.outlook,
-    AppAssets.instagram,
-    AppAssets.twitter,
+  List<DisplayOptions> displayOptions = [
+    DisplayOptions(
+        text: AppStrings.createAnAccount, routeString: RouteHelper.signUpPage),
+    DisplayOptions(
+        text: AppStrings.loginWithEmail, routeString: RouteHelper.loginPage),
+    DisplayOptions(
+        text: AppStrings.doYouHaveAnInviteCode,
+        routeString: RouteHelper.inviteCodeSignUp),
+    DisplayOptions(
+        text: AppStrings.enterAsAGuest, routeString: RouteHelper.homeScreen),
   ];
 
   @override
   void initState() {
     _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 2))
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
           ..reverse();
     // TODO: implement initState
     super.initState();
@@ -56,12 +54,12 @@ class _IntroScreenState extends State<IntroScreen>
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Spacer(),
+                  const Spacer(),
                   Image.asset(
                     AppAssets.bondioText,
                     width: 50.w,
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: GestureDetector(
@@ -87,88 +85,10 @@ class _IntroScreenState extends State<IntroScreen>
                                   smallSizedBox,
                                   Text(AppStrings.continueWith,
                                       style: AppStyles.mediumTextStyle.copyWith(
-                                          fontWeight: FontWeight.w600)),
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black)),
                                   smallSizedBox,
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Container(
-                                      margin:
-                                          paddingSymmetric(horizontalPad: 3.w),
-                                      height: 7.h,
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: List.generate(
-                                            socialMedia.length,
-                                            (index) => GestureDetector(
-                                              onTap: () async {
-                                                authController
-                                                    .fullNameController
-                                                    .value
-                                                    .text = '';
-                                                authController.mobileController
-                                                    .value.text = '';
-                                                authController.dobController
-                                                    .value.text = '';
-                                                authController
-                                                    .referCodeController
-                                                    .value
-                                                    .text = '';
-                                                Get.back();
-                                                if (index == 0) {
-                                                  authController.isGoogle
-                                                      .value = 'Google';
-                                                  authController.update();
-                                                  socialLoginController
-                                                      .signInWithGoogle();
-                                                } else if (index == 1) {
-                                                  authController.isGoogle
-                                                      .value = 'Facebook';
-                                                  authController.update();
-                                                  socialLoginController
-                                                      .signInWithFacebook();
-                                                } else if (index == 2) {
-                                                  //linkedInLogin();
-                                                  socialLoginController
-                                                      .signInWithLinkedIn();
-                                                } else if (index == 4) {
-                                                  socialLoginController
-                                                      .signInWithInstagram(
-                                                          userName:
-                                                              '_poriya_149');
-                                                }
-                                              },
-                                              child: Container(
-                                                width: 15.w,
-                                                height: 6.h,
-                                                padding:
-                                                    paddingAll(paddingAll: 2.w),
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    boxShadow: const [
-                                                      BoxShadow(
-                                                        color: Colors.black12,
-                                                        spreadRadius: 2,
-                                                        blurRadius: 2,
-                                                        offset: Offset(2,
-                                                            1), // changes position of shadow
-                                                      ),
-                                                    ],
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                        color: Colors
-                                                            .grey.shade300)),
-                                                child: Image.asset(
-                                                    socialMedia[index]
-                                                        .toString(),
-                                                    alignment:
-                                                        Alignment.center),
-                                              ),
-                                            ),
-                                          )),
-                                    ),
-                                  ),
+                                  AppWidget.socialLogin(),
                                   // _socialButton(
                                   //     text: AppStrings.signInWithGoogle,
                                   //     icon: AppAssets.google,
@@ -207,50 +127,53 @@ class _IntroScreenState extends State<IntroScreen>
                                   //     onTap: () async => await socialLoginController
                                   //         .signInWithFacebook()),
                                   smallerSizedBox,
-                                  Divider(thickness: 2),
 
-                                  buttonText(
-                                      text: AppStrings.doYouHaveAnInviteCode,
-                                      onTap: () {
-                                        Get.back();
-                                        Get.toNamed(RouteHelper.signUpPage);
-                                      }),
+                                  const Divider(thickness: 2),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: displayOptions.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          SizedBox(
+                                            width: 100.w,
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                  maximumSize: Size(100.w, 4.h),
+                                                  minimumSize: Size(100.w, 4.h),
+                                                  padding: EdgeInsets.zero),
+                                              onPressed: () {
+                                                Get.back();
 
-                                  Divider(thickness: 2),
+                                                Get.toNamed(
+                                                    displayOptions[index]
+                                                        .routeString);
+                                              },
+                                              child: Text(
+                                                displayOptions[index].text,
+                                                style: AppStyles.smallTextStyle
+                                                    .copyWith(
+                                                        color: Colors
+                                                            .blue.shade800),
+                                              ),
+                                            ),
+                                          ),
+                                          const Divider(thickness: 2),
+                                        ],
+                                      );
+                                    },
+                                  ),
 
-                                  buttonText(
-                                      text: AppStrings.enterAsAGuest,
-                                      onTap: () => Get.offNamedUntil(
-                                          RouteHelper.homeScreen,
-                                          (route) => false)),
-                                  Divider(thickness: 2),
-                                  buttonText(
-                                      text: AppStrings.createAnAccount,
-                                      onTap: () {
-                                        Get.back();
-                                        Get.toNamed(RouteHelper.signUpPage);
-                                      }),
-                                  Divider(thickness: 2),
-                                  buttonText(
-                                      text: AppStrings.loginWithEmail,
-                                      onTap: () {
-                                        Get.back();
-                                        Get.toNamed(RouteHelper.loginPage);
-                                      }),
-
-                                  Divider(thickness: 2),
-
-                                  Linkify(
-                                      onOpen: _onOpen,
-                                      text: AppStrings.acceptPrivacyPolicy,
+                                  LinkWell(AppStrings.acceptPrivacyPolicy,
                                       textAlign: TextAlign.center,
-                                      linkStyle: AppStyles.smallTextStyle
-                                          .copyWith(
-                                              fontSize: 10.sp,
-                                              color: Colors.grey.shade600),
                                       style: AppStyles.smallTextStyle.copyWith(
-                                          fontSize: 10.sp,
-                                          color: Colors.grey.shade500)),
+                                        color: Colors.grey,
+                                      ),
+                                      linkStyle:
+                                          AppStyles.smallTextStyle.copyWith(
+                                        color: Colors.blue,
+                                      )),
+
                                   smallSizedBox
                                 ],
                               ),
@@ -277,24 +200,7 @@ class _IntroScreenState extends State<IntroScreen>
               ),
               Obx(
                 () => authController.isLoading.value == true
-                    ? Container(
-                        color: Colors.black45,
-                        child: Center(
-                          child: Material(
-                            borderRadius: BorderRadius.circular(2.w),
-                            child: Container(
-                              height: 12.h,
-                              width: 24.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(2.w),
-                                color: Colors.white,
-                              ),
-                              child: AppWidget.progressIndicator(
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      )
+                    ? AppWidget.containerIndicator()
                     : Container(),
               )
             ],
@@ -304,73 +210,15 @@ class _IntroScreenState extends State<IntroScreen>
     );
   }
 
-  Future<void> _onOpen(LinkableElement link) async {
-    if (await canLaunchUrl(Uri.parse(link.url))) {
-      await launchUrl(Uri.parse(link.url));
-    } else {
-      throw 'Could not launch $link';
-    }
-  }
+  // Future<void> _onOpen(LinkableElement link) async {
+  //   if (await canLaunchUrl(Uri.parse(link.url))) {
+  //     await launchUrl(Uri.parse(link.url));
+  //   } else {
+  //     throw 'Could not launch $link';
+  //   }
+  // }
 
-  _socialButton(
-      {required String text,
-      required String icon,
-      Color? textColor,
-      Color? color,
-      required VoidCallback onTap}) {
-    return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            backgroundColor: color ?? Colors.black,
-            //side: BorderSide(color: Colors.black),
-            elevation: 2.w,
-            maximumSize: Size(80.w, 6.h),
-            minimumSize: Size(80.w, 6.h),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.w))),
-        onPressed: onTap,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Image.asset(icon, height: 3.h),
-            ),
-            SizedBox(
-              width: 4.w,
-            ),
-            Expanded(
-              flex: 5,
-              child: Center(
-                child: Text(
-                  text,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppStyles.smallTextStyle.copyWith(color: textColor),
-                ),
-              ),
-            )
-          ],
-        ));
-  }
-
-  linkedInLogin() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => LinkedInUserWidget(
-          appBar: AppBar(
-            title: Text('Bondio'),
-          ),
-          redirectUrl: 'http://example.com/sa/complete/linkedin-oauth2/',
-          clientId: '77qs3v01ir4zv2',
-          clientSecret: '5ZzZmoAjn3KtZblB',
-          onGetUserProfile: (UserSucceededAction linkedInUser) async {},
-        ),
-        fullscreenDialog: true,
-      ),
-    );
-  }
-
-  buttonText({required String text, required VoidCallback onTap}) => Container(
+  buttonText({required String text, required VoidCallback onTap}) => SizedBox(
         width: 100.w,
         child: TextButton(
           style: TextButton.styleFrom(
@@ -385,4 +233,11 @@ class _IntroScreenState extends State<IntroScreen>
           ),
         ),
       );
+}
+
+class DisplayOptions {
+  String text;
+  String routeString;
+
+  DisplayOptions({required this.text, required this.routeString});
 }

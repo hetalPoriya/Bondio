@@ -3,10 +3,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:bondio/controller/controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
@@ -14,16 +13,13 @@ import 'package:sizer/sizer.dart';
 import '../../model/model.dart';
 
 class ChatWidget {
-
   static ChatController chatController = Get.put(ChatController());
 
   static Future<void> getUserInfo() async {
     AuthController authController = Get.put(AuthController());
     var response = await SharedPrefClass.getUserData();
     log('Response $response');
-    if (response
-        .toString()
-        .isNotEmpty) {
+    if (response.toString().isNotEmpty) {
       authController
           .userModel(LoginData.fromMap(jsonDecode(response.toString())));
       authController.userModel.refresh();
@@ -33,10 +29,11 @@ class ChatWidget {
     }
   }
 
-  static Widget chatContainer({String? imageString,
-    String? titleText,
-    String? subText,
-    String? time}) =>
+  static Widget chatContainer(
+          {String? imageString,
+          String? titleText,
+          String? subText,
+          String? time}) =>
       Material(
         elevation: 2.w,
         borderRadius: BorderRadius.circular(4.w),
@@ -76,18 +73,19 @@ class ChatWidget {
                           Expanded(
                               flex: 4,
                               child: Text(titleText ?? ' ',
-                                  style: mediumTextStyleWhiteText.copyWith(
-                                      color: Colors.black))),
+                                  style: AppStyles.mediumTextStyle
+                                      .copyWith(color: Colors.black))),
                           Expanded(
                               child: Text(time.toString(),
-                                  style: smallerTextStyle.copyWith(
+                                  style: AppStyles.smallerTextStyle.copyWith(
                                       fontSize: 8.sp, color: Colors.black))),
                         ],
                       ),
                       Text(
                         subText ?? ' ',
                         maxLines: 2,
-                        style: smallerTextStyle.copyWith(fontSize: 8.sp),
+                        style:
+                            AppStyles.smallerTextStyle.copyWith(fontSize: 8.sp),
                         overflow: TextOverflow.ellipsis,
                       )
                     ])),
@@ -97,37 +95,32 @@ class ChatWidget {
 
   static Widget customDrawer() => Container();
 
-  static Widget appBarWidget({String? userName, String? status}) =>
-      SizedBox(
+  static Widget appBarWidget({String? userName, String? status}) => SizedBox(
         height: 10.h,
         child: Row(
           children: [
             Expanded(
                 child: CircleAvatar(
-                  maxRadius: 4.h,
-                  minRadius: 4.h,
-                )),
+              maxRadius: 4.h,
+              minRadius: 4.h,
+            )),
             Expanded(
                 flex: 4,
                 child: Padding(
                     padding:
-                    paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
+                        paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           userName ?? 'Jack hem',
-                          style: mediumTextStyleWhiteText,
+                          style: AppStyles.mediumTextStyle,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        Text(
-                          status ?? 'Online',
-                          overflow: TextOverflow.ellipsis,
-                          style: smallerTextStyle.copyWith(
-                            color: Colors.white,
-                          ),
-                        )
+                        Text(status ?? 'Online',
+                            overflow: TextOverflow.ellipsis,
+                            style: AppStyles.smallerTextStyle)
                       ],
                     ))),
           ],
@@ -135,26 +128,22 @@ class ChatWidget {
       );
 
   static Widget imageCircleAvatar(
-      {Uint8List? imageString, required BuildContext context}) =>
+          {Uint8List? imageString, required BuildContext context}) =>
       SizedBox(
         height: 6.h,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         child: (imageString != null && imageString.isNotEmpty)
             ? CircleAvatar(
-          backgroundImage: MemoryImage(imageString),
-        )
+                backgroundImage: MemoryImage(imageString),
+              )
             : CircleAvatar(
-          backgroundColor: ColorConstant.backGroundColorOrange,
-          child: Image.asset(AppAssets.user,
-              height: 3.h, color: Colors.white),
-        ),
+                backgroundColor: ColorConstant.backGroundColorOrange,
+                child: Image.asset(AppAssets.user,
+                    height: 3.h, color: Colors.white),
+              ),
       );
 
-  static Widget noConversionFound() =>
-      Column(
+  static Widget noConversionFound() => Column(
         children: [
           largeSizedBox,
           largeSizedBox,
@@ -162,7 +151,7 @@ class ChatWidget {
           Center(
             child: Text(
               'No Conversion found',
-              style: smallTextStyleGreyText,
+              style: AppStyles.smallerTextStyle,
             ),
           ),
         ],
@@ -171,15 +160,12 @@ class ChatWidget {
   static showDialogForImage({required BuildContext context}) {
     return Get.defaultDialog(
         title: 'From where do you want to take the photo?',
-        titleStyle: headerTextStyleBlack,
+        titleStyle: AppStyles.mediumTextStyle,
         contentPadding: EdgeInsets.zero,
         content: Padding(
           padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 0),
           child: SizedBox(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -190,7 +176,8 @@ class ChatWidget {
                   },
                   child: Text(
                     'Gallery',
-                    style: smallTextStyleGreyText.copyWith(color: Colors.black),
+                    style:
+                        AppStyles.smallTextStyle.copyWith(color: Colors.black),
                   ),
                 ),
                 smallerSizedBox,
@@ -201,7 +188,8 @@ class ChatWidget {
                   },
                   child: Text(
                     'Camera',
-                    style: smallTextStyleGreyText.copyWith(color: Colors.black),
+                    style:
+                        AppStyles.smallTextStyle.copyWith(color: Colors.black),
                   ),
                 )
               ],
@@ -227,11 +215,8 @@ class ChatWidget {
   }
 
   static displayImage({String? image}) {
-    return ((image
-        .toString()
-        .isEmpty || image.toString() == ' '))
+    return ((image.toString().isEmpty || image.toString() == ' '))
         ? AssetImage(AppAssets.addContact) as ImageProvider
         : NetworkImage(image.toString());
   }
-
 }

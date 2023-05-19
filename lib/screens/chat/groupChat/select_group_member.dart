@@ -28,7 +28,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
             ? ChatBackground(
                 floatingButton: FloatingActionButton(
                   onPressed: () {
-                    if (chatController.selectedGroupMember.value.length >= 2) {
+                    if (chatController.selectedGroupMember.length >= 2) {
                       homeController.onTapOnGroupCreate.value = true;
                       homeController.update();
                     } else {
@@ -58,9 +58,8 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                             controller: chatController.searchController.value,
                             onChanged: (v) {
                               chatController
-                                      .availableChatPersonSearchList?.value =
-                                  chatController
-                                      .availableChatPersonFromContacts!.value
+                                      .availableChatPersonSearchList.value =
+                                  chatController.availableChatPersonFromContacts
                                       .where((x) => (x.displayName
                                               .toString()
                                               .toLowerCase()
@@ -77,9 +76,9 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                                   .text)))
                                       .toList();
                               chatController.availableChatPersonSearchList
-                                  ?.refresh();
+                                  .refresh();
                               chatController.availableChatPersonFromContacts
-                                  ?.refresh();
+                                  .refresh();
                             }),
                       ),
                       smallerSizedBox,
@@ -159,8 +158,9 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                                     .selectedGroupMember[index]
                                                     .displayName,
                                                 overflow: TextOverflow.ellipsis,
-                                                style:
-                                                    smallerTextStyle.copyWith(
+                                                style: AppStyles
+                                                    .smallerTextStyle
+                                                    .copyWith(
                                                         color: Colors.black)),
                                           ],
                                         ),
@@ -195,6 +195,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                     .availableChatPersonSearchList),
                       )
                     ]),
+                textStyle: AppStyles.largeTextStyle,
                 title: 'Create Group')
             : CreateGroup();
       },
@@ -210,8 +211,8 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
         itemBuilder: ((context, index) {
           return GestureDetector(
             onTap: () {
-              if (chatController.selectedGroupMember.value.contains(
-                      chatController.availableChatPersonFromContacts?[index]) ==
+              if (chatController.selectedGroupMember.contains(
+                      chatController.availableChatPersonFromContacts[index]) ==
                   false) {
                 chatController.selectedGroupMember
                     .add(availableChatPersonFromContacts[index]);
@@ -246,8 +247,8 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                 availableChatPersonFromContacts[index]
                                         .displayName ??
                                     '',
-                                style: mediumTextStyleWhiteText.copyWith(
-                                    color: Colors.black),
+                                style: AppStyles.mediumTextStyle
+                                    .copyWith(color: Colors.black),
                                 overflow: TextOverflow.ellipsis),
                           ),
                           if (availableChatPersonFromContacts[index]
@@ -260,7 +261,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                       .first
                                       .normalizedNumber ??
                                   '(none)',
-                              style: smallTextStyleGreyText.copyWith(
+                              style: AppStyles.smallTextStyle.copyWith(
                                   color: Colors.black,
                                   fontWeight: FontWeight.w500),
                               overflow: TextOverflow.ellipsis,

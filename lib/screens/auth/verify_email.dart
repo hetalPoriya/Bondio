@@ -1,9 +1,7 @@
 import 'package:bondio/controller/auth_controller.dart';
-import 'package:bondio/utils/app_widget_new.dart';
 import 'package:bondio/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
@@ -87,7 +85,7 @@ class VerifyEmail extends StatelessWidget {
                     ),
                   ),
                   smallSizedBox,
-                  Divider(color: Colors.grey, thickness: 1),
+                  const Divider(color: Colors.grey, thickness: 1),
                   smallSizedBox,
                   GestureDetector(
                     onTap: () => Get.back(),

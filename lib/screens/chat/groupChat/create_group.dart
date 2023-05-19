@@ -1,5 +1,4 @@
 import 'package:bondio/controller/controller.dart';
-import 'package:bondio/route_helper/route_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -49,7 +48,7 @@ class CreateGroup extends StatelessWidget {
               ],
               borderRadius: BorderRadius.circular(4.w),
             ),
-            child: Text('done', style: smallTextStyleWhiteText),
+            child: Text('done', style: AppStyles.smallTextStyle),
           ),
         ),
         bodyWidget: ListView(
@@ -62,13 +61,14 @@ class CreateGroup extends StatelessWidget {
               child: RichText(
                   text: TextSpan(
                       text: 'Participants:',
-                      style: smallTextStyleGreyText,
+                      style: AppStyles.smallerTextStyle
+                          .copyWith(color: Colors.grey),
                       children: [
                     TextSpan(
                         text: chatController.selectedGroupMember.length
                             .toString(),
-                        style: smallTextStyleGreyText.copyWith(
-                            color: Colors.black))
+                        style: AppStyles.smallerTextStyle
+                            .copyWith(color: Colors.black))
                   ])),
             ),
             smallerSizedBox,
@@ -114,8 +114,8 @@ class CreateGroup extends StatelessWidget {
                                             .selectedGroupMember[index]
                                             .displayName,
                                         overflow: TextOverflow.ellipsis,
-                                        style: smallerTextStyle.copyWith(
-                                            fontSize: 8.sp),
+                                        style: AppStyles.smallerTextStyle
+                                            .copyWith(fontSize: 8.sp),
                                       )
                                     ],
                                   ),
@@ -154,7 +154,7 @@ class CreateGroup extends StatelessWidget {
                           controller: chatController.groupNameController.value,
                           decoration: InputDecoration(
                               hintText: 'Add group title..',
-                              hintStyle: smallerTextStyle,
+                              hintStyle: AppStyles.smallerTextStyle,
                               suffixIcon: const Icon(
                                 Icons.emoji_emotions_outlined,
                               ),

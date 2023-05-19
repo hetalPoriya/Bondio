@@ -1,11 +1,6 @@
-import 'dart:developer';
-
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
-import 'package:bondio/utils/app_widget_new.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
@@ -69,7 +64,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     ]),
                 child: Text(
                   text,
-                  style: smallerTextStyle.copyWith(
+                  style: AppStyles.smallerTextStyle.copyWith(
                       color: homeController.innerTabSelectedIndex.value == index
                           ? Colors.white
                           : Colors.grey),
@@ -92,13 +87,13 @@ class _ChatMainPageState extends State<ChatMainPage> {
       smallSizedBox,
       Text(
         AppStrings.conversations,
-        style: headerTextStyleBlack,
+        style: AppStyles.mediumTextStyle.copyWith(color: Colors.black),
       ),
       Padding(
         padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
         child: Text(
           AppStrings.conversationsDes,
-          style: smallTextStyleGreyText,
+          style: AppStyles.smallTextStyle.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),
       ),
@@ -117,15 +112,15 @@ class _ChatMainPageState extends State<ChatMainPage> {
             SharedPrefStrings.isDisplayContactScreenFirstTime, false) ==
         true) {
       homeController.titleWidget.value = Text('Add Contact',
-          style: headerTextStyleWhite.copyWith(fontSize: 18.sp));
+          style: AppStyles.extraLargeTextStyle.copyWith(fontSize: 18.sp));
       homeController.update();
     } else if (homeController.innerTabSelectedIndex.value == 0) {
       homeController.titleWidget.value =
-          Text('Chat', style: headerTextStyleWhite);
+          Text('Chat', style: AppStyles.extraLargeTextStyle);
       homeController.update();
     } else if (homeController.innerTabSelectedIndex.value == 1) {
       homeController.titleWidget.value =
-          Text('Group', style: headerTextStyleWhite);
+          Text('Group', style: AppStyles.extraLargeTextStyle);
       homeController.update();
     }
     return Obx(

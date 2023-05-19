@@ -1,12 +1,11 @@
 import 'dart:developer';
 import 'package:bondio/controller/controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../model/model.dart';
 import '../chat.dart';
 
 class AddParticipant extends StatefulWidget {
@@ -29,8 +28,23 @@ class _AddParticipantState extends State<AddParticipant> {
             floatingButton: Padding(
                 padding: EdgeInsets.only(left: 14.w, right: 8.w),
                 child: AppWidget.elevatedButton(
-                    text: 'Done', onTap: () => Get.back())),
+                    text: 'Done',
+                    onTap: () => chatController.addParticipant())),
             onBackButtonPressed: () {
+              // Stream<DocumentSnapshot<Map<String, dynamic>>>
+              // docSnap = chatController.groupChatRoomCollection
+              //     .doc(chatController.groupInfo.value.groupId
+              //     .toString())
+              //     .snapshots();
+              //
+              // docSnap.listen((DocumentSnapshot snap) {
+              //   chatController.groupInfo.value ==
+              //       GroupChat.fromDocument(snap);
+              //   log('Info ${chatController.groupInfo.value.groupId}');
+              //   log('Info ${chatController.groupInfo.value.membersId}');
+              //   chatController.groupInfo.refresh();
+              //   AppWidget.toast(text: 'Participant Added');
+              // });
               Get.back();
             },
             bodyWidget: ListView(
@@ -44,9 +58,8 @@ class _AddParticipantState extends State<AddParticipant> {
                     child: AppWidget.searchField(
                         controller: chatController.searchController.value,
                         onChanged: (v) {
-                          chatController.availableChatPersonSearchList?.value =
-                              chatController
-                                  .availableChatPersonFromContacts!.value
+                          chatController.availableChatPersonSearchList.value =
+                              chatController.availableChatPersonFromContacts
                                   .where((x) => (x.displayName
                                           .toString()
                                           .toLowerCase()
@@ -59,12 +72,110 @@ class _AddParticipantState extends State<AddParticipant> {
                                               .searchController.value.text)))
                                   .toList();
                           chatController.availableChatPersonSearchList
-                              ?.refresh();
+                              .refresh();
                           chatController.availableChatPersonFromContacts
-                              ?.refresh();
+                              .refresh();
                         }),
                   ),
                   smallerSizedBox,
+                  if (chatController.addParticipantList.isNotEmpty)
+                    Container(
+                      height: 10.h,
+                      alignment: Alignment.centerLeft,
+                      //color: Colors.green,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 7.w),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(
+                                chatController.addParticipantList.length,
+                                (index) {
+                              log('LoginId ${chatController.addParticipantList[index].loginId}');
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 10.h,
+                                    width: 18.w,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            chatController.addParticipantList
+                                                .removeAt(index);
+                                            chatController.update();
+                                          },
+                                          child: Container(
+                                            height: 7.h,
+                                            width: 14.w,
+                                            decoration: BoxDecoration(
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Colors.black26,
+                                                    blurRadius: 4,
+                                                  )
+                                                ],
+                                                border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 2),
+                                                color: Colors.grey,
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                    image: AssetImage(
+                                                        AppAssets.addContact),
+                                                    fit: BoxFit.cover)),
+                                            alignment: Alignment.bottomRight,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey,
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Colors.black26,
+                                                      blurRadius: 4,
+                                                    )
+                                                  ],
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                      color: Colors.white)),
+                                              child: Icon(Icons.close,
+                                                  size: 4.w,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                            chatController
+                                                .addParticipantList[index]
+                                                .displayName,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppStyles.smallerTextStyle
+                                                .copyWith(color: Colors.black)),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 2.w,
+                                  )
+                                ],
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
+                    ),
+                  smallerSizedBox,
+                  if (chatController.addParticipantList.isNotEmpty)
+                    Padding(
+                      padding: paddingSymmetric(
+                          horizontalPad: 5.w, verticalPad: 0.0),
+                      child: Divider(
+                        color: Colors.grey.shade300,
+                        thickness: 1,
+                      ),
+                    ),
                   Obx(
                     () => chatController.searchController.value.text.isEmpty
                         ? buildListView(
@@ -90,85 +201,67 @@ class _AddParticipantState extends State<AddParticipant> {
         itemBuilder: ((context, index) {
           log('Memeber ${chatController.groupInfo.value.membersId}');
           log('list ${chatController.groupInfo.value.membersId!.contains(availableChatPersonFromContacts[index].loginId.toString())}');
-          return Container(
-            height: 8.h,
-            margin: paddingSymmetric(verticalPad: 1.0),
-            child: Row(children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ChatWidget.imageCircleAvatar(
-                        imageString:
-                            availableChatPersonFromContacts[index].photo,
-                        context: context),
-                  ],
-                ),
-              ),
-              Expanded(
-                  flex: 4,
+          return GestureDetector(
+            onTap: () {
+              if (chatController.addParticipantList.contains(
+                      chatController.availableChatPersonFromContacts[index]) ==
+                  false) {
+                chatController.addParticipantList
+                    .add(availableChatPersonFromContacts[index]);
+
+                chatController.addParticipantList.refresh();
+                chatController.update();
+              } else {
+                Fluttertoast.showToast(msg: 'Already added.');
+              }
+            },
+            child: Container(
+              height: 8.h,
+              margin: paddingSymmetric(verticalPad: 1.0),
+              child: Row(children: [
+                Expanded(
                   child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(
-                          child: Text(
-                              availableChatPersonFromContacts[index]
-                                      .displayName ??
-                                  '',
-                              style: mediumTextStyleWhiteText.copyWith(
-                                  color: Colors.black),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                        if (availableChatPersonFromContacts[index]
-                                .phones
-                                .isNotEmpty ==
-                            true)
-                          Text(
-                            availableChatPersonFromContacts[index]
-                                    .phones
-                                    .first
-                                    .normalizedNumber ??
-                                '(none)',
-                            style: smallTextStyleGreyText.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ChatWidget.imageCircleAvatar(
+                          imageString:
+                              availableChatPersonFromContacts[index].photo,
+                          context: context),
+                    ],
+                  ),
+                ),
+                Expanded(
+                    flex: 4,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                                availableChatPersonFromContacts[index]
+                                        .displayName ??
+                                    '',
+                                style: AppStyles.mediumTextStyle
+                                    .copyWith(color: Colors.black),
+                                overflow: TextOverflow.ellipsis),
                           ),
-                      ])),
-              GestureDetector(
-                onTap: chatController.groupInfo.value.membersId!.contains(
-                            availableChatPersonFromContacts[index]
-                                .loginId
-                                .toString()) ==
-                        true
-                    ? () {}
-                    : () {
-                        Stream<DocumentSnapshot<Map<String, dynamic>>> docSnap =
-                            chatController.groupChatRoomCollection
-                                .doc(chatController.groupInfo.value.groupId
-                                    .toString())
-                                .snapshots();
-
-                        docSnap.listen((DocumentSnapshot snap) {
-                          chatController.groupInfo.value ==
-                              GroupChat.fromDocument(snap);
-                          log('Info ${chatController.groupInfo.value.groupId}');
-                          log('Info ${chatController.groupInfo.value.membersId}');
-                          chatController.groupInfo.refresh();
-                          AppWidget.toast(text: 'Participant Added');
-                        });
-
-                        chatController.addParticipant(
-                          id: availableChatPersonFromContacts[index]
-                              .loginId
-                              .toString(),
-                          userName: availableChatPersonFromContacts[index]
-                                  .displayName ??
-                              '',
-                        );
-                      },
-                child: Container(
+                          if (availableChatPersonFromContacts[index]
+                                  .phones
+                                  .isNotEmpty ==
+                              true)
+                            Text(
+                              availableChatPersonFromContacts[index]
+                                      .phones
+                                      .first
+                                      .normalizedNumber ??
+                                  '(none)',
+                              style: AppStyles.smallTextStyle.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ])),
+                Container(
                     width: 20.w,
                     height: 4.h,
                     alignment: Alignment.center,
@@ -191,10 +284,10 @@ class _AddParticipantState extends State<AddParticipant> {
                               true
                           ? 'Added'
                           : 'Add',
-                      style: smallerTextStyle.copyWith(color: Colors.white),
+                      style: AppStyles.smallerTextStyle,
                     )),
-              ),
-            ]),
+              ]),
+            ),
           );
         })));
   }

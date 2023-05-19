@@ -1,4 +1,3 @@
-import 'package:bondio/utils/app_widget_new.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -30,7 +29,7 @@ class ForgotPassword extends StatelessWidget {
                   largeSizedBox,
                   AppWidget.textFormFiledWhite(
                       textEditingController:
-                          authController.emailLoginController.value,
+                          authController.emailController.value,
                       hintText: AppStrings.emailAddress,
                       icon: Icons.email,
                       textInputAction: TextInputAction.done,

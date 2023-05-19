@@ -13,6 +13,7 @@ class RouteHelper {
   static String dashBoard = '/dashBoard';
   static String loginPage = '/loginPage';
   static String signUpPage = '/signUpPage';
+  static String inviteCodeSignUp = '/inviteCodeSignUp';
   static String socialSignUpPage = '/socialSignUpPage';
   static String verifyEmail = '/verifyEmail';
   static String homeScreen = '/homeScreen';
@@ -36,15 +37,16 @@ class RouteHelper {
   static String aboutUs = '/aboutUs';
 
   static List<GetPage> getPages = [
-    GetPage(name: splashScreen, page: () => SplashScreen()),
-    GetPage(name: introScreen, page: () => IntroScreen()),
+    GetPage(name: splashScreen, page: () => const SplashScreen()),
+    GetPage(name: introScreen, page: () => const IntroScreen()),
     GetPage(name: dashBoard, page: () => DashBoard()),
-    GetPage(name: loginPage, page: () => LoginPage()),
-    GetPage(name: signUpPage, page: () => SignUpPage()),
+    GetPage(name: loginPage, page: () => const LoginPage()),
+    GetPage(name: signUpPage, page: () => const SignUpPage()),
+    GetPage(name: inviteCodeSignUp, page: () => const InviteCodeSignUp()),
     GetPage(name: socialSignUpPage, page: () => const SocialLoginScreen()),
-    GetPage(name: verifyEmail, page: () => VerifyEmail()),
+    GetPage(name: verifyEmail, page: () => const VerifyEmail()),
 
-    GetPage(name: forgotPassword, page: () => ForgotPassword()),
+    GetPage(name: forgotPassword, page: () => const ForgotPassword()),
     GetPage(name: homeScreen, page: () => const HomeScreen()),
     GetPage(name: inviteFriend, page: () => InviteFriend()),
     GetPage(name: rewardsScreen, page: () => const RewardsScreen()),
@@ -59,8 +61,8 @@ class RouteHelper {
     GetPage(name: profilePage, page: () => const ProfilePage()),
     GetPage(name: aboutUs, page: () => const AboutUs()),
     GetPage(name: selectGroupMember, page: () => const SelectGroupMember()),
-    GetPage(name: addParticipant, page: () => AddParticipant()),
-    GetPage(name: removeParticipant, page: () => RemoveParticipant()),
+    GetPage(name: addParticipant, page: () => const AddParticipant()),
+    GetPage(name: removeParticipant, page: () => const RemoveParticipant()),
     GetPage(name: createGroup, page: () => CreateGroup()),
   ];
 }

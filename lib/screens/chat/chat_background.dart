@@ -72,7 +72,7 @@ class ChatBackground extends StatelessWidget {
                       ),
                       appBarWidget ??
                           Text(title.toString(),
-                              style: textStyle ?? headerTextStyleWhite),
+                              style: textStyle ?? AppStyles.mediumTextStyle),
                       smallerSizedBox
                     ],
                   ),

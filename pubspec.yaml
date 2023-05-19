@@ -46,16 +46,17 @@ dependencies:
   csc_picker: ^0.2.6
   image_picker: ^0.8.6
   google_sign_in: ^5.4.4
-  flutter_facebook_auth:  ^4.4.1+1
+  flutter_facebook_auth: ^4.4.1+1
   linkedin_login: ^2.2.1
   flutter_insta: ^1.0.1
   webview_flutter: ^4.0.7
+  linkwell: ^2.0.6
+  twitter_login: ^4.4.0
 
   country_code_picker: ^3.0.0
   intl: ^0.17.0
   dotted_border: ^2.0.0+3
   flutter_sms: ^2.3.3
-  flutter_linkify: ^5.0.2
   url_launcher: ^6.1.10
   animated_text_kit: ^4.2.2
   firebase_auth: ^4.4.0
@@ -64,6 +65,7 @@ dependencies:
   firebase_storage: ^11.0.16
   firebase_messaging: ^14.3.0
   flutter_local_notifications: ^13.0.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2

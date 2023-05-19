@@ -5,7 +5,6 @@ import 'package:bondio/controller/auth_controller.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import '../utils/utils.dart';
 
 class NetworkHandler {
   static Dio dio = Dio();

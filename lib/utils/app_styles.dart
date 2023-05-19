@@ -188,48 +188,48 @@ EdgeInsets paddingSymmetric({double? horizontalPad, double? verticalPad}) =>
     EdgeInsets.symmetric(
         horizontal: horizontalPad ?? 00, vertical: verticalPad ?? 00);
 
-TextStyle smallerTextStyle = TextStyle(
-    fontFamily: 'Poppins', fontSize: 10.sp, color: Colors.grey.shade600);
-
-TextStyle smallTextStyleGreyText = TextStyle(
-    fontFamily: 'Poppins', fontSize: 12.sp, color: Colors.grey.shade600);
-
-TextStyle smallerTextStyleOrangeText = TextStyle(
-    fontFamily: 'Poppins',
-    fontSize: 10.sp,
-    color: ColorConstant.backGroundColorOrange);
-
-TextStyle smallTextStyleOrangeText = TextStyle(
-    fontFamily: 'Poppins',
-    fontSize: 12.sp,
-    color: ColorConstant.backGroundColorOrange);
-
-TextStyle smallTextStyleWhiteText =
-    TextStyle(fontFamily: 'Poppins', fontSize: 12.sp, color: Colors.white);
-
-TextStyle mediumTextStyleWhiteText =
-    TextStyle(fontFamily: 'Poppins', fontSize: 14.sp, color: Colors.white);
-
-TextStyle headerTextStyleBlack = TextStyle(
-    fontFamily: 'Poppins-Bold',
-    fontSize: 14.sp,
-    color: Colors.black,
-    fontWeight: FontWeight.w500);
-
-TextStyle headerTextStyleWhite = TextStyle(
-    fontFamily: 'Poppins-Bold',
-    fontSize: 22.sp,
-    color: Colors.white,
-    fontWeight: FontWeight.w500);
-
-TextStyle titleTextStyleWhite = TextStyle(
-    fontFamily: 'Poppins-Bold',
-    fontSize: 12.sp,
-    color: Colors.black,
-    fontWeight: FontWeight.w500);
-
-TextStyle largeTextStyle =
-    TextStyle(fontFamily: 'Poppins', fontSize: 22.sp, color: Colors.white);
+// TextStyle smallerTextStyle = TextStyle(
+//     fontFamily: 'Poppins', fontSize: 10.sp, color: Colors.grey.shade600);
+//
+// TextStyle smallTextStyleGreyText = TextStyle(
+//     fontFamily: 'Poppins', fontSize: 12.sp, color: Colors.grey.shade600);
+//
+// TextStyle smallerTextStyleOrangeText = TextStyle(
+//     fontFamily: 'Poppins',
+//     fontSize: 10.sp,
+//     color: ColorConstant.backGroundColorOrange);
+//
+// TextStyle smallTextStyleOrangeText = TextStyle(
+//     fontFamily: 'Poppins',
+//     fontSize: 12.sp,
+//     color: ColorConstant.backGroundColorOrange);
+//
+// TextStyle smallTextStyleWhiteText =
+//     TextStyle(fontFamily: 'Poppins', fontSize: 12.sp, color: Colors.white);
+//
+// TextStyle mediumTextStyleWhiteText =
+//     TextStyle(fontFamily: 'Poppins', fontSize: 14.sp, color: Colors.white);
+//
+// TextStyle headerTextStyleBlack = TextStyle(
+//     fontFamily: 'Poppins-Bold',
+//     fontSize: 14.sp,
+//     color: Colors.black,
+//     fontWeight: FontWeight.w500);
+//
+// TextStyle headerTextStyleWhite = TextStyle(
+//     fontFamily: 'Poppins-Bold',
+//     fontSize: 22.sp,
+//     color: Colors.white,
+//     fontWeight: FontWeight.w500);
+//
+// TextStyle titleTextStyleWhite = TextStyle(
+//     fontFamily: 'Poppins-Bold',
+//     fontSize: 12.sp,
+//     color: Colors.black,
+//     fontWeight: FontWeight.w500);
+//
+// TextStyle largeTextStyle =
+//     TextStyle(fontFamily: 'Poppins', fontSize: 22.sp, color: Colors.white);
 
 SizedBox smallerSizedBox = SizedBox(height: 1.h);
 SizedBox smallSizedBox = SizedBox(height: 2.h);
@@ -248,12 +248,18 @@ LinearGradient drawerLinearColor = LinearGradient(colors: [
 ], begin: Alignment.topCenter, end: Alignment.bottomCenter);
 
 class AppStyles {
+  static TextStyle smallerTextStyle = TextStyle(
+      fontSize: 10.sp, fontFamily: 'Exo2-Regular', color: Colors.white);
+
   static TextStyle smallTextStyle = TextStyle(
       fontSize: 12.sp, fontFamily: 'Exo2-Regular', color: Colors.white);
 
   static TextStyle mediumTextStyle = TextStyle(
-      fontSize: 14.sp, fontFamily: 'Exo2-Regular', color: Colors.black);
+      fontSize: 14.sp, fontFamily: 'Exo2-Regular', color: Colors.white);
 
   static TextStyle largeTextStyle = TextStyle(
       fontSize: 16.sp, fontFamily: 'Exo2-Regular', color: Colors.white);
+
+  static TextStyle extraLargeTextStyle = TextStyle(
+      fontSize: 18.sp, fontFamily: 'Exo2-Regular', color: Colors.white);
 }

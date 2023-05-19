@@ -1,12 +1,11 @@
 import 'dart:developer';
 import 'package:bondio/controller/controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../model/model.dart';
 import '../chat.dart';
 
 class RemoveParticipant extends StatefulWidget {
@@ -23,11 +22,11 @@ class _RemoveParticipantState extends State<RemoveParticipant> {
 
   @override
   Widget build(BuildContext context) {
-    return ChatBackground(
+    return Obx(() => ChatBackground(
         floatingButton: Padding(
             padding: EdgeInsets.only(left: 14.w, right: 8.w),
             child: AppWidget.elevatedButton(
-                text: 'Done', onTap: () => Get.back())),
+                text: 'Done', onTap: () => chatController.removeParticipant())),
         onBackButtonPressed: () {
           Get.back();
         },
@@ -41,8 +40,8 @@ class _RemoveParticipantState extends State<RemoveParticipant> {
                 child: AppWidget.searchField(
                     controller: chatController.searchController.value,
                     onChanged: (v) {
-                      chatController.availableChatPersonSearchList?.value =
-                          chatController.availableChatPersonFromContacts!.value
+                      chatController.availableChatPersonSearchList.value =
+                          chatController.availableChatPersonFromContacts
                               .where((x) => (x.displayName
                                       .toString()
                                       .toLowerCase()
@@ -54,10 +53,106 @@ class _RemoveParticipantState extends State<RemoveParticipant> {
                                       .contains(chatController
                                           .searchController.value.text)))
                               .toList();
-                      chatController.availableChatPersonSearchList?.refresh();
-                      chatController.availableChatPersonFromContacts?.refresh();
+                      chatController.availableChatPersonSearchList.refresh();
+                      chatController.availableChatPersonFromContacts.refresh();
                     }),
               ),
+              smallerSizedBox,
+              if (chatController.removeParticipantList.isNotEmpty)
+                Container(
+                  height: 10.h,
+                  alignment: Alignment.centerLeft,
+                  //color: Colors.green,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 7.w),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(
+                            chatController.removeParticipantList.length,
+                            (index) {
+                          log('LoginId ${chatController.removeParticipantList[index].loginId}');
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 10.h,
+                                width: 18.w,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        chatController.removeParticipantList
+                                            .removeAt(index);
+                                        chatController.update();
+                                      },
+                                      child: Container(
+                                        height: 7.h,
+                                        width: 14.w,
+                                        decoration: BoxDecoration(
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                blurRadius: 4,
+                                              )
+                                            ],
+                                            border: Border.all(
+                                                color: Colors.white, width: 2),
+                                            color: Colors.grey,
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                image: AssetImage(
+                                                    AppAssets.addContact),
+                                                fit: BoxFit.cover)),
+                                        alignment: Alignment.bottomRight,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey,
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.black26,
+                                                  blurRadius: 4,
+                                                )
+                                              ],
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Colors.white)),
+                                          child: Icon(Icons.close,
+                                              size: 4.w, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                        chatController
+                                            .removeParticipantList[index]
+                                            .displayName,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppStyles.smallerTextStyle
+                                            .copyWith(color: Colors.black)),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: 2.w,
+                              )
+                            ],
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+              smallerSizedBox,
+              if (chatController.removeParticipantList.isNotEmpty)
+                Padding(
+                  padding:
+                      paddingSymmetric(horizontalPad: 5.w, verticalPad: 0.0),
+                  child: Divider(
+                    color: Colors.grey.shade300,
+                    thickness: 1,
+                  ),
+                ),
               Obx(
                 () => chatController.searchController.value.text.isEmpty
                     ? buildListView(
@@ -69,7 +164,7 @@ class _RemoveParticipantState extends State<RemoveParticipant> {
               )
             ]),
         textStyle: AppStyles.largeTextStyle,
-        title: 'Remove Participant');
+        title: 'Remove Participant'));
   }
 
   buildListView({RxList? availableChatPersonFromContacts}) {
@@ -86,79 +181,69 @@ class _RemoveParticipantState extends State<RemoveParticipant> {
                           .loginId
                           .toString()) ==
                   true
-              ? Container(
-                  height: 8.h,
-                  margin: paddingSymmetric(verticalPad: 1.0),
-                  child: Row(children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ChatWidget.imageCircleAvatar(
-                              imageString:
-                                  availableChatPersonFromContacts[index].photo,
-                              context: context),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                        flex: 4,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                    availableChatPersonFromContacts[index]
-                                            .displayName ??
-                                        '',
-                                    style: mediumTextStyleWhiteText.copyWith(
-                                        color: Colors.black),
-                                    overflow: TextOverflow.ellipsis),
-                              ),
-                              if (availableChatPersonFromContacts[index]
-                                      .phones
-                                      .isNotEmpty ==
-                                  true)
-                                Text(
-                                  availableChatPersonFromContacts[index]
-                                          .phones
-                                          .first
-                                          .normalizedNumber ??
-                                      '(none)',
-                                  style: smallTextStyleGreyText.copyWith(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                            ])),
-                    GestureDetector(
-                      onTap: () {
-                        // Stream<DocumentSnapshot<Map<String, dynamic>>> docSnap =
-                        //     chatController.groupChatRoomCollection
-                        //         .doc(chatController.groupInfo.value.groupId
-                        //             .toString())
-                        //         .snapshots();
-                        //
-                        // docSnap.listen((DocumentSnapshot snap) {
-                        //   chatController.groupInfo.value ==
-                        //       GroupChat.fromDocument(snap);
-                        //   log('Info ${chatController.groupInfo.value.groupId}');
-                        //   log('Info ${chatController.groupInfo.value.membersId}');
-                        //   chatController.groupInfo.refresh();
-                        //   AppWidget.toast(text: 'Participant Removed');
-                        // });
+              ? GestureDetector(
+                  onTap: () {
+                    if (chatController.removeParticipantList.contains(
+                            chatController
+                                .availableChatPersonFromContacts[index]) ==
+                        false) {
+                      chatController.removeParticipantList
+                          .add(availableChatPersonFromContacts[index]);
 
-                        chatController.removeParticipant(
-                          id: availableChatPersonFromContacts[index]
-                              .loginId
-                              .toString(),
-                          userName: availableChatPersonFromContacts[index]
-                                  .displayName ??
-                              '',
-                        );
-                      },
-                      child: Container(
+                      chatController.removeParticipantList.refresh();
+                      chatController.update();
+                    } else {
+                      Fluttertoast.showToast(msg: 'Already added.');
+                    }
+                  },
+                  child: Container(
+                    height: 8.h,
+                    margin: paddingSymmetric(verticalPad: 1.0),
+                    child: Row(children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ChatWidget.imageCircleAvatar(
+                                imageString:
+                                    availableChatPersonFromContacts[index]
+                                        .photo,
+                                context: context),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                          flex: 4,
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                      availableChatPersonFromContacts[index]
+                                              .displayName ??
+                                          '',
+                                      style: AppStyles.mediumTextStyle
+                                          .copyWith(color: Colors.black),
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                                if (availableChatPersonFromContacts[index]
+                                        .phones
+                                        .isNotEmpty ==
+                                    true)
+                                  Text(
+                                    availableChatPersonFromContacts[index]
+                                            .phones
+                                            .first
+                                            .normalizedNumber ??
+                                        '(none)',
+                                    style: AppStyles.smallTextStyle.copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ])),
+                      Container(
                           width: 20.w,
                           height: 4.h,
                           alignment: Alignment.center,
@@ -169,11 +254,10 @@ class _RemoveParticipantState extends State<RemoveParticipant> {
                               color: ColorConstant.backGroundColorOrange),
                           child: Text(
                             'Remove',
-                            style:
-                                smallerTextStyle.copyWith(color: Colors.white),
+                            style: AppStyles.smallerTextStyle,
                           )),
-                    ),
-                  ]),
+                    ]),
+                  ),
                 )
               : Container();
         })));

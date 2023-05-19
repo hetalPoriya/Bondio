@@ -622,21 +622,18 @@
 // //   );
 // // }
 // }
-import 'dart:developer';
 
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/model/model.dart';
-import 'package:bondio/model/user_info.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../utils/app_widget_new.dart';
 import '../chat.dart';
 
 class ChatPage extends StatefulWidget {
@@ -720,10 +717,10 @@ class _ChatPageState extends State<ChatPage> {
               controller: chatController.typeMessageCon.value,
               textAlign: TextAlign.justify,
               textAlignVertical: TextAlignVertical.center,
-              style: smallTextStyleWhiteText.copyWith(color: Colors.white),
+              style: AppStyles.smallTextStyle,
               decoration: InputDecoration(
                 hintText: 'Type message...',
-                hintStyle: smallerTextStyle.copyWith(color: Colors.white),
+                hintStyle: AppStyles.smallerTextStyle,
                 contentPadding: EdgeInsets.only(
                   left: 2.w,
                   top: 0.0,
@@ -732,10 +729,10 @@ class _ChatPageState extends State<ChatPage> {
                 // focusedBorder: InputBorder.none
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(2.w),
-                    borderSide: BorderSide(color: Colors.white)),
+                    borderSide: const BorderSide(color: Colors.white)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(2.w),
-                    borderSide: BorderSide(color: Colors.white)),
+                    borderSide: const BorderSide(color: Colors.white)),
               ),
               cursorColor: Colors.white,
               onSubmitted: (text) {},
@@ -843,9 +840,7 @@ class _ChatPageState extends State<ChatPage> {
                     SizedBox(
                       width: 4.w,
                     ),
-                    Text(data?['name'] ?? '',
-                        style: smallTextStyleOrangeText.copyWith(
-                            fontSize: 14.sp, color: Colors.white)),
+                    Text(data?['name'] ?? '', style: AppStyles.mediumTextStyle),
                   ]);
             }));
   }
@@ -963,14 +958,14 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Text(
             content,
-            style: smallTextStyleGreyText.copyWith(
-                color: ColorConstant.mainAppColorNew),
+            style: AppStyles.smallTextStyle
+                .copyWith(color: ColorConstant.mainAppColorNew),
           ),
           Text(
             DateFormat('kk:mm a').format(
                 DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp))),
-            style: smallerTextStyle.copyWith(
-                color: ColorConstant.mainAppColorNew, fontSize: 6.sp),
+            style: AppStyles.smallerTextStyle
+                .copyWith(color: ColorConstant.mainAppColorNew, fontSize: 6.sp),
           )
         ],
       ),

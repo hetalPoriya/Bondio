@@ -1,5 +1,4 @@
 import 'package:bondio/controller/controller.dart';
-import 'package:bondio/controller/controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GroupChat {

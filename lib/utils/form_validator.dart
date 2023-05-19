@@ -39,7 +39,7 @@ class FormValidation {
         if (value == null || value.isEmpty) {
           return 'Please enter your mobile number';
         } else if (!GetUtils.isPhoneNumber(value)) {
-          return "Email is not valid";
+          return "Mobile number is not valid";
         }
         return null;
       };
@@ -61,14 +61,14 @@ class FormValidation {
 //       return null;
 //     };
 
-// static String? Function(String?)? referralValidation({String? value}) =>
-//     (value) {
-//       RegExp regExp = RegExp(r"^[A-Za-z]{3}[0-9]{5}$");
-//       if (value == null || value.isEmpty) {
-//         return 'Please enter referral code';
-//       } else if (!regExp.hasMatch(value)) {
-//         return 'Enter a valid referral code(3 char & 5 digits)';
-//       }
-//       return null;
-//     };
+  static String? Function(String?)? passwordValidation({String? value}) =>
+      (value) {
+        RegExp regExp = RegExp(r'^(?=.*?[A-Za-z])(?=.*?[!@#\$&*~]).{8,}$');
+        if (value == null || value.isEmpty) {
+          return 'Please enter your password';
+        } else if (!regExp.hasMatch(value)) {
+          return 'Password must contain 8 characters:one uppercase, one special character needed.';
+        }
+        return null;
+      };
 }

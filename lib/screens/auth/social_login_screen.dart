@@ -5,8 +5,6 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-
-import '../../utils/app_widget_new.dart';
 import '../../utils/utils.dart';
 
 class SocialLoginScreen extends StatefulWidget {
@@ -61,29 +59,25 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_rounded),
+              icon: const Icon(Icons.arrow_back_ios_rounded),
               onPressed: () => Get.back(),
             )),
         backgroundColor: Colors.transparent,
         body: Padding(
             padding: paddingSymmetric(horizontalPad: 6.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
+              // mainAxisAlignment: MainAxisAlignment.start,
+              // crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 mediumSizedBox,
                 Text(
                     'Great, you have logged in via ${authController.isGoogle.value}',
-                    style: mediumTextStyleWhiteText.copyWith(
-                        fontFamily: 'Poppins-Bold',
-                        color: Colors.white,
-                        fontSize: 15.sp),
+                    style: AppStyles.mediumTextStyle,
                     textAlign: TextAlign.center),
                 smallSizedBox,
                 Text(
                     'Fill additional details to complete sign up via ${authController.isGoogle}',
-                    style: smallerTextStyle.copyWith(
-                        fontFamily: 'Poppins-Bold', color: Colors.white),
+                    style: AppStyles.smallerTextStyle,
                     textAlign: TextAlign.center),
                 mediumSizedBox,
                 Row(
@@ -130,7 +124,19 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
                 ),
                 smallerSizedBox,
                 Text('Please enter your phone number to find your friends.',
-                    style: smallerTextStyle.copyWith(color: Colors.white)),
+                    style: AppStyles.smallerTextStyle),
+                if (authController.isGoogle.value == 'Twitter' ||
+                    authController.isGoogle.value == "Outlook")
+                  smallSizedBox,
+                if (authController.isGoogle.value == 'Twitter' ||
+                    authController.isGoogle.value == "Outlook")
+                  AppWidget.textFormFiledWhite(
+                      textEditingController:
+                          authController.emailController.value,
+                      hintText: AppStrings.emailAddress,
+                      validator: FormValidation.emailValidation(
+                          value: authController.emailController.value.text),
+                      textInputType: TextInputType.emailAddress),
                 smallSizedBox,
                 AppWidget.textFormFiledWhite(
                   textEditingController: authController.dobController.value,
@@ -139,8 +145,7 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
                   readOnly: true,
                 ),
                 smallerSizedBox,
-                Text('App rewards on birthday',
-                    style: smallerTextStyle.copyWith(color: Colors.white)),
+                Text(AppStrings.dobText, style: AppStyles.smallerTextStyle),
                 smallSizedBox,
                 AppWidget.textFormFiledWhite(
                   hintText: AppStrings.inviteCode,
@@ -149,14 +154,12 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
                       authController.referCodeController.value,
                 ),
                 smallerSizedBox,
-                Text('Optional',
-                    style: smallerTextStyle.copyWith(color: Colors.white)),
+                Text('Optional', style: AppStyles.smallerTextStyle),
                 largeSizedBox,
-                AppWidget.elevatedButton(
+                Obx(() => AppWidget.elevatedButton(
                     text: AppStrings.continueText,
-                    onTap: () async =>
-                        await authController.registerOtpApiCall(),
-                    loading: authController.isLoading.value)
+                    onTap: () async => authController.registerApiCall(),
+                    loading: authController.isLoading.value))
               ],
             )
             // child: Column(
@@ -412,7 +415,7 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
         ),
         smallSizedBox,
         AppWidget.textFormFiledWhite(
-            hintText: AppStrings.fullName,
+            hintText: AppStrings.firstName,
             validator: FormValidation.emptyValidation(
                 value: authController.fullNameController.value.text),
             textInputAction: TextInputAction.done,
@@ -445,16 +448,3 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
     );
   }
 }
-
-_floatingActionButton(
-        {VoidCallback? onTap,
-        Color? buttonColor,
-        Color? textColor,
-        required IconData icon}) =>
-    FloatingActionButton.small(
-      heroTag: null,
-      onPressed: onTap,
-      backgroundColor: buttonColor ?? Colors.white,
-      child: Icon(icon,
-          color: textColor ?? ColorConstant.mainAppColorNew, size: 4.w),
-    );

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:bondio/model/user_info.dart';
+import 'package:bondio/model/contact_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_contacts/contact.dart';
 import 'package:get/get.dart';
 import '../model/model.dart';
 import 'controller.dart';
@@ -38,12 +38,16 @@ class ChatController extends GetxController {
           .collection(ApiConstant.groupChatRoomCollection);
 
   //check status for user from firebase manage contacts collection
-  RxList contacts = [].obs;
+  RxList<ContactListModel> contacts = <ContactListModel>[].obs;
   RxList searchContactListModel = [].obs;
 
   //for group members
   RxList availableChatPersonFromContacts = [].obs;
   RxList availableChatPersonSearchList = [].obs;
+
+  RxList addParticipantList = [].obs;
+
+  RxList removeParticipantList = [].obs;
   RxList selectedGroupMember = [].obs;
 
   //textEditing controller
@@ -258,41 +262,77 @@ class ChatController extends GetxController {
   }
 
   //add participant to group
-  Future addParticipant({required String id, required String userName}) async {
-    log(groupInfo.value.groupId.toString());
-    log(id.toString());
-    log(userName.toString());
-    await groupChatRoomCollection.doc(groupInfo.value.groupId.toString()).set({
-      ApiConstant.members: FieldValue.arrayUnion(['${id}_${userName}']),
-      ApiConstant.membersId: FieldValue.arrayUnion([id]),
-    }, SetOptions(merge: true));
+  Future addParticipant() async {
+    for (int i = 0; i < addParticipantList.length; i++) {
+      await groupChatRoomCollection
+          .doc(groupInfo.value.groupId.toString())
+          .set({
+        ApiConstant.members: FieldValue.arrayUnion([
+          '${addParticipantList[i].loginId}_${addParticipantList[i].displayName}'
+        ]),
+        ApiConstant.membersId:
+            FieldValue.arrayUnion([addParticipantList[i].loginId]),
+      }, SetOptions(merge: true));
 
-    DocumentReference<Map<String, dynamic>> userDocRef =
-        groupChatListCollection.doc(id);
+      DocumentReference<Map<String, dynamic>> userDocRef =
+          groupChatListCollection.doc(addParticipantList[i].loginId);
 
-    await userDocRef.set({
-      ApiConstant.groupId: FieldValue.arrayUnion([id])
-    }, SetOptions(merge: true));
+      await userDocRef.set({
+        ApiConstant.groupId:
+            FieldValue.arrayUnion([addParticipantList[i].loginId])
+      }, SetOptions(merge: true));
+    }
 
-    AppWidget.toast(text: 'Participant Added');
+    Stream<DocumentSnapshot<Map<String, dynamic>>> docSnap =
+        groupChatRoomCollection
+            .doc(groupInfo.value.groupId.toString())
+            .snapshots();
+
+    docSnap.listen((DocumentSnapshot snap) {
+      groupInfo.value = GroupChat.fromDocument(snap);
+      log('Info ${groupInfo.value.groupId}');
+      log('Info ${groupInfo.value.membersId}');
+      groupInfo.refresh();
+      AppWidget.toast(text: 'Participant Added');
+    });
+    Get.back();
   }
 
   //add participant to group
-  Future removeParticipant(
-      {required String id, required String userName}) async {
-    await groupChatRoomCollection.doc(groupInfo.value.groupId.toString()).set({
-      ApiConstant.members: FieldValue.arrayRemove(['${id}_${userName}']),
-      ApiConstant.membersId: FieldValue.arrayRemove([id]),
-    }, SetOptions(merge: true));
+  Future removeParticipant() async {
+    for (int i = 0; i < removeParticipantList.length; i++) {
+      await groupChatRoomCollection
+          .doc(groupInfo.value.groupId.toString())
+          .set({
+        ApiConstant.members: FieldValue.arrayRemove([
+          '${removeParticipantList[i].loginId}_${removeParticipantList[i].displayName}'
+        ]),
+        ApiConstant.membersId:
+            FieldValue.arrayRemove([removeParticipantList[i].loginId]),
+      }, SetOptions(merge: true));
 
-    DocumentReference<Map<String, dynamic>> userDocRef =
-        groupChatListCollection.doc(id);
+      DocumentReference<Map<String, dynamic>> userDocRef =
+          groupChatListCollection.doc(removeParticipantList[i].loginId);
 
-    await userDocRef.set({
-      ApiConstant.groupId: FieldValue.arrayRemove([id])
-    }, SetOptions(merge: true));
+      await userDocRef.set({
+        ApiConstant.groupId:
+            FieldValue.arrayRemove([removeParticipantList[i].loginId])
+      }, SetOptions(merge: true));
+    }
 
-    AppWidget.toast(text: 'Participant Removed');
+    Stream<DocumentSnapshot<Map<String, dynamic>>> docSnap =
+        groupChatRoomCollection
+            .doc(groupInfo.value.groupId.toString())
+            .snapshots();
+
+    docSnap.listen((DocumentSnapshot snap) {
+      groupInfo.value = GroupChat.fromDocument(snap);
+      log('Info ${groupInfo.value.groupId}');
+      log('Info ${groupInfo.value.membersId}');
+      groupInfo.refresh();
+      AppWidget.toast(text: 'Participant Removed');
+    });
+
     Get.back();
   }
 }

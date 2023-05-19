@@ -37,8 +37,7 @@ class AboutUs extends StatelessWidget {
                       const SizedBox(height: 1),
                       AppWidget.backIcon(onTap: () => Get.back()),
                       Text('About Us',
-                          style: largeTextStyle.copyWith(
-                              fontFamily: 'Poppins-Bold'),
+                          style: AppStyles.largeTextStyle,
                           textAlign: TextAlign.center),
                       largeSizedBox,
                       mediumSizedBox
@@ -51,8 +50,8 @@ class AboutUs extends StatelessWidget {
                   child: Text(
                       'Welcome to Bondio: A virtual gathering place for colleagues and friends',
                       textAlign: TextAlign.center,
-                      style: mediumTextStyleWhiteText.copyWith(
-                          color: Colors.black)),
+                      style: AppStyles.mediumTextStyle
+                          .copyWith(color: Colors.black)),
                 ),
                 mediumSizedBox,
                 Padding(
@@ -61,8 +60,8 @@ class AboutUs extends StatelessWidget {
                   child: Text(
                       'We offer a fun and safe way to connect with those you know and love, and professional friends and colleagues, even if miles away. Let Bondio host your next meal with a friend, group celebration, or work gathering. There’s no FOMO here. We make it possible to still have a fun sit-down meal with a friend, whether going dutch or someone is picking up the tab 500 miles away.',
                       textAlign: TextAlign.center,
-                      style: smallTextStyleWhiteText.copyWith(
-                          color: Colors.black)),
+                      style: AppStyles.smallTextStyle
+                          .copyWith(color: Colors.black)),
                 ),
               ],
             ),

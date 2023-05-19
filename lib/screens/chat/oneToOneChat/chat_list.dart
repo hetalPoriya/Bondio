@@ -1,10 +1,7 @@
-import 'dart:developer';
-import 'package:bondio/model/model.dart';
 import 'package:bondio/model/user_info.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/controller/controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

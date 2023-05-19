@@ -4,10 +4,6 @@
 
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../utils/api_constant.dart';
-
 LoginModel loginModelFromMap(String str) =>
     LoginModel.fromMap(json.decode(str));
 
@@ -35,26 +31,29 @@ class LoginBody {
 }
 
 class SignUpBody {
-  SignUpBody({
-    this.name,
-    this.email,
-    this.mobile,
-    this.zipCode,
-    this.country,
-    this.state,
-    this.city,
-    this.aboutMe,
-    this.photo,
-    this.company,
-    this.dob,
-    this.gender,
-    this.password,
-    this.referCode,
-    this.referBy,
-    this.deviceToken,
-    this.googleToken,
-    this.facebookToken,
-  });
+  SignUpBody(
+      {this.name,
+      this.email,
+      this.mobile,
+      this.zipCode,
+      this.country,
+      this.state,
+      this.city,
+      this.aboutMe,
+      this.photo,
+      this.company,
+      this.dob,
+      this.gender,
+      this.password,
+      this.referCode,
+      this.referBy,
+      this.deviceToken,
+      this.googleToken,
+      this.facebookToken,
+      this.outlookToken,
+      this.twitterToken,
+      this.linkedinToken,
+      this.instagramToken});
 
   String? name;
   String? email;
@@ -74,6 +73,10 @@ class SignUpBody {
   String? deviceToken;
   dynamic googleToken;
   dynamic facebookToken;
+  dynamic outlookToken;
+  dynamic instagramToken;
+  dynamic twitterToken;
+  dynamic linkedinToken;
 
   Map<String, dynamic> toMap() => {
         "name": name,
@@ -94,6 +97,10 @@ class SignUpBody {
         "device_token": deviceToken,
         "google_token": googleToken,
         "facebook_token": facebookToken,
+        "outlook_token": outlookToken,
+        "instagram_token": instagramToken,
+        "linkedin_token": linkedinToken,
+        "twitter_token": twitterToken,
       };
 }
 
@@ -162,6 +169,7 @@ class User {
     this.deviceToken,
     this.googleToken,
     this.facebookToken,
+    this.outlookToken,
     this.createdAt,
     this.updatedAt,
   });
@@ -185,6 +193,7 @@ class User {
   String? deviceToken;
   dynamic googleToken;
   dynamic facebookToken;
+  dynamic outlookToken;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -208,6 +217,7 @@ class User {
         deviceToken: json["device_token"] ?? '',
         googleToken: json["google_token"] ?? '',
         facebookToken: json["facebook_token"] ?? '',
+        outlookToken: json["outlook_token"] ?? '',
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -236,6 +246,7 @@ class User {
         "device_token": deviceToken,
         "google_token": googleToken,
         "facebook_token": facebookToken,
+        "outlook_token": outlookToken,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };

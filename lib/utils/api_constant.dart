@@ -16,6 +16,7 @@ class ApiConstant {
   static String isRegisterApi = 'api/v1/is-register';
   static String loginApi = 'api/v1/login';
   static String logoutApi = 'api/v1/logout';
+  static String customerDetailApi = 'api/v1/customer-detail';
 
   //firebase collections
   static String userCollection = 'user';
