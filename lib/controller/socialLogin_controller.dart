@@ -186,6 +186,15 @@ class SocialLoginController extends GetxController {
   signInWithInstagram({required String userName}) async {
     FlutterInsta flutterInsta = new FlutterInsta();
     await flutterInsta.getProfileData(userName);
+
+    print("Username : ${flutterInsta.username}");
+    print("Followers : ${flutterInsta.followers}");
+    print("Folowing : ${flutterInsta.following}");
+    print("Bio : ${flutterInsta.bio}");
+    print("Website : ${flutterInsta.website}");
+    print("Profile Image : ${flutterInsta.imgurl}");
+    print("Feed images:${flutterInsta.feedImagesUrl}");
+
     await authController.userExistOrNotApi(
         tokenType: 'instagram_token', token: '' ?? ''); //instagram username;
   }
