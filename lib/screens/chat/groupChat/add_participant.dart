@@ -60,15 +60,13 @@ class _AddParticipantState extends State<AddParticipant> {
                         onChanged: (v) {
                           chatController.availableChatPersonSearchList.value =
                               chatController.availableChatPersonFromContacts
-                                  .where((x) => (x.displayName
+                                  .where((x) => (x.name
                                           .toString()
                                           .toLowerCase()
                                           .contains(chatController
                                               .searchController.value.text) ||
-                                      x.displayName
-                                          .toString()
-                                          .toUpperCase()
-                                          .contains(chatController
+                                      x.name.toString().toUpperCase().contains(
+                                          chatController
                                               .searchController.value.text)))
                                   .toList();
                           chatController.availableChatPersonSearchList
@@ -91,7 +89,7 @@ class _AddParticipantState extends State<AddParticipant> {
                             children: List.generate(
                                 chatController.addParticipantList.length,
                                 (index) {
-                              log('LoginId ${chatController.addParticipantList[index].loginId}');
+                              log('LoginId ${chatController.addParticipantList[index].id}');
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -148,8 +146,9 @@ class _AddParticipantState extends State<AddParticipant> {
                                         ),
                                         Text(
                                             chatController
-                                                .addParticipantList[index]
-                                                .displayName,
+                                                    .addParticipantList[index]
+                                                    .name ??
+                                                '',
                                             overflow: TextOverflow.ellipsis,
                                             style: AppStyles.smallerTextStyle
                                                 .copyWith(color: Colors.black)),
@@ -199,8 +198,6 @@ class _AddParticipantState extends State<AddParticipant> {
         itemCount: availableChatPersonFromContacts!.length,
         physics: const ClampingScrollPhysics(),
         itemBuilder: ((context, index) {
-          log('Memeber ${chatController.groupInfo.value.membersId}');
-          log('list ${chatController.groupInfo.value.membersId!.contains(availableChatPersonFromContacts[index].loginId.toString())}');
           return GestureDetector(
             onTap: () {
               if (chatController.addParticipantList.contains(
@@ -223,10 +220,7 @@ class _AddParticipantState extends State<AddParticipant> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ChatWidget.imageCircleAvatar(
-                          imageString:
-                              availableChatPersonFromContacts[index].photo,
-                          context: context),
+                      ChatWidget.imageCircleAvatar(context: context),
                     ],
                   ),
                 ),
@@ -238,28 +232,25 @@ class _AddParticipantState extends State<AddParticipant> {
                         children: [
                           Flexible(
                             child: Text(
-                                availableChatPersonFromContacts[index]
-                                        .displayName ??
+                                availableChatPersonFromContacts[index].name ??
                                     '',
                                 style: AppStyles.mediumTextStyle
                                     .copyWith(color: Colors.black),
                                 overflow: TextOverflow.ellipsis),
                           ),
-                          if (availableChatPersonFromContacts[index]
-                                  .phones
-                                  .isNotEmpty ==
-                              true)
-                            Text(
-                              availableChatPersonFromContacts[index]
-                                      .phones
-                                      .first
-                                      .normalizedNumber ??
-                                  '(none)',
-                              style: AppStyles.smallTextStyle.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          // if (availableChatPersonFromContacts[index]
+                          //         .phoneNumber
+                          //         .isNotEmpty ==
+                          //     true)
+                          Text(
+                            availableChatPersonFromContacts[index]
+                                    .phoneNumber ??
+                                '(none)',
+                            style: AppStyles.smallTextStyle.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ])),
                 Container(
                     width: 20.w,
@@ -271,7 +262,7 @@ class _AddParticipantState extends State<AddParticipant> {
                         color: chatController.groupInfo.value.membersId!
                                     .contains(
                                         availableChatPersonFromContacts[index]
-                                            .loginId
+                                            .id
                                             .toString()) ==
                                 true
                             ? Colors.grey.shade400
@@ -279,7 +270,7 @@ class _AddParticipantState extends State<AddParticipant> {
                     child: Text(
                       chatController.groupInfo.value.membersId!.contains(
                                   availableChatPersonFromContacts[index]
-                                      .loginId
+                                      .id
                                       .toString()) ==
                               true
                           ? 'Added'

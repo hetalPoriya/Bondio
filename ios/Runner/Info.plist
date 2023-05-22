@@ -2,6 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>fb754280139332528</string>
+      </array>
+      </dict>
+    </array>
+    <key>FacebookAppID</key>
+    <string>754280139332528</string>
+    <key>FacebookClientToken</key>
+    <string>0392690966cf1d9d783f3a4b1c806701</string>
+    <key>FacebookDisplayName</key>
+    <string>Bondiomeet</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -44,7 +60,7 @@
     		<array>
     			<!-- TODO Replace this value: -->
     			<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
-    			<string>com.googleusercontent.apps.155532140901-qgigeb88hp0o9fugh0ianvk5j1evo3st</string>
+    			<string>com.googleusercontent.apps.943237404479-ao5p1m0lrk5h09gdvhtioruii06n3vok</string>
     		</array>
     	</dict>
     </array>

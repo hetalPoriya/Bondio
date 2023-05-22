@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bondio/model/user_info.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
@@ -82,6 +84,8 @@ class _ChatListState extends State<ChatList> {
       physics: const ClampingScrollPhysics(),
       itemBuilder: ((context, index) {
         UserInfo userInfo = userInfoList[index];
+        log('UserInfo %${userInfo.members}');
+        log('UserInfo %${userInfo.lastMessage}');
         List? members = userInfo.members;
         members?.remove(authController.userModel.value.user?.id.toString());
 
@@ -105,7 +109,7 @@ class _ChatListState extends State<ChatList> {
                 },
                 child: ChatWidget.chatContainer(
                     titleText: snapshot.data?.get('name'),
-                    subText: userInfo.lastMessage.toString(),
+                    subText: userInfo.lastMessage ?? '',
                     imageString: snapshot.data?.get('photo') ?? '',
                     time: DateFormat('kk:mm a').format(
                         DateTime.fromMillisecondsSinceEpoch(

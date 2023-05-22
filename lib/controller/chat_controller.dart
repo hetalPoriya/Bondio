@@ -42,13 +42,15 @@ class ChatController extends GetxController {
   RxList searchContactListModel = [].obs;
 
   //for group members
-  RxList availableChatPersonFromContacts = [].obs;
-  RxList availableChatPersonSearchList = [].obs;
+  RxList<ContactListModel> availableChatPersonFromContacts =
+      <ContactListModel>[].obs;
+  RxList<ContactListModel> availableChatPersonSearchList =
+      <ContactListModel>[].obs;
 
-  RxList addParticipantList = [].obs;
+  RxList<ContactListModel> addParticipantList = <ContactListModel>[].obs;
 
-  RxList removeParticipantList = [].obs;
-  RxList selectedGroupMember = [].obs;
+  RxList<ContactListModel> removeParticipantList = <ContactListModel>[].obs;
+  RxList<ContactListModel> selectedGroupMember = <ContactListModel>[].obs;
 
   //textEditing controller
   Rx<TextEditingController> searchController = TextEditingController().obs;
@@ -128,11 +130,17 @@ class ChatController extends GetxController {
     DocumentSnapshot<Map<String, dynamic>> peerInfo =
         await userCollection.doc(peerId).get();
 
+    log('Enter Create group');
+    log(roomId);
+    log(userId.toString());
+    log(peerId.toString());
+    log(userInfo.toString());
     fireStoreInstant
         .collection(ApiConstant.personalChatRoomCollection)
         .doc(roomId)
         .set({
-      ApiConstant.members: FieldValue.arrayUnion([userId, peerId]),
+      ApiConstant.members:
+          FieldValue.arrayUnion([userId.toString(), peerId.toString()]),
       ApiConstant.user1: FieldValue.arrayUnion(
           [userId, userInfo.get('name'), userInfo.get('email')]),
       ApiConstant.user2: FieldValue.arrayUnion(
@@ -191,8 +199,8 @@ class ChatController extends GetxController {
     List<String> userId = [authController.userModel.value.user!.id.toString()];
 
     for (var element in selectedGroupMember) {
-      userInfo.add('${element.loginId}_${element.displayName ?? ''}');
-      userId.add('${element.loginId}');
+      userInfo.add('${element.id}_${element.name ?? ''}');
+      userId.add('${element.id}');
     }
 
     GroupChat groupChat = GroupChat(
@@ -220,7 +228,7 @@ class ChatController extends GetxController {
 
     selectedGroupMember.every((element) {
       DocumentReference<Map<String, dynamic>> userDocRef =
-          groupChatListCollection.doc(element.loginId);
+          groupChatListCollection.doc(element.id);
 
       userDocRef.set({
         ApiConstant.groupId: FieldValue.arrayUnion([groupDocRef.id])
@@ -267,19 +275,17 @@ class ChatController extends GetxController {
       await groupChatRoomCollection
           .doc(groupInfo.value.groupId.toString())
           .set({
-        ApiConstant.members: FieldValue.arrayUnion([
-          '${addParticipantList[i].loginId}_${addParticipantList[i].displayName}'
-        ]),
+        ApiConstant.members: FieldValue.arrayUnion(
+            ['${addParticipantList[i].id}_${addParticipantList[i].name}']),
         ApiConstant.membersId:
-            FieldValue.arrayUnion([addParticipantList[i].loginId]),
+            FieldValue.arrayUnion([addParticipantList[i].id]),
       }, SetOptions(merge: true));
 
       DocumentReference<Map<String, dynamic>> userDocRef =
-          groupChatListCollection.doc(addParticipantList[i].loginId);
+          groupChatListCollection.doc(addParticipantList[i].id);
 
       await userDocRef.set({
-        ApiConstant.groupId:
-            FieldValue.arrayUnion([addParticipantList[i].loginId])
+        ApiConstant.groupId: FieldValue.arrayUnion([addParticipantList[i].id])
       }, SetOptions(merge: true));
     }
 
@@ -293,8 +299,8 @@ class ChatController extends GetxController {
       log('Info ${groupInfo.value.groupId}');
       log('Info ${groupInfo.value.membersId}');
       groupInfo.refresh();
-      AppWidget.toast(text: 'Participant Added');
     });
+    AppWidget.toast(text: 'Participant Added');
     Get.back();
   }
 
@@ -305,18 +311,18 @@ class ChatController extends GetxController {
           .doc(groupInfo.value.groupId.toString())
           .set({
         ApiConstant.members: FieldValue.arrayRemove([
-          '${removeParticipantList[i].loginId}_${removeParticipantList[i].displayName}'
+          '${removeParticipantList[i].id}_${removeParticipantList[i].name}'
         ]),
         ApiConstant.membersId:
-            FieldValue.arrayRemove([removeParticipantList[i].loginId]),
+            FieldValue.arrayRemove([removeParticipantList[i].id]),
       }, SetOptions(merge: true));
 
       DocumentReference<Map<String, dynamic>> userDocRef =
-          groupChatListCollection.doc(removeParticipantList[i].loginId);
+          groupChatListCollection.doc(removeParticipantList[i].id);
 
       await userDocRef.set({
         ApiConstant.groupId:
-            FieldValue.arrayRemove([removeParticipantList[i].loginId])
+            FieldValue.arrayRemove([removeParticipantList[i].id])
       }, SetOptions(merge: true));
     }
 
@@ -330,9 +336,8 @@ class ChatController extends GetxController {
       log('Info ${groupInfo.value.groupId}');
       log('Info ${groupInfo.value.membersId}');
       groupInfo.refresh();
-      AppWidget.toast(text: 'Participant Removed');
     });
-
+    AppWidget.toast(text: 'Participant Removed');
     Get.back();
   }
 }

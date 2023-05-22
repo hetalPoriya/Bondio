@@ -84,8 +84,8 @@ class ChatWidget {
                       Text(
                         subText ?? ' ',
                         maxLines: 2,
-                        style:
-                            AppStyles.smallerTextStyle.copyWith(fontSize: 8.sp),
+                        style: AppStyles.smallerTextStyle
+                            .copyWith(color: Colors.grey.shade800),
                         overflow: TextOverflow.ellipsis,
                       )
                     ])),

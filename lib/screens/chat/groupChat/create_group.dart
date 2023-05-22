@@ -111,8 +111,9 @@ class CreateGroup extends StatelessWidget {
                                       ),
                                       Text(
                                         chatController
-                                            .selectedGroupMember[index]
-                                            .displayName,
+                                                .selectedGroupMember[index]
+                                                .name ??
+                                            '',
                                         overflow: TextOverflow.ellipsis,
                                         style: AppStyles.smallerTextStyle
                                             .copyWith(fontSize: 8.sp),

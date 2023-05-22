@@ -60,14 +60,14 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                               chatController
                                       .availableChatPersonSearchList.value =
                                   chatController.availableChatPersonFromContacts
-                                      .where((x) => (x.displayName
+                                      .where((x) => (x.name
                                               .toString()
                                               .toLowerCase()
                                               .contains(chatController
                                                   .searchController
                                                   .value
                                                   .text) ||
-                                          x.displayName
+                                          x.name
                                               .toString()
                                               .toUpperCase()
                                               .contains(chatController
@@ -95,7 +95,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                 children: List.generate(
                                     chatController.selectedGroupMember.length,
                                     (index) {
-                                  log('LoginId ${chatController.selectedGroupMember[index].loginId}');
+                                  log('LoginId ${chatController.selectedGroupMember[index].id}');
                                   return Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -155,8 +155,10 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                             ),
                                             Text(
                                                 chatController
-                                                    .selectedGroupMember[index]
-                                                    .displayName,
+                                                        .selectedGroupMember[
+                                                            index]
+                                                        .name ??
+                                                    '',
                                                 overflow: TextOverflow.ellipsis,
                                                 style: AppStyles
                                                     .smallerTextStyle
@@ -229,10 +231,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ChatWidget.imageCircleAvatar(
-                          imageString:
-                              availableChatPersonFromContacts[index].photo,
-                          context: context),
+                      ChatWidget.imageCircleAvatar(context: context),
                     ],
                   ),
                 ),
@@ -244,28 +243,25 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                         children: [
                           Flexible(
                             child: Text(
-                                availableChatPersonFromContacts[index]
-                                        .displayName ??
+                                availableChatPersonFromContacts[index].name ??
                                     '',
                                 style: AppStyles.mediumTextStyle
                                     .copyWith(color: Colors.black),
                                 overflow: TextOverflow.ellipsis),
                           ),
-                          if (availableChatPersonFromContacts[index]
-                                  .phones
-                                  .isNotEmpty ==
-                              true)
-                            Text(
-                              availableChatPersonFromContacts[index]
-                                      .phones
-                                      .first
-                                      .normalizedNumber ??
-                                  '(none)',
-                              style: AppStyles.smallTextStyle.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          // if (availableChatPersonFromContacts.value[index]
+                          //         .phoneNumber
+                          //         .isNotEmpty ==
+                          //     true)
+                          Text(
+                            availableChatPersonFromContacts[index]
+                                    .phoneNumber ??
+                                '(none)',
+                            style: AppStyles.smallTextStyle.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ])),
               ]),
             ),

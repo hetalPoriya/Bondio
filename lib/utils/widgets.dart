@@ -47,11 +47,12 @@ class AppWidget {
   static AuthController authController = Get.put(AuthController());
 
   static SocialLoginController socialLoginController =
-  Get.put(SocialLoginController());
+      Get.put(SocialLoginController());
 
-  static backIcon({required VoidCallback onTap,
-    Color? backIconColor,
-    AlignmentGeometry? alignment}) {
+  static backIcon(
+      {required VoidCallback onTap,
+      Color? backIconColor,
+      AlignmentGeometry? alignment}) {
     return Align(
       alignment: alignment ?? Alignment.topLeft,
       child: GestureDetector(
@@ -93,9 +94,7 @@ class AppWidget {
               child: child!);
         }))!;
 
-    if (authController.pickedDate.value
-        .toString()
-        .isNotEmpty) {
+    if (authController.pickedDate.value.toString().isNotEmpty) {
       // log(authController.pickedDate.value
       //     .toString()); //pickedDate output format => 2021-03-10 00:00:00.000
 
@@ -110,18 +109,19 @@ class AppWidget {
     }
   }
 
-  static textFormFiledWhite({String? hintText,
-    IconData? icon,
-    TextInputAction? textInputAction,
-    TextInputType? textInputType,
-    bool? obscureText,
-    void Function()? suffixOnTap,
-    void Function()? onTapReadOnly,
-    TextStyle? textStyle,
-    bool? readOnly,
-    bool isIconVisible = false,
-    TextEditingController? textEditingController,
-    String? Function(String?)? validator}) =>
+  static textFormFiledWhite(
+          {String? hintText,
+          IconData? icon,
+          TextInputAction? textInputAction,
+          TextInputType? textInputType,
+          bool? obscureText,
+          void Function()? suffixOnTap,
+          void Function()? onTapReadOnly,
+          TextStyle? textStyle,
+          bool? readOnly,
+          bool isIconVisible = false,
+          TextEditingController? textEditingController,
+          String? Function(String?)? validator}) =>
       TextFormField(
         style: AppStyles.smallTextStyle.copyWith(color: Colors.white),
         textInputAction: textInputAction ?? TextInputAction.next,
@@ -170,18 +170,19 @@ class AppWidget {
         cursorColor: Colors.white,
       );
 
-  static textFormFiled({String? hintText,
-    IconData? icon,
-    TextInputAction? textInputAction,
-    TextInputType? textInputType,
-    bool? obscureText,
-    void Function()? suffixOnTap,
-    void Function()? onTapReadOnly,
-    TextStyle? textStyle,
-    bool? readOnly,
-    bool isIconVisible = false,
-    TextEditingController? textEditingController,
-    String? Function(String?)? validator}) =>
+  static textFormFiled(
+          {String? hintText,
+          IconData? icon,
+          TextInputAction? textInputAction,
+          TextInputType? textInputType,
+          bool? obscureText,
+          void Function()? suffixOnTap,
+          void Function()? onTapReadOnly,
+          TextStyle? textStyle,
+          bool? readOnly,
+          bool isIconVisible = false,
+          TextEditingController? textEditingController,
+          String? Function(String?)? validator}) =>
       TextFormField(
         textInputAction: textInputAction ?? TextInputAction.next,
         keyboardType: textInputType ?? TextInputType.text,
@@ -223,18 +224,19 @@ class AppWidget {
         cursorColor: ColorConstant.backGroundColorOrange,
       );
 
-  static textFormFiledProfilePage({String? hintText,
-    IconData? icon,
-    TextInputAction? textInputAction,
-    TextInputType? textInputType,
-    bool? obscureText,
-    void Function()? suffixOnTap,
-    void Function()? onTapReadOnly,
-    TextStyle? textStyle,
-    Color? color,
-    bool? readOnly,
-    TextEditingController? textEditingController,
-    String? Function(String?)? validator}) =>
+  static textFormFiledProfilePage(
+          {String? hintText,
+          IconData? icon,
+          TextInputAction? textInputAction,
+          TextInputType? textInputType,
+          bool? obscureText,
+          void Function()? suffixOnTap,
+          void Function()? onTapReadOnly,
+          TextStyle? textStyle,
+          Color? color,
+          bool? readOnly,
+          TextEditingController? textEditingController,
+          String? Function(String?)? validator}) =>
       TextFormField(
         textInputAction: textInputAction ?? TextInputAction.next,
         keyboardType: textInputType ?? TextInputType.text,
@@ -266,10 +268,11 @@ class AppWidget {
         cursorColor: color ?? ColorConstant.backGroundColorOrange,
       );
 
-  static elevatedButton({required String text,
-    required void Function()? onTap,
-    bool? loading,
-    Color? progressColor}) =>
+  static elevatedButton(
+          {required String text,
+          required void Function()? onTap,
+          bool? loading,
+          Color? progressColor}) =>
       GestureDetector(
         onTap: onTap,
         child: Container(
@@ -316,8 +319,7 @@ class AppWidget {
     AppAssets.twitter,
   ];
 
-  static socialLogin() =>
-      SingleChildScrollView(
+  static socialLogin() => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Container(
           margin: paddingSymmetric(horizontalPad: 3.w),
@@ -326,66 +328,64 @@ class AppWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(
                 socialMedia.length,
-                    (index) =>
-                    GestureDetector(
-                      onTap: () async {
-                        authController.fullNameController.value.text = '';
-                        authController.mobileController.value.text = '';
-                        authController.dobController.value.text = '';
-                        authController.referCodeController.value.text = '';
-                        Get.back();
-                        // if (index == 0) {
-                        //   authController.isGoogle.value = 'Outlook';
-                        //   authController.update();
-                        //
-                        //   await FirebaseAuth.instance.signOut();
-                        //   socialLoginController.signInWithOutlook();
-                        // } else
+                (index) => GestureDetector(
+                  onTap: () async {
+                    authController.fullNameController.value.text = '';
+                    authController.mobileController.value.text = '';
+                    authController.dobController.value.text = '';
+                    authController.referCodeController.value.text = '';
+                    Get.back();
+                    // if (index == 0) {
+                    //   authController.isGoogle.value = 'Outlook';
+                    //   authController.update();
+                    //
+                    //   await FirebaseAuth.instance.signOut();
+                    //   socialLoginController.signInWithOutlook();
+                    // } else
 
-                        if (index == 0) {
-                          authController.isGoogle.value = 'LinkedIn';
-                          authController.update();
-                          socialLoginController.signInWithLinkedIn();
-                        } else if (index == 1) {
-                          authController.isGoogle.value = 'Google';
-                          authController.update();
-                          socialLoginController.signInWithGoogle();
-                        } else if (index == 2) {
-                          authController.isGoogle.value = 'Instagram';
-                          authController.update();
-                          socialLoginController.signInWithInstagram();
-                        } else if (index == 3) {
-                          authController.isGoogle.value = 'Facebook';
-                          authController.update();
-                          socialLoginController.signInWithFacebook();
-                        } else {
-                          authController.isGoogle.value = 'Twitter';
-                          socialLoginController.signInWithTwitter();
-                          authController.update();
-                        }
-                      },
-                      child: Container(
-                        width: 15.w,
-                        height: 6.h,
-                        padding: paddingAll(paddingAll: 2.w),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                spreadRadius: 2,
-                                blurRadius: 2,
-                                offset: Offset(
-                                    2, 1), // changes position of shadow
-                              ),
-                            ],
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey.shade300)),
-                        child: Image.asset(socialMedia[index].toString(),
-                            alignment: Alignment.center),
-                      ),
-                    ),
+                    if (index == 0) {
+                      authController.isGoogle.value = 'LinkedIn';
+                      authController.update();
+                      socialLoginController.signInWithLinkedIn();
+                    } else if (index == 1) {
+                      authController.isGoogle.value = 'Google';
+                      authController.update();
+                      socialLoginController.signInWithGoogle();
+                    } else if (index == 2) {
+                      authController.isGoogle.value = 'Instagram';
+                      Get.toNamed(RouteHelper.instagramLogin);
+                      authController.update();
+                    } else if (index == 3) {
+                      authController.isGoogle.value = 'Facebook';
+                      authController.update();
+                      socialLoginController.signInWithFacebook();
+                    } else {
+                      authController.isGoogle.value = 'Twitter';
+                      socialLoginController.signInWithTwitter();
+                      authController.update();
+                    }
+                  },
+                  child: Container(
+                    width: 15.w,
+                    height: 6.h,
+                    padding: paddingAll(paddingAll: 2.w),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            spreadRadius: 2,
+                            blurRadius: 2,
+                            offset: Offset(2, 1), // changes position of shadow
+                          ),
+                        ],
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey.shade300)),
+                    child: Image.asset(socialMedia[index].toString(),
+                        alignment: Alignment.center),
+                  ),
+                ),
               )),
         ),
       );
@@ -429,14 +429,12 @@ class AppWidget {
         ),
       );
 
-  static toast({required String text}) =>
-      Fluttertoast.showToast(
-          msg: text,
-          backgroundColor: ColorConstant.mainAppColorNew,
-          textColor: Colors.white);
+  static toast({required String text}) => Fluttertoast.showToast(
+      msg: text,
+      backgroundColor: ColorConstant.mainAppColorNew,
+      textColor: Colors.white);
 
-  static containerIndicator() =>
-      Container(
+  static containerIndicator() => Container(
         color: Colors.black45,
         child: Center(
           child: Material(
@@ -454,9 +452,10 @@ class AppWidget {
         ),
       );
 
-  static richText({required String text1,
-    required String text2,
-    void Function()? onTap}) =>
+  static richText(
+          {required String text1,
+          required String text2,
+          void Function()? onTap}) =>
       GestureDetector(
         onTap: onTap,
         child: Row(
@@ -474,21 +473,17 @@ class AppWidget {
         ),
       );
 
-  static bihPolygon({required BuildContext context}) =>
-      Container(
+  static bihPolygon({required BuildContext context}) => Container(
         padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 0.0),
         height: 38.h,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(
-                AppAssets.bigPolygon,
-              ),
-              fit: BoxFit.fill,
-            )),
+          image: AssetImage(
+            AppAssets.bigPolygon,
+          ),
+          fit: BoxFit.fill,
+        )),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -503,9 +498,10 @@ class AppWidget {
         ),
       );
 
-  static searchField({required TextEditingController controller,
-    void Function(String?)? onChanged,
-    void Function(String?)? onFieldSubmitted}) =>
+  static searchField(
+          {required TextEditingController controller,
+          void Function(String?)? onChanged,
+          void Function(String?)? onFieldSubmitted}) =>
       TextFormField(
         cursorColor: ColorConstant.backGroundColorLightPink,
         controller: controller,
@@ -526,7 +522,7 @@ class AppWidget {
       );
 
   static bondioTextAndMenu(
-      {VoidCallback? onTapOnMenu, required BuildContext context}) =>
+          {VoidCallback? onTapOnMenu, required BuildContext context}) =>
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -549,7 +545,7 @@ class AppWidget {
       );
 
   static containerWithLinearColor(
-      {double? height, required Widget widget, VoidCallback? onTap}) =>
+          {double? height, required Widget widget, VoidCallback? onTap}) =>
       Container(
           height: height ?? 10.h,
           decoration: BoxDecoration(
@@ -561,24 +557,23 @@ class AppWidget {
             children: [
               Expanded(
                   child: GestureDetector(
-                    onTap: onTap ?? () => Get.back(),
-                    child: Container(
-                      //color: Colors.red,
-                      height: 8.h,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.arrow_back_sharp,
-                        color: Colors.white,
-                        size: 10.w,
-                      ),
-                    ),
-                  )),
+                onTap: onTap ?? () => Get.back(),
+                child: Container(
+                  //color: Colors.red,
+                  height: 8.h,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.arrow_back_sharp,
+                    color: Colors.white,
+                    size: 10.w,
+                  ),
+                ),
+              )),
               Expanded(flex: 5, child: widget),
             ],
           ));
 
-  static progressIndicator({Color? color}) =>
-      Center(
+  static progressIndicator({Color? color}) => Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(
             color ?? ColorConstant.backGroundColorOrange,
@@ -595,8 +590,7 @@ class AppWidget {
     DrawerText(text: 'Sign Out', routeString: ''),
   ];
 
-  static appbar({required String text, Widget? widget}) =>
-      AppBar(
+  static appbar({required String text, Widget? widget}) => AppBar(
         centerTitle: true,
         title: Text(
           text,
@@ -610,122 +604,115 @@ class AppWidget {
         leading: widget != null
             ? Container()
             : IconButton(
-            padding: EdgeInsets.only(left: 8.w),
-            onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back_ios)),
+                padding: EdgeInsets.only(left: 8.w),
+                onPressed: () => Get.back(),
+                icon: const Icon(Icons.arrow_back_ios)),
       );
 
-  static drawerWidget() =>
-      Drawer(
-          width: 80.w,
-          child: Container(
-            decoration: BoxDecoration(gradient: ColorConstant.linearColor),
-            child: ListView(children: [
-              Padding(
-                padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 00),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+  static drawerWidget() => Drawer(
+      width: 80.w,
+      child: Container(
+        decoration: BoxDecoration(gradient: ColorConstant.linearColor),
+        child: ListView(children: [
+          Padding(
+            padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 00),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  smallerSizedBox,
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: GestureDetector(
+                        onTap: () => Get.back(),
+                        child: const Icon(Icons.close, color: Colors.white)),
+                  ),
+                  const CircleAvatar(
+                    minRadius: 12,
+                    maxRadius: 50,
+                    backgroundColor: Colors.white54,
+                  ),
+                  smallerSizedBox,
+                  Padding(
+                    padding:
+                        paddingSymmetric(horizontalPad: 1.w, verticalPad: 00),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == false ? 'Guest' : authController.userModel.value.user?.name.toString()}',
+                          style: AppStyles.mediumTextStyle,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Get.back();
+                            Get.toNamed(RouteHelper.profilePage);
+                          },
+                          child: Container(
+                            padding: paddingAll(paddingAll: 1.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2.w),
+                              color: const Color(0xffE42F3B),
+                            ),
+                            child: const Icon(Icons.edit, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]),
+          ),
+          smallerSizedBox,
+          Container(
+            color: const Color(0xffF0747F),
+            height: 4.h,
+          ),
+          mediumSizedBox,
+          ListView.builder(
+              itemCount: drawerText.length,
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemBuilder: ((context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    if (drawerText[index].text == 'About Us') {
+                      Get.back();
+                      Get.toNamed(RouteHelper.aboutUs);
+                    }
+                    if (index == drawerText.length - 1) {
+                      Get.back();
+                      _showSignOutDialog();
+                    }
+                  },
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      smallerSizedBox,
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: GestureDetector(
-                            onTap: () => Get.back(),
-                            child: const Icon(
-                                Icons.close, color: Colors.white)),
-                      ),
-                      const CircleAvatar(
-                        minRadius: 12,
-                        maxRadius: 50,
-                        backgroundColor: Colors.white54,
+                      Padding(
+                        padding: EdgeInsets.only(left: 10.w),
+                        child: Text(drawerText[index].text.toString(),
+                            style: AppStyles.mediumTextStyle),
                       ),
                       smallerSizedBox,
                       Padding(
-                        padding:
-                        paddingSymmetric(horizontalPad: 1.w, verticalPad: 00),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${SharedPrefClass.getBool(
-                                  SharedPrefStrings.isLogin, false) == false
-                                  ? 'Guest'
-                                  : authController.userModel.value.user?.name
-                                  .toString()}',
-                              style: AppStyles.mediumTextStyle,
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Get.back();
-                                Get.toNamed(RouteHelper.profilePage);
-                              },
-                              child: Container(
-                                padding: paddingAll(paddingAll: 1.w),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(2.w),
-                                  color: const Color(0xffE42F3B),
-                                ),
-                                child: const Icon(Icons.edit, color: Colors
-                                    .white),
-                              ),
-                            ),
-                          ],
-                        ),
+                        padding: EdgeInsets.only(right: 15.w),
+                        child: const Divider(color: Colors.white),
                       ),
-                    ]),
-              ),
-              smallerSizedBox,
-              Container(
-                color: const Color(0xffF0747F),
-                height: 4.h,
-              ),
-              mediumSizedBox,
-              ListView.builder(
-                  itemCount: drawerText.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: ((context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        if (drawerText[index].text == 'About Us') {
-                          Get.back();
-                          Get.toNamed(RouteHelper.aboutUs);
-                        }
-                        if (index == drawerText.length - 1) {
-                          Get.back();
-                          _showSignOutDialog();
-                        }
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 10.w),
-                            child: Text(drawerText[index].text.toString(),
-                                style: AppStyles.mediumTextStyle),
-                          ),
-                          smallerSizedBox,
-                          Padding(
-                            padding: EdgeInsets.only(right: 15.w),
-                            child: const Divider(color: Colors.white),
-                          ),
-                          smallerSizedBox,
-                        ],
-                      ),
-                    );
-                  })),
-              largeSizedBox,
-              mediumSizedBox,
-              SizedBox(
-                height: 10.h,
-                child: Image.asset(
-                  AppAssets.bondioText,
-                ),
-              ),
-              largeSizedBox,
-            ]),
-          ));
+                      smallerSizedBox,
+                    ],
+                  ),
+                );
+              })),
+          largeSizedBox,
+          mediumSizedBox,
+          SizedBox(
+            height: 10.h,
+            child: Image.asset(
+              AppAssets.bondioText,
+            ),
+          ),
+          largeSizedBox,
+        ]),
+      ));
 
   static _showSignOutDialog() {
     AuthController authController = Get.put(AuthController());
@@ -744,7 +731,7 @@ class AppWidget {
           Padding(
             padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
             child:
-            AppWidget.elevatedButton(text: 'No', onTap: () => Get.back()),
+                AppWidget.elevatedButton(text: 'No', onTap: () => Get.back()),
           ),
           Padding(
             padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
@@ -760,8 +747,7 @@ class AppWidget {
   }
 
   static cscPiker({required AuthController authController}) =>
-      Obx(() =>
-          CSCPicker(
+      Obx(() => CSCPicker(
             showCities: true,
             showStates: true,
             layout: Layout.vertical,

@@ -3,6 +3,7 @@ import 'package:bondio/screens/auth/auth.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/dashboard.dart';
 import 'package:bondio/screens/home_screen.dart';
+import 'package:bondio/screens/instagram_login.dart';
 import 'package:bondio/screens/profile_page.dart';
 import 'package:get/get.dart';
 import '../screens/reward_and_share/reward_and_share.dart';
@@ -35,7 +36,7 @@ class RouteHelper {
   static String forgotPassword = '/forgotPassword';
   static String profilePage = '/profilePage';
   static String aboutUs = '/aboutUs';
-
+  static String instagramLogin = '/instagramLogin';
   static List<GetPage> getPages = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
     GetPage(name: introScreen, page: () => const IntroScreen()),
@@ -64,5 +65,6 @@ class RouteHelper {
     GetPage(name: addParticipant, page: () => const AddParticipant()),
     GetPage(name: removeParticipant, page: () => const RemoveParticipant()),
     GetPage(name: createGroup, page: () => CreateGroup()),
+    GetPage(name: instagramLogin, page: () => InstagramLogin()),
   ];
 }
