@@ -83,141 +83,153 @@ class _ContactScreenState extends State<ContactScreen> {
     // }
 
     List<ContactListModel> loadedList =
-        await SharedPrefClass.getListFromSharedPreferences();
+        await SharedPrefClass.getListFromSharedPreferences(
+            sharedPrefString: SharedPrefStrings.myContacts);
+    List<ContactListModel> availableList =
+        await SharedPrefClass.getListFromSharedPreferences(
+            sharedPrefString: SharedPrefStrings.availableContacts);
     log('MY SHERED ${loadedList.length}');
+    log('MY SHERED ${availableList.length}');
     //log('MY SHERED ${loadedList.first.toMap()}');
 
     if (!await FlutterContacts.requestPermission(readonly: true)) {
     } else {
-      // if (loadedList.isNotEmpty) {
-      //   chatController.contacts.value = loadedList;
-      //   chatController.update();
-      //   chatController.contacts.refresh();
-      // } else {
-      FlutterContacts.getContacts(withProperties: true, withPhoto: true)
-          .then((contacts) async {
-        log('Con ${contacts.first.toString()}');
+      if (loadedList.isNotEmpty) {
+        chatController.contacts.value = loadedList;
+        chatController.availableChatPersonFromContacts.value = availableList;
+        chatController.update();
+        chatController.contacts.refresh();
+        chatController.availableChatPersonFromContacts.refresh();
+      } else {
+        FlutterContacts.getContacts(withProperties: true, withPhoto: true)
+            .then((contacts) async {
+          log('Con ${contacts.first.toString()}');
 
-        contacts.map((data) {
-          String phone = data.phones.isNotEmpty
-              ? data.phones.first.normalizedNumber.toString().isNotEmpty
-                  ? data.phones.first.normalizedNumber.toString()
-                  : 'none'
-              : 'none';
-          log('PHONE ${phone}');
-          chatController.contactCollection.doc(phone).get().then((value) {
-            if (value.exists) {
-              chatController.contacts.value.add(ContactListModel(
-                  id: value.get('id'),
-                  name: data.displayName,
-                  phoneNumber: phone,
-                  status: value.get('status')));
-              chatController.contacts.refresh();
-              chatController.update();
-              SharedPrefClass.saveListToSharedPreferences(
-                  chatController.contacts.value);
-              if (value.get('status') == 'Chat') {
-                chatController.availableChatPersonFromContacts.add(
-                    ContactListModel(
-                        id: value.get('id'),
-                        name: data.displayName,
-                        phoneNumber: phone,
-                        status: value.get('status')));
-                chatController.availableChatPersonFromContacts.refresh();
+          contacts.map((data) {
+            String phone = data.phones.isNotEmpty
+                ? data.phones.first.normalizedNumber.toString().isNotEmpty
+                    ? data.phones.first.normalizedNumber.toString()
+                    : 'none'
+                : 'none';
+            log('PHONE ${phone}');
+            chatController.contactCollection.doc(phone).get().then((value) {
+              if (value.exists) {
+                chatController.contacts.value.add(ContactListModel(
+                    id: value.get('id'),
+                    name: data.displayName,
+                    phoneNumber: phone,
+                    status: value.get('status')));
+                chatController.contacts.refresh();
                 chatController.update();
-                log('AvailableList ${chatController.availableChatPersonFromContacts.value.length}');
+                SharedPrefClass.saveListToSharedPreferences(
+                    con: chatController.contacts.value,
+                    sharedPrefString: SharedPrefStrings.myContacts);
+                if (value.get('status') == 'Chat') {
+                  chatController.availableChatPersonFromContacts.add(
+                      ContactListModel(
+                          id: value.get('id'),
+                          name: data.displayName,
+                          phoneNumber: phone,
+                          status: value.get('status')));
+                  chatController.availableChatPersonFromContacts.refresh();
+                  chatController.update();
+                  SharedPrefClass.saveListToSharedPreferences(
+                      con: chatController.availableChatPersonFromContacts.value,
+                      sharedPrefString: SharedPrefStrings.availableContacts);
+                  log('AvailableList ${chatController.availableChatPersonFromContacts.value.length}');
+                }
+              } else {
+                chatController.contacts.value.add(ContactListModel(
+                    id: data.loginId,
+                    name: data.displayName,
+                    phoneNumber: phone,
+                    status: data.status.toString()));
+                chatController.contacts.refresh();
+                chatController.update();
+                SharedPrefClass.saveListToSharedPreferences(
+                    con: chatController.contacts.value,
+                    sharedPrefString: SharedPrefStrings.myContacts);
+                log('contactList ${chatController.contacts.value.length}');
               }
-            } else {
-              chatController.contacts.value.add(ContactListModel(
-                  id: data.loginId,
-                  name: data.displayName,
-                  phoneNumber: phone,
-                  status: data.status.toString()));
-              chatController.contacts.refresh();
-              chatController.update();
-              SharedPrefClass.saveListToSharedPreferences(
-                  chatController.contacts.value);
-              log('contactList ${chatController.contacts.value.length}');
-            }
-          });
+            });
+            // SharedPrefClass.saveListToSharedPreferences(
+            //     chatController.contacts.value);
+            log('contactList ${chatController.contacts.value.length}');
+            //log('contactList ${chatController.contacts.value.first.toMap()}');
+            // log('ISEXITS ${isExits}');
+            // return ContactListModel(
+            //     id: data.loginId,
+            //     name: data.displayName,
+            //     phoneNumber: phone,
+            //     status: data.status.toString());
+          }).toList();
+
           // SharedPrefClass.saveListToSharedPreferences(
           //     chatController.contacts.value);
-          log('contactList ${chatController.contacts.value.length}');
-          //log('contactList ${chatController.contacts.value.first.toMap()}');
-          // log('ISEXITS ${isExits}');
-          // return ContactListModel(
-          //     id: data.loginId,
-          //     name: data.displayName,
-          //     phoneNumber: phone,
-          //     status: data.status.toString());
-        }).toList();
+          // log('contactList ${chatController.contacts.value.length}');
+          // log('contactList ${chatController.contacts.value.first.toMap()}');
 
-        // SharedPrefClass.saveListToSharedPreferences(
-        //     chatController.contacts.value);
-        // log('contactList ${chatController.contacts.value.length}');
-        // log('contactList ${chatController.contacts.value.first.toMap()}');
+          // chatController.contacts.asMap().entries.map((data) async {
+          //   if (chatController.contacts[data.key].phoneNumber
+          //       .toString()
+          //       .isNotEmpty) {
+          //     await chatController.contactCollection
+          //         .doc(chatController.contacts[data.key].phoneNumber
+          //                 .toString()
+          //                 .isNotEmpty
+          //             ? chatController.contacts[data.key].phoneNumber
+          //             : 'none')
+          //         .get()
+          //         .then((value) {
+          //       log('ENter');
+          //       if (value.exists) {
+          //         log('MYNUMBER ${chatController.contacts[data.key].phoneNumber}');
+          //         chatController.contacts[data.key].status = value.get('status');
+          //         chatController.contacts[data.key].id = value.get('id');
+          //
+          //         chatController.contacts.refresh();
+          //         chatController.update();
+          //         SharedPrefClass.saveListToSharedPreferences(
+          //             chatController.contacts.value);
+          //
+          //         if (chatController.contacts[data.key].status == 'Chat') {
+          //           chatController.availableChatPersonFromContacts.add(data);
+          //           chatController.availableChatPersonFromContacts.refresh();
+          //           chatController.update();
+          //         }
+          //         chatController.contacts.refresh();
+          //       }
+          //     });
+          //     SharedPrefClass.saveListToSharedPreferences(
+          //         chatController.contacts.value);
+          //   }
+          // });
+        });
+        // }
 
-        // chatController.contacts.asMap().entries.map((data) async {
-        //   if (chatController.contacts[data.key].phoneNumber
-        //       .toString()
-        //       .isNotEmpty) {
+        // chatController.contacts.addAll(contacts);
+        // chatController.contacts.asMap().entries.map((e) async {
+        //   if (chatController.contacts[e.key].phones.isNotEmpty) {
         //     await chatController.contactCollection
-        //         .doc(chatController.contacts[data.key].phoneNumber
-        //                 .toString()
-        //                 .isNotEmpty
-        //             ? chatController.contacts[data.key].phoneNumber
-        //             : 'none')
+        //         .doc(chatController
+        //             .contacts[e.key].phones.first.normalizedNumber
+        //             .toString())
         //         .get()
         //         .then((value) {
-        //       log('ENter');
         //       if (value.exists) {
-        //         log('MYNUMBER ${chatController.contacts[data.key].phoneNumber}');
-        //         chatController.contacts[data.key].status = value.get('status');
-        //         chatController.contacts[data.key].id = value.get('id');
-        //
+        //         chatController.contacts[e.key].status = value.get('status');
+        //         chatController.contacts[e.key].loginId = value.get('id');
         //         chatController.contacts.refresh();
         //         chatController.update();
-        //         SharedPrefClass.saveListToSharedPreferences(
-        //             chatController.contacts.value);
-        //
-        //         if (chatController.contacts[data.key].status == 'Chat') {
-        //           chatController.availableChatPersonFromContacts.add(data);
+        //         if (chatController.contacts[e.key].status == 'Chat') {
+        //           chatController.availableChatPersonFromContacts
+        //               .add(chatController.contacts[e.key]);
         //           chatController.availableChatPersonFromContacts.refresh();
-        //           chatController.update();
         //         }
         //         chatController.contacts.refresh();
         //       }
         //     });
-        //     SharedPrefClass.saveListToSharedPreferences(
-        //         chatController.contacts.value);
-        //   }
-        // });
-      });
-      // }
-
-      // chatController.contacts.addAll(contacts);
-      // chatController.contacts.asMap().entries.map((e) async {
-      //   if (chatController.contacts[e.key].phones.isNotEmpty) {
-      //     await chatController.contactCollection
-      //         .doc(chatController
-      //             .contacts[e.key].phones.first.normalizedNumber
-      //             .toString())
-      //         .get()
-      //         .then((value) {
-      //       if (value.exists) {
-      //         chatController.contacts[e.key].status = value.get('status');
-      //         chatController.contacts[e.key].loginId = value.get('id');
-      //         chatController.contacts.refresh();
-      //         chatController.update();
-      //         if (chatController.contacts[e.key].status == 'Chat') {
-      //           chatController.availableChatPersonFromContacts
-      //               .add(chatController.contacts[e.key]);
-      //           chatController.availableChatPersonFromContacts.refresh();
-      //         }
-      //         chatController.contacts.refresh();
-      //       }
-      //     });
-      //   }
+      }
       // }).toList();
     }
   }
@@ -460,7 +472,8 @@ class _ContactScreenState extends State<ContactScreen> {
                       chatController.contacts[index].status = 'Invited';
                       chatController.contacts.refresh();
                       SharedPrefClass.saveListToSharedPreferences(
-                          chatController.contacts.value);
+                          con: chatController.contacts.value,
+                          sharedPrefString: SharedPrefStrings.myContacts);
                     } else {
                       chatController.searchContactListModel[index].status =
                           'Invited';
@@ -469,7 +482,8 @@ class _ContactScreenState extends State<ContactScreen> {
                           chatController.searchContactListModel[index].status);
                       chatController.contacts.refresh();
                       SharedPrefClass.saveListToSharedPreferences(
-                          chatController.contacts.value);
+                          con: chatController.contacts.value,
+                          sharedPrefString: SharedPrefStrings.myContacts);
                       chatController.searchContactListModel.refresh();
                     }
 

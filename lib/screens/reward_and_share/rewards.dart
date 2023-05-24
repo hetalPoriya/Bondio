@@ -91,10 +91,7 @@ class _RewardsScreenState extends State<RewardsScreen>
           homeController.update();
         },
         backIcon: false,
-        backgroundImage:
-            SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == false
-                ? AppAssets.normalBackground
-                : AppAssets.rewardBackground,
+        backgroundImage: AppAssets.normalBackground,
         appBarWidget: SizedBox(
           width: 60.w,
           child: Text(
@@ -269,7 +266,7 @@ class _RewardsScreenState extends State<RewardsScreen>
                       containerListWidget(
                           image1: AppAssets.partyAttendance,
                           count1: '0',
-                          text1: 'Party Attendance',
+                          text1: 'Event Attendance',
                           text2: 'Upcoming Events',
                           count2: '0',
                           image2: AppAssets.upcomingEvent),

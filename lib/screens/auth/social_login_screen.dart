@@ -126,10 +126,10 @@ class _SocialLoginScreenState extends State<SocialLoginScreen> {
                 Text('Please enter your phone number to find your friends.',
                     style: AppStyles.smallerTextStyle),
                 if (authController.isGoogle.value == 'Twitter' ||
-                    authController.isGoogle.value == "Outlook")
+                    authController.isGoogle.value == "Instagram")
                   smallSizedBox,
                 if (authController.isGoogle.value == 'Twitter' ||
-                    authController.isGoogle.value == "Outlook")
+                    authController.isGoogle.value == "Instagram")
                   AppWidget.textFormFiledWhite(
                       textEditingController:
                           authController.emailController.value,

@@ -23,15 +23,15 @@ class OtpMap {
 }
 
 class OtpModel {
+  bool? status;
+  String? msg;
+  OtpData? data;
+
   OtpModel({
     this.status,
     this.msg,
     this.data,
   });
-
-  bool? status;
-  String? msg;
-  OtpData? data;
 
   factory OtpModel.fromMap(Map<String, dynamic> json) => OtpModel(
         status: json["Status"],
@@ -47,21 +47,17 @@ class OtpModel {
 }
 
 class OtpData {
+  String? service;
+
   OtpData({
-    this.name,
-    this.otp,
+    this.service,
   });
 
-  String? name;
-  int? otp;
-
   factory OtpData.fromMap(Map<String, dynamic> json) => OtpData(
-        name: json["name"],
-        otp: json["otp"],
+        service: json["service"],
       );
 
   Map<String, dynamic> toMap() => {
-        "name": name,
-        "otp": otp,
+        "service": service,
       };
 }

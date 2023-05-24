@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
+import 'package:cross_file/src/types/interface.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/instance_manager.dart';
+import 'package:get/route_manager.dart';
+import 'package:get/state_manager.dart';
+
 import '../model/model.dart';
 import '../screens/chat/chat.dart';
 
@@ -45,6 +50,7 @@ class AuthController extends GetxController {
   var conPassController = TextEditingController().obs;
   var referCodeController = TextEditingController().obs;
   var zipCodeController = TextEditingController().obs;
+  var aboutMeController = TextEditingController().obs;
 
   //for date picker
   RxString formattedDate = ''.obs;
@@ -78,6 +84,10 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
 
+      log('Email ${emailController.value.text}');
+      log('Email ${fullNameController.value.text}');
+      log('Email ${countryCodeController.value.text}${mobileController.value.text}');
+
       if (countryCodeController.value.text.isEmpty) {
         countryCodeController.value.text = '+1';
       }
@@ -90,16 +100,16 @@ class AuthController extends GetxController {
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.registerOtpApi),
         data: otpModelToMap(otpMap),
-        options: NetworkHandler.options,
+        //options: NetworkHandler.options,
       );
       log('OtpResponse ${response.data}');
       if (response.data['Status'] == true) {
         OtpModel data = OtpModel.fromMap(response.data);
-        otpValue.value = data.data!.otp.toString();
+        otpValue.value = data.data!.service.toString();
         AppWidget.toast(text: data.msg.toString());
         Get.toNamed(RouteHelper.verifyEmail);
       } else {
-        AppWidget.toast(text: response.data['Data'][0].toString());
+        AppWidget.toast(text: 'Please enter valid phone number');
       }
     } catch (e) {
       log(e.toString());
@@ -113,8 +123,9 @@ class AuthController extends GetxController {
       isLoading(true);
       String? token = await FirebaseMessaging.instance.getToken();
       log('Token $token');
-      log('Token ${linkedinToken.value}');
-      log('Token ${emailController.value.text.toString()}');
+      log('Token $token');
+      log(' otpValue.value ${otpValue.value}');
+      log(' otpValue.value ${enterOtpByUser.value}');
 
       SignUpBody signUpBody = SignUpBody(
           email: emailController.value.text.toString(),
@@ -140,6 +151,8 @@ class AuthController extends GetxController {
           twitterToken: twitterToken.value,
           facebookToken: facebookToken.value,
           googleToken: googleToken.value,
+          otp: enterOtpByUser.value,
+          service: otpValue.value,
           gender: ' ',
           referCode: ' ');
 
@@ -309,6 +322,70 @@ class AuthController extends GetxController {
       } finally {
         isLoading(false);
       }
+    }
+  }
+
+  updateProfileApiCall({File? imagePath}) async {
+    try {
+      isLoading(true);
+
+      log('TOKEN ${userModel.value.token.toString()}');
+      log('API ${ApiConstant.buildUrl(ApiConstant.updateProfileApi)}');
+      log('API ${imagePath.toString()}');
+      String fileName = imagePath?.path.split('/').last ?? '';
+
+      log('fileName ${fileName.toString()}');
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.updateProfileApi),
+        data: FormData.fromMap({
+          "photo": fileName.isNotEmpty
+              ? await MultipartFile.fromFile(imagePath?.path ?? '',
+                  filename: fileName)
+              : userModel.value.user!.photo.toString(),
+          "name": fullNameController.value.text,
+          "zip_code": zipCodeController.value.text,
+          "country": countryValue.value,
+          "state": stateValue.value,
+          "city": cityValue.value,
+          "about_me": aboutMeController.value.text,
+        }),
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${userModel.value.token.toString()}'
+        }),
+      );
+      log('RegisterResponse ${response.data}');
+      if (response.data['Status'] == true) {
+        LoginModel data = LoginModel.fromMap(response.data);
+        SharedPrefClass.setUserData(json.encode(response.data['Data']));
+        AppWidget.toast(text: data.msg.toString());
+        SharedPrefClass.setBool(SharedPrefStrings.isLogin, true);
+        SharedPrefClass.setString(
+            SharedPrefStrings.userId, data.data?.user?.id.toString() ?? '');
+        SharedPrefClass.setString(
+            SharedPrefStrings.userName, data.data?.user?.name.toString() ?? '');
+        await ChatWidget.getUserInfo();
+
+        chatController.userCollection
+            .doc(data.data?.user?.id.toString())
+            .update({
+          "photo": data.data?.user?.photo.toString() ?? '',
+          "name": data.data?.user?.name.toString() ?? '',
+          "zip_code": data.data?.user?.zipCode.toString() ?? '',
+          "country": data.data?.user?.country.toString() ?? '',
+          "state": data.data?.user?.state.toString() ?? '',
+          "city": data.data?.user?.city.toString() ?? '',
+          "about_me": data.data?.user?.aboutMe.toString() ?? '',
+        });
+
+        Get.offNamedUntil(RouteHelper.homeScreen, (route) => false);
+      } else {
+        AppWidget.toast(text: response.data['Data'][0].toString());
+      }
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isLoading(false);
     }
   }
 }

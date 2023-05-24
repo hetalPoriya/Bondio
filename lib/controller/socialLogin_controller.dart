@@ -183,20 +183,30 @@ class SocialLoginController extends GetxController {
     // );
   }
 
-  signInWithInstagram({required String userName}) async {
-    FlutterInsta flutterInsta = new FlutterInsta();
-    await flutterInsta.getProfileData(userName);
-
-    print("Username : ${flutterInsta.username}");
-    print("Followers : ${flutterInsta.followers}");
-    print("Folowing : ${flutterInsta.following}");
-    print("Bio : ${flutterInsta.bio}");
-    print("Website : ${flutterInsta.website}");
-    print("Profile Image : ${flutterInsta.imgurl}");
-    print("Feed images:${flutterInsta.feedImagesUrl}");
-
+  signInWithInstagram({required String userName, required String id}) async {
+    authController.isLoading(true);
+    // FlutterInsta flutterInsta = new FlutterInsta();
+    // try {
+    //   await flutterInsta.getProfileData(userName);
+    //
+    //   log("Username : ${flutterInsta.username ?? ''}");
+    //   log("Followers : ${flutterInsta.followers ?? ''}");
+    //   log("Folowing : ${flutterInsta.following ?? ''}");
+    //   log("Bio : ${flutterInsta.bio ?? ''}");
+    //   log("Website : ${flutterInsta.website ?? ''}");
+    //   log("Profile Image : ${flutterInsta.imgurl ?? ''}");
+    //   log("Feed images:${flutterInsta.feedImagesUrl ?? ''}");
+    authController.fullNameController.value.text = userName ?? '';
+    authController.emailController.value.text = '' ?? '';
+    authController.imageController.value.text = '';
+    authController.instagramToken.value = id.toString() ?? '';
     await authController.userExistOrNotApi(
-        tokenType: 'instagram_token', token: '' ?? ''); //instagram username;
+        tokenType: 'instagram_token', token: id.toString() ?? '');
+    // } catch (e) {
+    //   authController.isLoading(false);
+    //   log('zas   ${e.toString()}');
+    //   AppWidget.toast(text: 'Please enter correct userName');
+    // } //instagram username;
   }
 
   signInWithTwitter() async {

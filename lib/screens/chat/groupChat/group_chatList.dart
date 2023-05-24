@@ -22,6 +22,12 @@ class _GroupChatListState extends State<GroupChatList> {
   ChatController chatController = Get.put(ChatController());
 
   @override
+  void initState() {
+    log(SharedPrefClass.getString(SharedPrefStrings.userId));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -49,7 +55,7 @@ class _GroupChatListState extends State<GroupChatList> {
             stream: chatController.groupChatRoomCollection
                 .where(ApiConstant.membersId,
                     arrayContains:
-                        SharedPrefClass.getString(SharedPrefStrings.userId))
+                        authController.userModel.value.user?.id.toString())
                 .orderBy(ApiConstant.timestamp, descending: true)
                 .snapshots(),
             builder: ((context, snapshot) {

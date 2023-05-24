@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
+import '../screens/chat/chat.dart';
+
 class AppWidget {
   // static appBarMenu(
   //         {bool? backIcon = true,
@@ -248,8 +250,10 @@ class AppWidget {
         validator: validator,
         decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: textStyle ?? AppStyles.smallTextStyle,
-            labelStyle: textStyle ?? AppStyles.smallTextStyle,
+            hintStyle: textStyle ??
+                AppStyles.smallTextStyle.copyWith(color: Colors.grey.shade500),
+            labelStyle: textStyle ??
+                AppStyles.smallTextStyle.copyWith(color: Colors.grey.shade500),
             contentPadding: paddingAll(paddingAll: 3.w),
             labelText: hintText,
             suffixIcon: GestureDetector(
@@ -323,9 +327,12 @@ class AppWidget {
         scrollDirection: Axis.horizontal,
         child: Container(
           margin: paddingSymmetric(horizontalPad: 3.w),
+          // color: Colors.grey,
+          width: 87.w,
           height: 7.h,
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: List.generate(
                 socialMedia.length,
                 (index) => GestureDetector(
@@ -583,7 +590,7 @@ class AppWidget {
       );
 
   static List<DrawerText> drawerText = [
-    DrawerText(text: 'Events / Party', routeString: ''),
+    DrawerText(text: 'Events', routeString: ''),
     DrawerText(text: 'Privacy', routeString: ''),
     DrawerText(text: 'Help & Support', routeString: ''),
     DrawerText(text: 'About Us', routeString: ''),
@@ -627,10 +634,12 @@ class AppWidget {
                         onTap: () => Get.back(),
                         child: const Icon(Icons.close, color: Colors.white)),
                   ),
-                  const CircleAvatar(
+                  CircleAvatar(
                     minRadius: 12,
                     maxRadius: 50,
-                    backgroundColor: Colors.white54,
+                    backgroundColor: Colors.black12,
+                    backgroundImage: ChatWidget.displayImage(
+                        image: authController.userModel.value.user?.photo),
                   ),
                   smallerSizedBox,
                   Padding(
@@ -767,9 +776,12 @@ class AppWidget {
             // cityDropdownLabel: authController.cityValue.value,
             // countryDropdownLabel: authController.countryValue.value,
             // stateDropdownLabel: authController.stateValue.value,
-            dropdownHeadingStyle: AppStyles.smallTextStyle,
-            dropdownItemStyle: AppStyles.smallTextStyle,
-            selectedItemStyle: AppStyles.smallTextStyle,
+            dropdownHeadingStyle:
+                AppStyles.smallTextStyle.copyWith(color: Colors.black),
+            dropdownItemStyle:
+                AppStyles.smallTextStyle.copyWith(color: Colors.black),
+            selectedItemStyle:
+                AppStyles.smallTextStyle.copyWith(color: Colors.black),
             dropdownDecoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(

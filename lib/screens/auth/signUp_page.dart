@@ -796,7 +796,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           loading: authController.isLoading.value,
                           text: AppStrings.signUp,
                           onTap: () async {
-                            log('CountryCOde ${authController.countryCodeController.value.text}');
+                            // log('CountryCOde ${authController.countryCodeController.value.text}');
                             if (_formkey.currentState!.validate()) {
                               log('REFRE ${authController.referCodeController.value.text}');
 

@@ -7,3 +7,4 @@ export 'app_styles.dart';
 export 'form_validator.dart';
 export 'api_constant.dart';
 export 'widgets.dart';
+export 'instagram_constant.dart';

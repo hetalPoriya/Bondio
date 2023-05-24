@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/auth/bigPolygon_background.dart';
@@ -17,6 +19,13 @@ class _ProfilePageState extends State<ProfilePage> {
   ChatController chatController = Get.put(ChatController());
 
   @override
+  void initState() {
+    ChatWidget.getUserInfo();
+    log('ass ${authController.userModel.value.user?.toMap()}');
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BigPolygonBackground(
         aboveText: Row(children: [
@@ -26,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Text(
                   authController.userModel.value.user?.name.toString() ??
                       'Guest',
-                  style: AppStyles.mediumTextStyle
+                  style: AppStyles.extraLargeTextStyle
                       .copyWith(fontWeight: FontWeight.w500)),
             ),
           ),
@@ -41,11 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   CircleAvatar(
                     minRadius: 5.h,
                     maxRadius: 6.h,
-                    backgroundImage: chatController.pickedImage?.value == null
-                        ? AssetImage(AppAssets.addContact) as ImageProvider
-                        : FileImage(
-                            chatController.pickedImage!.value!,
-                          ),
+                    backgroundColor: Colors.black12,
+                    backgroundImage: ChatWidget.displayImage(
+                        image: authController.userModel.value.user?.photo),
                   ),
                   Align(
                     alignment: Alignment.bottomRight,
@@ -74,16 +81,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   () => Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'My profile',
-                        style:
-                            AppStyles.mediumTextStyle.copyWith(fontSize: 20.sp),
-                      ),
-                      smallSizedBox,
+                      // Text(
+                      //   'My profile',
+                      //   style: AppStyles.mediumTextStyle.copyWith(
+                      //       fontSize: 20.sp,
+                      //       color: ColorConstant.backGroundColorOrange),
+                      // ),
+                      // smallSizedBox,
+                      smallerSizedBox,
                       AppWidget.textFormFiledProfilePage(
                           textEditingController:
                               authController.fullNameController.value,
                           hintText: AppStrings.firstName,
+                          validator: FormValidation.emptyValidation(
+                              value:
+                                  authController.fullNameController.value.text),
                           textInputType: TextInputType.name),
                       smallSizedBox,
                       AppWidget.textFormFiledProfilePage(
@@ -103,6 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             borderRadius: BorderRadius.circular(2.w)),
                         child: TextField(
+                            controller: authController.aboutMeController.value,
                             cursorColor: ColorConstant.backGroundColorOrange,
                             maxLines: null,
                             decoration: InputDecoration(
@@ -111,12 +124,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             )),
                       ),
                       smallSizedBox,
-                      AppWidget.elevatedButton(
-                          text: AppStrings.update,
-                          onTap: () {
-                            authController.update();
-                            Get.back();
-                          }),
+                      Obx(
+                        () => AppWidget.elevatedButton(
+                            loading: authController.isLoading.value,
+                            text: AppStrings.update,
+                            onTap: () async {
+                              authController.update();
+                              await authController.updateProfileApiCall();
+                            }),
+                      ),
                       largeSizedBox
                     ],
                   ),

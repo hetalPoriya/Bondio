@@ -85,11 +85,6 @@ class SharedPrefClass {
     prefs.setString('currentUser', userData);
   }
 
-  static Future<void> setContactData(String userData) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(SharedPrefStrings.myContacts, userData);
-  }
-
   static Future<String> getUserData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String myModel = pref.getString('currentUser') ?? "";
@@ -98,18 +93,20 @@ class SharedPrefClass {
   }
 
   static Future<void> saveListToSharedPreferences(
-      List<ContactListModel> con) async {
+      {required List<ContactListModel> con,
+      required String sharedPrefString}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> jsonList =
         con.map((contact) => jsonEncode(contact.toMap())).toList();
-    await prefs.setStringList(SharedPrefStrings.myContacts, jsonList);
+    await prefs.setStringList(sharedPrefString, jsonList);
     log('Added');
   }
 
   // Retrieve the list of objects from SharedPreferences
-  static Future<List<ContactListModel>> getListFromSharedPreferences() async {
+  static Future<List<ContactListModel>> getListFromSharedPreferences(
+      {required String sharedPrefString}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? jsonList = prefs.getStringList(SharedPrefStrings.myContacts);
+    List<String>? jsonList = prefs.getStringList(sharedPrefString);
 
     if (jsonList == null) {
       return [];

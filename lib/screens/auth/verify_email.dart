@@ -30,17 +30,18 @@ class VerifyEmail extends StatelessWidget {
                         style: AppStyles.smallTextStyle),
                   ),
                   Center(
-                    child: Text(authController.emailController.value.text,
-                        style: AppStyles.smallTextStyle
-                            .copyWith(color: Colors.black)),
+                    child: Text(
+                        '${authController.countryCodeController.value.text}${authController.mobileController.value.text}',
+                        style: AppStyles.smallTextStyle.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
-                  smallSizedBox,
-                  Center(
-                    child: Text(AppStrings.codeExpireString,
-                        style:
-                            AppStyles.smallTextStyle.copyWith(fontSize: 9.sp),
-                        textAlign: TextAlign.center),
-                  ),
+                  // smallSizedBox,
+                  // Center(
+                  //   child: Text(AppStrings.codeExpireString,
+                  //       style:
+                  //           AppStyles.smallTextStyle.copyWith(fontSize: 9.sp),
+                  //       textAlign: TextAlign.center),
+                  // ),
                   largeSizedBox,
                   OtpTextField(
                     numberOfFields: 6,
@@ -64,12 +65,12 @@ class VerifyEmail extends StatelessWidget {
                         text: AppStrings.verify,
                         loading: authController.isLoading.value,
                         onTap: () async {
-                          if (authController.enterOtpByUser.value !=
-                              authController.otpValue.value) {
-                            AppWidget.toast(text: 'Please enter valid otp');
-                          } else {
-                            await authController.registerApiCall();
-                          }
+                          // if (authController.enterOtpByUser.value !=
+                          //     authController.otpValue.value) {
+                          //   AppWidget.toast(text: 'Please enter valid otp');
+                          // } else {
+                          await authController.registerApiCall();
+                          // }
                         }),
                   ),
                   //onTap: () => Get.toNamed(RouteHelper.homeScreen)),

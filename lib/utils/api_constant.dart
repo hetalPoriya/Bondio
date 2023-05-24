@@ -11,12 +11,14 @@ class ApiConstant {
 
   //api
   //static String registerOtpApi = 'register-otp';
+  static String imageBaseUrl = 'https://bondiomeet.com/storage/app/';
   static String registerOtpApi = 'api/v1/registration-otp';
   static String registerApi = 'api/v1/register';
   static String isRegisterApi = 'api/v1/is-register';
   static String loginApi = 'api/v1/login';
   static String logoutApi = 'api/v1/logout';
   static String customerDetailApi = 'api/v1/customer-detail';
+  static String updateProfileApi = 'api/v1/update-profile';
 
   //firebase collections
   static String userCollection = 'user';

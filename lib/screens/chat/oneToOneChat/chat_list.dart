@@ -32,24 +32,34 @@ class _ChatListState extends State<ChatList> {
               controller: chatController.searchController.value,
               onChanged: (searchText) {
                 chatController.searchController.refresh();
+
                 chatController.searchUserInfoList.value = chatController
                     .userInfoList
-                    .where((x) => (x.peerName
-                            .toString()
-                            .toLowerCase()
-                            .contains(searchText.toString()) ||
-                        x.peerName
-                            .toString()
-                            .toUpperCase()
-                            .contains(searchText.toString())))
+                    .where((x) =>
+                ((x.user1[1]
+                    .toString()
+                    .toLowerCase()
+                    .contains(searchText.toString()) ||
+                    x.user1[1]
+                        .toString()
+                        .toUpperCase()
+                        .contains(searchText.toString()) ||
+                    x.user2[1]
+                        .toString()
+                        .toLowerCase()
+                        .contains(searchText.toString()) ||
+                    x.user2[1]
+                        .toString()
+                        .toUpperCase()
+                        .contains(searchText.toString()))))
                     .toList();
               }),
         ),
         StreamBuilder(
             stream: chatController.personalChatRoomCollection
                 .where(ApiConstant.members,
-                    arrayContains:
-                        authController.userModel.value.user?.id.toString())
+                arrayContains:
+                authController.userModel.value.user?.id.toString())
                 .orderBy('timestamp', descending: true)
                 .snapshots(),
             builder: ((context, snapshot) {
@@ -66,55 +76,58 @@ class _ChatListState extends State<ChatList> {
               return snapshot.data!.docs.isEmpty
                   ? ChatWidget.noConversionFound()
                   : Obx(() {
-                      return chatController.searchController.value.text.isEmpty
-                          ? displayList(
-                              userInfoList: chatController.userInfoList)
-                          : displayList(
-                              userInfoList: chatController.searchUserInfoList);
-                    });
+                return chatController.searchController.value.text.isEmpty
+                    ? displayList(
+                    userInfoList: chatController.userInfoList)
+                    : displayList(
+                    userInfoList: chatController.searchUserInfoList);
+              });
             }))
       ],
     );
   }
 
-  displayList({required RxList userInfoList}) => ListView.builder(
-      padding: paddingSymmetric(verticalPad: 1.h),
-      shrinkWrap: true,
-      itemCount: userInfoList.length,
-      physics: const ClampingScrollPhysics(),
-      itemBuilder: ((context, index) {
-        UserInfo userInfo = userInfoList[index];
-        log('UserInfo %${userInfo.members}');
-        log('UserInfo %${userInfo.lastMessage}');
-        List? members = userInfo.members;
-        members?.remove(authController.userModel.value.user?.id.toString());
+  displayList({required RxList userInfoList}) =>
+      ListView.builder(
+          padding: paddingSymmetric(verticalPad: 1.h),
+          shrinkWrap: true,
+          itemCount: userInfoList.length,
+          physics: const ClampingScrollPhysics(),
+          itemBuilder: ((context, index) {
+            UserInfo userInfo = userInfoList[index];
+            log('UserInfo %${userInfo.members}');
+            log('UserInfo %${userInfo.lastMessage}');
+            List? members = userInfo.members;
+            members?.remove(authController.userModel.value.user?.id.toString());
 
-        return Padding(
-            padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 1.h),
-            child: StreamBuilder(
-              stream: chatController.userCollection
-                  .doc(members?[0].toString())
-                  .snapshots(),
-              builder: (context, snapshot) => GestureDetector(
-                onTap: () async {
-                  homeController.personalChatPage.value = true;
-                  homeController.personalGroupChatPage.value = false;
-                  homeController.update();
-                  chatController.collectionId.value = userInfo.id.toString();
-                  chatController.peerId.value = members?[0];
+            return Padding(
+                padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 1.h),
+                child: StreamBuilder(
+                  stream: chatController.userCollection
+                      .doc(members?[0].toString())
+                      .snapshots(),
+                  builder: (context, snapshot) =>
+                      GestureDetector(
+                        onTap: () async {
+                          homeController.personalChatPage.value = true;
+                          homeController.personalGroupChatPage.value = false;
+                          homeController.update();
+                          chatController.collectionId.value =
+                              userInfo.id.toString();
+                          chatController.peerId.value = members?[0];
 
-                  chatController.update();
+                          chatController.update();
 
-                  Get.toNamed(RouteHelper.chatPage);
-                },
-                child: ChatWidget.chatContainer(
-                    titleText: snapshot.data?.get('name'),
-                    subText: userInfo.lastMessage ?? '',
-                    imageString: snapshot.data?.get('photo') ?? '',
-                    time: DateFormat('kk:mm a').format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                            int.parse(userInfo.timestamp.toString())))),
-              ),
-            ));
-      }));
+                          Get.toNamed(RouteHelper.chatPage);
+                        },
+                        child: ChatWidget.chatContainer(
+                            titleText: snapshot.data?.get('name'),
+                            subText: userInfo.lastMessage ?? '',
+                            imageString: snapshot.data?.get('photo') ?? '',
+                            time: DateFormat('kk:mm a').format(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    int.parse(userInfo.timestamp.toString())))),
+                      ),
+                ));
+          }));
 }

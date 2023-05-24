@@ -800,49 +800,47 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   buildAppBar() {
-    return GestureDetector(
-        onTap: () => Get.toNamed(RouteHelper.chatProfilePage),
-        child: StreamBuilder(
-            stream: chatController.userCollection
-                .doc(chatController.peerId.toString())
-                .snapshots(),
-            builder: (context, snapshot) {
-              Map<String, dynamic>? data = snapshot.data?.data();
-              return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 2.w,
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        homeController.onTapOnAddContact.value = false;
-                        homeController.personalGroupChatPage.value = false;
-                        homeController.personalChatPage.value = false;
-                        homeController.update();
+    return StreamBuilder(
+        stream: chatController.userCollection
+            .doc(chatController.peerId.toString())
+            .snapshots(),
+        builder: (context, snapshot) {
+          Map<String, dynamic>? data = snapshot.data?.data();
+          return Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 2.w,
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    homeController.onTapOnAddContact.value = false;
+                    homeController.personalGroupChatPage.value = false;
+                    homeController.personalChatPage.value = false;
+                    homeController.update();
 
-                        Get.back();
-                      },
-                      child: Icon(Icons.arrow_back_ios_outlined,
-                          color: Colors.white, size: 8.w),
-                    ),
-                    SizedBox(
-                      width: 6.w,
-                    ),
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      maxRadius: 6.w,
-                      minRadius: 2.w,
-                      backgroundImage:
-                          ChatWidget.displayImage(image: data?['photo'] ?? ''),
-                    ),
-                    SizedBox(
-                      width: 4.w,
-                    ),
-                    Text(data?['name'] ?? '', style: AppStyles.mediumTextStyle),
-                  ]);
-            }));
+                    Get.back();
+                  },
+                  child: Icon(Icons.arrow_back_ios_outlined,
+                      color: Colors.white, size: 8.w),
+                ),
+                SizedBox(
+                  width: 6.w,
+                ),
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  maxRadius: 6.w,
+                  minRadius: 2.w,
+                  backgroundImage:
+                      ChatWidget.displayImage(image: data?['photo'] ?? ''),
+                ),
+                SizedBox(
+                  width: 4.w,
+                ),
+                Text(data?['name'] ?? '', style: AppStyles.mediumTextStyle),
+              ]);
+        });
   }
 
   Widget buildItem(int index, DocumentSnapshot? document) {

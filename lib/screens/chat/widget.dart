@@ -14,6 +14,7 @@ import '../../model/model.dart';
 
 class ChatWidget {
   static ChatController chatController = Get.put(ChatController());
+  static AuthController authController = Get.put(AuthController());
 
   static Future<void> getUserInfo() async {
     AuthController authController = Get.put(AuthController());
@@ -23,6 +24,18 @@ class ChatWidget {
       authController
           .userModel(LoginData.fromMap(jsonDecode(response.toString())));
       authController.userModel.refresh();
+      authController.fullNameController.value.text =
+          authController.userModel.value.user?.name.toString() ?? '';
+      authController.zipCodeController.value.text =
+          authController.userModel.value.user?.zipCode.toString() ?? '';
+      authController.countryValue.value =
+          authController.userModel.value.user?.country.toString() ?? '';
+      authController.cityValue.value =
+          authController.userModel.value.user?.city.toString() ?? '';
+      authController.stateValue.value =
+          authController.userModel.value.user?.state.toString() ?? '';
+      authController.aboutMeController.value.text =
+          authController.userModel.value.user?.aboutMe.toString() ?? '';
       authController.update();
       log('UserResponse ${authController.userModel.value.toMap()}');
       log('UserResponse ${authController.userModel.value.user?.id.toString()}');
@@ -160,7 +173,7 @@ class ChatWidget {
   static showDialogForImage({required BuildContext context}) {
     return Get.defaultDialog(
         title: 'From where do you want to take the photo?',
-        titleStyle: AppStyles.mediumTextStyle,
+        titleStyle: AppStyles.mediumTextStyle.copyWith(color: Colors.grey),
         contentPadding: EdgeInsets.zero,
         content: Padding(
           padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 0),
@@ -202,6 +215,7 @@ class ChatWidget {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) return;
     chatController.pickedImage?.value = File(image.path);
+    await authController.updateProfileApiCall(imagePath: File(image.path));
     // firebaseController.uploadPic(image: File(image.path));
     chatController.update();
   }
@@ -210,6 +224,7 @@ class ChatWidget {
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null) return;
     chatController.pickedImage?.value = File(image.path);
+    await authController.updateProfileApiCall(imagePath: File(image.path));
     // firebaseController.uploadPic(image: File(image.path));
     chatController.update();
   }
@@ -217,6 +232,6 @@ class ChatWidget {
   static displayImage({String? image}) {
     return ((image.toString().isEmpty || image.toString() == ' '))
         ? AssetImage(AppAssets.addContact) as ImageProvider
-        : NetworkImage(image.toString());
+        : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
   }
 }

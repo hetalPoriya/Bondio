@@ -53,7 +53,9 @@ class SignUpBody {
       this.outlookToken,
       this.twitterToken,
       this.linkedinToken,
-      this.instagramToken});
+      this.instagramToken,
+      this.otp,
+      this.service});
 
   String? name;
   String? email;
@@ -77,6 +79,8 @@ class SignUpBody {
   dynamic instagramToken;
   dynamic twitterToken;
   dynamic linkedinToken;
+  String? otp;
+  String? service;
 
   Map<String, dynamic> toMap() => {
         "name": name,
@@ -101,6 +105,8 @@ class SignUpBody {
         "instagram_token": instagramToken,
         "linkedin_token": linkedinToken,
         "twitter_token": twitterToken,
+        "otp": otp,
+        "service": service
       };
 }
 
