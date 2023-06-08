@@ -4,6 +4,10 @@
 
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../utils/utils.dart';
+
 LoginModel loginModelFromMap(String str) =>
     LoginModel.fromMap(json.decode(str));
 
@@ -33,6 +37,9 @@ class LoginBody {
 class SignUpBody {
   SignUpBody(
       {this.name,
+      this.lName,
+      this.photoSocial,
+      this.onlineStatus,
       this.email,
       this.mobile,
       this.zipCode,
@@ -59,6 +66,9 @@ class SignUpBody {
 
   String? name;
   String? email;
+  String? onlineStatus;
+  dynamic lName;
+  dynamic photoSocial;
   String? mobile;
   dynamic zipCode;
   dynamic country;
@@ -85,6 +95,9 @@ class SignUpBody {
   Map<String, dynamic> toMap() => {
         "name": name,
         "email": email,
+        "lname": lName,
+        "photo_social": photoSocial,
+        "online_status": onlineStatus,
         "mobile": mobile,
         "zip_code": zipCode,
         "country": country,
@@ -158,6 +171,9 @@ class User {
   User({
     this.id,
     this.name,
+    this.lName,
+    this.onlineStatus,
+    this.photoSocial,
     this.email,
     this.mobile,
     this.zipCode,
@@ -182,6 +198,9 @@ class User {
 
   int? id;
   String? name;
+  String? lName;
+  String? photoSocial;
+  String? onlineStatus;
   String? email;
   String? mobile;
   dynamic zipCode;
@@ -206,6 +225,9 @@ class User {
   factory User.fromMap(Map<String, dynamic> json) => User(
         id: json["id"] ?? '',
         name: json["name"] ?? '',
+        lName: json["lname"] ?? '',
+        photoSocial: json["photo_social"] ?? '',
+        onlineStatus: json["online_status"] ?? '',
         email: json["email"] ?? '',
         mobile: json["mobile"] ?? '',
         zipCode: json["zip_code"] ?? '',
@@ -235,6 +257,9 @@ class User {
   Map<String, dynamic> toMap() => {
         "id": id,
         "name": name,
+        "lname": lName,
+        "photo_social": photoSocial,
+        "online_status": onlineStatus,
         "email": email,
         "mobile": mobile,
         "zip_code": zipCode,
@@ -256,37 +281,61 @@ class User {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
+
 //
-// factory User.fromDocument(DocumentSnapshot doc) {
-//   int id = doc.get(ApiConstant.id);
-//   String? name = doc.get(ApiConstant.id);
-//   String? email = doc.get(ApiConstant.id);
-//   String? mobile = doc.get(ApiConstant.id);
-//   dynamic zipCode = doc.get(ApiConstant.id);
-//   dynamic country = doc.get(ApiConstant.id);
-//   dynamic state = doc.get(ApiConstant.id);
-//   dynamic city = doc.get(ApiConstant.id);
-//   dynamic aboutMe = doc.get(ApiConstant.id);
-//   dynamic photo = doc.get(ApiConstant.id);
-//   String? company = doc.get(ApiConstant.id);
-//   String? dob = doc.get(ApiConstant.id);
-//   dynamic gender = doc.get(ApiConstant.id);
-//   String? oPassword = doc.get(ApiConstant.id);
-//   String? referCode = doc.get(ApiConstant.id);
-//   dynamic referBy = doc.get(ApiConstant.id);
-//   String? deviceToken = doc.get(ApiConstant.id);
-//   dynamic googleToken = doc.get(ApiConstant.id);
-//   dynamic facebookToken = doc.get(ApiConstant.id);
-//   DateTime? createdAt = doc.get(ApiConstant.id);
-//   DateTime? updatedAt = doc.get(ApiConstant.id);
-//
-//   return UserInfo(
-//     id: id,
-//     timestamp: timestamp,
-//     lastMessage: lastMessage,
-//     user1: user1,
-//     user2: user2,
-//     members: members,
-//   );
-// }
+  factory User.fromDocument(DocumentSnapshot doc) {
+    int? id = doc.get('id');
+    String? name = doc.get('name');
+    String? lName = doc.get('lname');
+    String? photoSocial = doc.get('photo_social');
+    String? onlineStatus = doc.get('online_status');
+    String? email = doc.get('email');
+    String? mobile = doc.get('mobile');
+    dynamic zipCode = doc.get('zip_code');
+    dynamic country = doc.get('country');
+    dynamic state = doc.get('state');
+    dynamic city = doc.get('city');
+    dynamic aboutMe = doc.get('about_me');
+    dynamic photo = doc.get('photo');
+    String? company = doc.get('company');
+    String? dob = doc.get('dob');
+    dynamic gender = doc.get('gender');
+    String? oPassword = doc.get('o_password');
+    String? referCode = doc.get('refer_code');
+    dynamic referBy = doc.get('refer_by');
+    String? deviceToken = doc.get('device_token');
+    dynamic googleToken = doc.get('google_token');
+    dynamic facebookToken = doc.get('facebook_token');
+    dynamic outlookToken = doc.get('outlook_token');
+    DateTime? createdAt = doc.get('created_at');
+    DateTime? updatedAt = doc.get('updated_at');
+
+    return User(
+      id: id,
+      name: name,
+      lName: lName,
+      photoSocial: photoSocial,
+      onlineStatus: onlineStatus,
+      email: email,
+      mobile: mobile,
+      zipCode: zipCode,
+      country: country,
+      state: state,
+      city: city,
+      aboutMe: aboutMe,
+      photo: photo,
+      company: company,
+      dob: dob,
+      gender: gender,
+      oPassword: oPassword,
+      referCode: referCode,
+      referBy: referBy,
+      deviceToken: deviceToken,
+      googleToken: googleToken,
+      facebookToken: facebookToken,
+      outlookToken: outlookToken,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
 }

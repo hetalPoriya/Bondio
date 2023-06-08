@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -34,12 +37,92 @@ class ForgotPassword extends StatelessWidget {
                       icon: Icons.email,
                       textInputAction: TextInputAction.done,
                       textInputType: TextInputType.emailAddress),
-                  SizedBox(height: 30.h),
-                  AppWidget.elevatedButton(
-                    loading: authController.isLoading.value,
-                    text: AppStrings.submit,
-                    onTap: () {},
+                  smallSizedBox,
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Divider(color: Colors.white, thickness: 1),
+                      ),
+                      Text('OR', style: AppStyles.smallerTextStyle),
+                      const Expanded(
+                        child: Divider(color: Colors.white, thickness: 1),
+                      ),
+                    ],
                   ),
+                  smallSizedBox,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white),
+                              borderRadius: BorderRadius.circular(3.w)),
+                          child: CountryCodePicker(
+                            initialSelection: 'US',
+                            onChanged: ((value) {
+                              authController.countryCodeController.value.text =
+                                  value.dialCode.toString();
+                              authController.update();
+                              log('Auth ${authController.countryCodeController.value.text}');
+                            }),
+                            textStyle: AppStyles.smallTextStyle
+                                .copyWith(color: Colors.white),
+                            padding: paddingSymmetric(
+                                horizontalPad: 00, verticalPad: 2),
+                            showDropDownButton: true,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 2.w,
+                      ),
+                      Flexible(
+                        flex: 2,
+                        child: AppWidget.textFormFiledWhite(
+                            textEditingController:
+                                authController.mobileController.value,
+                            hintText: AppStrings.mobileNumber,
+                            textInputType: TextInputType.number),
+                      ),
+                    ],
+                  ),
+                  largeSizedBox,
+
+                  Obx(
+                    () => AppWidget.elevatedButton(
+                      loading: authController.isLoading.value,
+                      text: AppStrings.submit,
+                      onTap: () async {
+                        if (authController.emailController.value.text.isEmpty &&
+                            authController
+                                .mobileController.value.text.isEmpty) {
+                          AppWidget.toast(text: "Please enter valid data");
+                        } else {
+                          if (authController
+                              .emailController.value.text.isNotEmpty) {
+                            authController.emailOrPhone.value =
+                                authController.emailController.value.text;
+                            authController.update();
+
+                            await authController.forgotPasswordOtpApiCall();
+                          } else {
+                            if (authController
+                                .countryCodeController.value.text.isEmpty) {
+                              authController.countryCodeController.value.text =
+                                  '+1';
+                            }
+                            authController.emailOrPhone.value =
+                                '${authController.countryCodeController.value.text}${authController.mobileController.value.text}';
+                            authController.update();
+
+                            await authController.forgotPasswordOtpApiCall();
+                          }
+                        }
+                      },
+                    ),
+                  )
                   //Get.toNamed(RouteHelper.verifyEmailForForgotPass)),
                 ]),
           )),

@@ -12,8 +12,14 @@ class HomeController extends GetxController {
   //home page 3 tab which one selected
   RxInt selectedIndex = 0.obs;
 
+  //host Event index
+  RxInt hostEvent = 0.obs;
+  RxInt viewEvent = 0.obs;
+
+
   //chat main page (chat and group) which tab selected
   RxInt innerTabSelectedIndex = 0.obs;
+  RxInt hostEventTabSelectedIndex = 0.obs;
 
   //tap on groupMember add
   RxBool onTapOnAddGroupMember = false.obs;

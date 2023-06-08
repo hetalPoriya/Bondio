@@ -21,7 +21,7 @@ class AppStrings {
   static String login = 'Login';
   static String continueText = 'Continue';
   static String meetMineCelebrate =
-      'Being miles apart shouldn\'t keep you apart. Meet.Dine.Celebrate!';
+      'Meet. Dine. Celebrate.\nBeing miles apart shouldn\'t keep you apart.';
 
   //social login
   static String yourName = 'Hey there! \nWhat\'s your First name?';
@@ -43,8 +43,10 @@ class AppStrings {
   static String emailAddress = 'Email *';
   static String mobileNumber = 'Mobile Number *';
   static String password = 'Password *';
+  static String conPassword = 'Confirm password *';
   static String rememberMe = 'Remember me? ';
-  static String forgotPass = 'Forgot password?';
+  static String forgotPass = 'Forgot password';
+  static String enterNewPassword = 'Enter new password!';
   static String notHaveAccount = 'Don’t have an account? ';
 
   //sign up screen
@@ -75,7 +77,7 @@ class AppStrings {
   //forgot pass screen
   static String forgotPassword = 'Forgot your password?';
   static String forgotPasswordLink =
-      'Enter your e-mail address we’ll send you a link to reset your password';
+      'Enter your e-mail address or phone number we’ll send you a Otp';
 
   //forgot pass verification email screen
   static String sixDigitCodeDes =
@@ -108,5 +110,17 @@ class AppStrings {
   static String copyCode = 'Copy your code, show it with your friends.';
   static String totalRewards = 'Total Rewards Earned';
   static String profileCreated = 'You have successfully created your profile!';
+
 //static String referAndEarn = 'REFER & EARN';
+
+  //add event
+  static String inviteMemberForParty = 'Invite members to your party';
+  static String hostEvent = 'Host an Event';
+  static String viewEvent = 'View Event';
+  static String eventTitle = 'Event title';
+  static String description = 'Description';
+  static String location = 'Location';
+  static String date = 'Date';
+  static String time = 'Time';
+  static String invitePeople = 'Invite People';
 }

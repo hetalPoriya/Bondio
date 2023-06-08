@@ -31,7 +31,9 @@ class VerifyEmail extends StatelessWidget {
                   ),
                   Center(
                     child: Text(
-                        '${authController.countryCodeController.value.text}${authController.mobileController.value.text}',
+                        Get.arguments[0] == 0
+                            ? '${authController.countryCodeController.value.text}${authController.mobileController.value.text}'
+                            : authController.emailOrPhone.value,
                         style: AppStyles.smallTextStyle.copyWith(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
@@ -64,20 +66,17 @@ class VerifyEmail extends StatelessWidget {
                     () => AppWidget.elevatedButton(
                         text: AppStrings.verify,
                         loading: authController.isLoading.value,
-                        onTap: () async {
-                          // if (authController.enterOtpByUser.value !=
-                          //     authController.otpValue.value) {
-                          //   AppWidget.toast(text: 'Please enter valid otp');
-                          // } else {
-                          await authController.registerApiCall();
-                          // }
-                        }),
+                        onTap: () async => Get.arguments[0] == 0
+                            ? await authController.registerApiCall()
+                            : await authController
+                                .forgotPasswordVerifyOtpApiCall()),
                   ),
                   //onTap: () => Get.toNamed(RouteHelper.homeScreen)),
                   smallSizedBox,
                   GestureDetector(
-                    onTap: () async =>
-                        await authController.registerOtpApiCall(),
+                    onTap: () async => Get.arguments[0] == 0
+                        ? await authController.registerOtpApiCall()
+                        : await authController.forgotPasswordOtpApiCall(),
                     child: Center(
                       child: Text(
                         AppStrings.resendCode,

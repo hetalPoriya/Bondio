@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:bondio/model/contact_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../model/model.dart';
 import 'controller.dart';
 
 class ChatController extends GetxController {
+  RxBool isLoading = false.obs;
   FirebaseController firebaseController = Get.put(FirebaseController());
   FirebaseFirestore fireStoreInstant = FirebaseFirestore.instance;
 
@@ -69,12 +70,12 @@ class ChatController extends GetxController {
 
   //chat snapshot
   RxList userInfoList = [].obs;
+  RxList searchUserInfoList = [].obs;
   RxList groupInfoList = [].obs;
+  RxList searchGroupInfoList = [].obs;
 
   Rx<GroupChat> groupInfo = GroupChat().obs;
   Rx<User> peerInfo = User().obs;
-  RxList searchUserInfoList = [].obs;
-  RxList searchGroupInfoList = [].obs;
 
   //add users
   addUserInfoToFirebase({User? userInfo}) {
@@ -130,11 +131,6 @@ class ChatController extends GetxController {
     DocumentSnapshot<Map<String, dynamic>> peerInfo =
         await userCollection.doc(peerId).get();
 
-    log('Enter Create group');
-    log(roomId);
-    log(userId.toString());
-    log(peerId.toString());
-    log(userInfo.toString());
     fireStoreInstant
         .collection(ApiConstant.personalChatRoomCollection)
         .doc(roomId)
@@ -148,6 +144,7 @@ class ChatController extends GetxController {
       ApiConstant.timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
       ApiConstant.lastMessage: '',
       ApiConstant.id: roomId,
+      ApiConstant.isPinned: false
     });
   }
 
@@ -190,52 +187,72 @@ class ChatController extends GetxController {
 
   // create group
   Future createGroup(
-      {required String userName, required String groupName}) async {
-    AuthController authController = Get.put(AuthController());
-    List<String> userInfo = [
-      '${authController.userModel.value.user!.id.toString()}_${authController.userModel.value.user!.name.toString()}'
-    ];
+      {required String userName,
+      required String groupName,
+      bool? isEvent,
+      String? eventDate,
+      String? eventDes}) async {
+    try {
+      isLoading(true);
+      AuthController authController = Get.put(AuthController());
+      List<String> userInfo = [
+        '${authController.userModel.value.user!.id.toString()}_${authController.userModel.value.user!.name.toString()}'
+      ];
 
-    List<String> userId = [authController.userModel.value.user!.id.toString()];
+      List<String> userId = [
+        authController.userModel.value.user!.id.toString()
+      ];
 
-    for (var element in selectedGroupMember) {
-      userInfo.add('${element.id}_${element.name ?? ''}');
-      userId.add('${element.id}');
+      for (var element in selectedGroupMember) {
+        userInfo.add('${element.id}_${element.name ?? ''}');
+        userId.add('${element.id}');
+      }
+
+      GroupChat groupChat = GroupChat(
+          groupName: groupName,
+          groupIcon: '',
+          members: [],
+          membersId: [],
+          isAdmin: [],
+          //'messages': ,
+          groupId: '',
+          lastMessage: eventDes ?? '',
+          lastMessageSender: '',
+          timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+          isEvent: isEvent ?? false,
+          eventDate:
+              eventDate ?? DateFormat('dd-MM-yyyy').format(DateTime.now()));
+
+      DocumentReference groupDocRef =
+          await groupChatRoomCollection.add(groupChat.toJson());
+
+      await groupDocRef.update({
+        ApiConstant.members: FieldValue.arrayUnion(userInfo),
+        ApiConstant.groupId: groupDocRef.id,
+        ApiConstant.membersId: FieldValue.arrayUnion(userId),
+        ApiConstant.isAdmin: FieldValue.arrayUnion(
+            [authController.userModel.value.user?.id.toString()]),
+      });
+
+      selectedGroupMember.every((element) {
+        DocumentReference<Map<String, dynamic>> userDocRef =
+            groupChatListCollection.doc(element.id);
+
+        userDocRef.set({
+          ApiConstant.groupId: FieldValue.arrayUnion([groupDocRef.id])
+        }, SetOptions(merge: true));
+
+        return true;
+      });
+
+      selectedGroupMember.clear();
+      selectedGroupMember.value = [];
+      groupNameController.value.clear();
+      selectedGroupMember.refresh();
+      isLoading(false);
+    } catch (e) {
+      isLoading(false);
     }
-
-    GroupChat groupChat = GroupChat(
-        groupName: groupName,
-        groupIcon: '',
-        members: [],
-        membersId: [],
-        isAdmin: [],
-        //'messages': ,
-        groupId: '',
-        lastMessage: '',
-        lastMessageSender: '',
-        timestamp: DateTime.now().millisecondsSinceEpoch.toString());
-
-    DocumentReference groupDocRef =
-        await groupChatRoomCollection.add(groupChat.toJson());
-
-    await groupDocRef.update({
-      ApiConstant.members: FieldValue.arrayUnion(userInfo),
-      ApiConstant.groupId: groupDocRef.id,
-      ApiConstant.membersId: FieldValue.arrayUnion(userId),
-      ApiConstant.isAdmin: FieldValue.arrayUnion(
-          [authController.userModel.value.user?.id.toString()]),
-    });
-
-    selectedGroupMember.every((element) {
-      DocumentReference<Map<String, dynamic>> userDocRef =
-          groupChatListCollection.doc(element.id);
-
-      userDocRef.set({
-        ApiConstant.groupId: FieldValue.arrayUnion([groupDocRef.id])
-      }, SetOptions(merge: true));
-
-      return true;
-    });
   }
 
   // group send message

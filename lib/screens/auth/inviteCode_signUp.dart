@@ -38,7 +38,7 @@ class InviteCodeSignUp extends StatelessWidget {
                       AppWidget.textFormFiledWhite(
                           hintText: AppStrings.inviteCode,
                           textEditingController:
-                              authController.referCodeController.value,
+                              authController.referByController.value,
                           textInputAction: TextInputAction.done),
                       largeSizedBox,
                       Obx(
@@ -47,8 +47,10 @@ class InviteCodeSignUp extends StatelessWidget {
                             text: AppStrings.submit,
                             onTap: () {
                               if (authController
-                                  .referCodeController.value.text.isNotEmpty) {
-                                authController.checkInviteCodeApi();
+                                  .referByController.value.text.isNotEmpty) {
+                                authController.checkInviteCodeApi(
+                                    referCode: authController
+                                        .referByController.value.text);
                               } else {
                                 AppWidget.toast(
                                     text: 'Please enter an Invite Code');

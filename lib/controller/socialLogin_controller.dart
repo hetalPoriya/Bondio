@@ -196,9 +196,11 @@ class SocialLoginController extends GetxController {
     //   log("Website : ${flutterInsta.website ?? ''}");
     //   log("Profile Image : ${flutterInsta.imgurl ?? ''}");
     //   log("Feed images:${flutterInsta.feedImagesUrl ?? ''}");
+
     authController.fullNameController.value.text = userName ?? '';
     authController.emailController.value.text = '' ?? '';
-    authController.imageController.value.text = '';
+    authController.imageController.value.clear();
+    //authController.imageController.value.text = '';
     authController.instagramToken.value = id.toString() ?? '';
     await authController.userExistOrNotApi(
         tokenType: 'instagram_token', token: id.toString() ?? '');

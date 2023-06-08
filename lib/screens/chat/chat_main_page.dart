@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
@@ -28,19 +31,20 @@ class _ChatMainPageState extends State<ChatMainPage> {
   //controller
   HomeController homeController = Get.put(HomeController());
   ChatController chatController = Get.put(ChatController());
+  AuthController authController = Get.put(AuthController());
+
 
   @override
   Widget build(BuildContext context) {
-    // return (homeController.onTapOnAddContact.value == true)
-    //     ? const ContactScreen()
-    //     : _chatAndGroupTabScreen();
-    return Obx(() => (homeController.onTapOnAddContact.value == true)
+    return Obx(() =>
+    (homeController.onTapOnAddContact.value == true)
         ? const ContactScreen()
         : _chatAndGroupTabScreen());
   }
 
-  tabContainer({required String text, required int index}) => Obx(
-        () {
+  tabContainer({required String text, required int index}) =>
+      Obx(
+            () {
           return GestureDetector(
             onTap: () {
               homeController.innerTabSelectedIndex.value = index;
@@ -55,7 +59,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     color: Colors.white,
                     gradient: LinearGradient(
                         colors: homeController.innerTabSelectedIndex.value ==
-                                index
+                            index
                             ? [ColorConstant.darkRed, ColorConstant.lightRed]
                             : [Colors.white, Colors.white]),
                     boxShadow: const [
@@ -109,7 +113,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   Widget _chatAndGroupTabScreen() {
     if (SharedPrefClass.getBool(
-            SharedPrefStrings.isDisplayContactScreenFirstTime, false) ==
+        SharedPrefStrings.isDisplayContactScreenFirstTime, true) ==
         true) {
       homeController.titleWidget.value = Text('Add Contact',
           style: AppStyles.extraLargeTextStyle.copyWith(fontSize: 18.sp));
@@ -124,7 +128,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
       homeController.update();
     }
     return Obx(
-      () {
+          () {
         return ChatBackground(
             onBackButtonPressed: () {
               homeController.selectedIndex.value = 0;
@@ -132,14 +136,17 @@ class _ChatMainPageState extends State<ChatMainPage> {
             },
             appBarWidget: homeController.titleWidget.value,
             bodyWidget: SizedBox(
-              width: MediaQuery.of(context).size.width,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               //color: Colors.grey,
               child: Column(
                 children: [
                   smallSizedBox,
                   Padding(
                     padding:
-                        paddingSymmetric(horizontalPad: 6.w, verticalPad: 00),
+                    paddingSymmetric(horizontalPad: 6.w, verticalPad: 00),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -156,7 +163,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                           GestureDetector(
                             onTap: () {
                               if (SharedPrefClass.getBool(
-                                      SharedPrefStrings.isLogin, false) ==
+                                  SharedPrefStrings.isLogin, false) ==
                                   false) {
                                 _showDialogToGuest();
                               } else {
@@ -193,17 +200,23 @@ class _ChatMainPageState extends State<ChatMainPage> {
                       ],
                     ),
                   ),
+                  // if (SharedPrefClass.getBool(
+                  //         SharedPrefStrings.isDisplayContactScreenFirstTime,
+                  //         true) ==
+                  //     true) ...[
                   if (SharedPrefClass.getBool(
-                          SharedPrefStrings.isDisplayContactScreenFirstTime,
-                          true) ==
+                      SharedPrefStrings.isDisplayContactScreenFirstTime,
+                      true) ==
                       true) ...[
                     _addContactContainer(),
-                  ] else ...[
-                    Obx(
-                      () => displayTab.elementAt(
-                          homeController.innerTabSelectedIndex.value),
-                    ),
-                  ]
+                  ] else
+                    ...[
+                      Obx(
+                            () =>
+                            displayTab.elementAt(
+                                homeController.innerTabSelectedIndex.value),
+                      ),
+                    ]
                 ],
               ),
             ));

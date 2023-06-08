@@ -623,11 +623,14 @@
 // // }
 // }
 
+import 'dart:developer';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/model/model.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -643,7 +646,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   //controller
   HomeController homeController = Get.put(HomeController());
   AuthController authController = Get.put(AuthController());
@@ -670,6 +673,20 @@ class _ChatPageState extends State<ChatPage> {
     chatController.currentUserId.value =
         authController.userModel.value.user!.id.toString();
     chatController.update();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      chatController.userCollection
+          .doc(authController.userModel.value.user?.id.toString())
+          .update({'online_status': 'Online'});
+    } else {
+      chatController.userCollection
+          .doc(authController.userModel.value.user?.id.toString())
+          .update({'online_status': 'Offline'});
+    }
   }
 
   @override
@@ -743,32 +760,32 @@ class _ChatPageState extends State<ChatPage> {
           ),
           Expanded(
               child: GestureDetector(
-            onTap: () async {
-              if (chatController.typeMessageCon.value.text.isNotEmpty) {
-                chatController.sendMessage(
-                    content: chatController.typeMessageCon.value.text,
-                    collectionId: chatController.collectionId.value,
-                    peerId: chatController.peerId.value);
-                chatController.typeMessageCon.value.clear();
-              } else {
-                Fluttertoast.showToast(msg: 'Nothing to sent');
-              }
-            },
-            // child: Icon(
-            //   Icons.send_sharp,
-            //   color: Colors.white,
-            //   size: 4.h,
-            // ),
-            child: Container(
-              height: 5.h,
-              color: Colors.transparent,
-              child: Icon(
-                Icons.send_sharp,
-                color: Colors.white,
-                size: 4.h,
-              ),
-            ),
-          )),
+                onTap: () async {
+                  if (chatController.typeMessageCon.value.text.isNotEmpty) {
+                    chatController.sendMessage(
+                        content: chatController.typeMessageCon.value.text,
+                        collectionId: chatController.collectionId.value,
+                        peerId: chatController.peerId.value);
+                    chatController.typeMessageCon.value.clear();
+                  } else {
+                    Fluttertoast.showToast(msg: 'Nothing to sent');
+                  }
+                },
+                // child: Icon(
+                //   Icons.send_sharp,
+                //   color: Colors.white,
+                //   size: 4.h,
+                // ),
+                child: Container(
+                  height: 5.h,
+                  color: Colors.transparent,
+                  child: Icon(
+                    Icons.send_sharp,
+                    color: Colors.white,
+                    size: 4.h,
+                  ),
+                ),
+              )),
         ],
       ),
     );
@@ -784,17 +801,19 @@ class _ChatPageState extends State<ChatPage> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return AppWidget.progressIndicator(color: Colors.transparent);
-        } else {
-          listMessage = snapshot.data!.docs;
-          return ListView.builder(
-            padding: paddingAll(paddingAll: 10.0),
-            itemBuilder: (context, index) =>
-                buildItem(index, snapshot.data?.docs[index]),
-            itemCount: snapshot.data!.docs.length,
-            reverse: true,
-            // controller: listScrollController,
-          );
+        } else if (snapshot.connectionState == ConnectionState.waiting ||
+            snapshot.connectionState == ConnectionState.none) {
+          return AppWidget.progressIndicator();
         }
+        listMessage = snapshot.data!.docs;
+        return ListView.builder(
+          padding: paddingAll(paddingAll: 10.0),
+          itemBuilder: (context, index) =>
+              buildItem(index, snapshot.data?.docs[index]),
+          itemCount: snapshot.data!.docs.length,
+          reverse: true,
+          // controller: listScrollController,
+        );
       },
     );
   }
@@ -806,6 +825,7 @@ class _ChatPageState extends State<ChatPage> {
             .snapshots(),
         builder: (context, snapshot) {
           Map<String, dynamic>? data = snapshot.data?.data();
+
           return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -832,20 +852,32 @@ class _ChatPageState extends State<ChatPage> {
                   backgroundColor: Colors.white,
                   maxRadius: 6.w,
                   minRadius: 2.w,
-                  backgroundImage:
-                      ChatWidget.displayImage(image: data?['photo'] ?? ''),
+                  backgroundImage: ChatWidget.displayImage(
+                      image: snapshot.data?.get('photo') ?? '',
+                      socialImage: snapshot.data?.get('photo_social') ?? ''),
                 ),
                 SizedBox(
                   width: 4.w,
                 ),
-                Text(data?['name'] ?? '', style: AppStyles.mediumTextStyle),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(snapshot.data?.get('name') ?? '',
+                        style: AppStyles.mediumTextStyle),
+                    // Text(snapshot.data?.get('online_status') ?? '',
+                    //     style: AppStyles.smallerTextStyle),
+                  ],
+                ),
               ]);
         });
   }
 
-  Widget buildItem(int index, DocumentSnapshot? document) {
+  buildItem(int index, DocumentSnapshot? document) {
     if (document != null) {
       ChatMessages messageChat = ChatMessages.fromDocument(document);
+
+
       if (messageChat.idFrom ==
           authController.userModel.value.user?.id.toString()) {
         // Right (my message)
@@ -854,13 +886,12 @@ class _ChatPageState extends State<ChatPage> {
           children: <Widget>[
             Flexible(
                 child: Padding(
-              padding: EdgeInsets.only(left: 20.w),
-              child: _textContainer(
-                  content: messageChat.content ?? '',
-                  index: index,
-                  timestamp: messageChat.timestamp ?? ''),
-            )),
-
+                  padding: EdgeInsets.only(left: 20.w),
+                  child: _textContainer(
+                      content: messageChat.content.toString() ?? '',
+                      index: index,
+                      timestamp: messageChat.timestamp.toString() ?? ''),
+                )),
             // Container(
             //   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
             //   width: 200,
@@ -868,7 +899,7 @@ class _ChatPageState extends State<ChatPage> {
             //   margin: EdgeInsets.only(
             //       bottom: isLastMessageRight(index) ? 20 : 10, right: 10),
             //   child: Text(
-            //     messageChat.content,
+            //     messageChat.content ?? 'z',
             //   ),
             // )
           ],
@@ -920,8 +951,8 @@ class _ChatPageState extends State<ChatPage> {
 
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
-            listMessage[index - 1].get('idFrom') !=
-                authController.userModel.value.user?.id.toString()) ||
+        listMessage[index - 1].get('idFrom') !=
+            authController.userModel.value.user?.id.toString()) ||
         index == 0) {
       return true;
     } else {
@@ -945,9 +976,9 @@ class _ChatPageState extends State<ChatPage> {
             topLeft: Radius.circular(3.w),
             topRight: Radius.circular(3.w),
             bottomLeft:
-                radius == 0 ? Radius.circular(3.w) : Radius.circular(0.w),
+            radius == 0 ? Radius.circular(3.w) : Radius.circular(0.w),
             bottomRight:
-                radius == 1 ? Radius.circular(3.w) : Radius.circular(0.w),
+            radius == 1 ? Radius.circular(3.w) : Radius.circular(0.w),
           ),
           color: containerColor ?? Colors.white),
       //width: 50.w,

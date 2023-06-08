@@ -1,5 +1,6 @@
 import 'package:bondio/controller/controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class GroupChat {
   String? groupName;
@@ -12,6 +13,8 @@ class GroupChat {
   String? lastMessage;
   String? lastMessageSender;
   String? timestamp;
+  final String? eventDate;
+  bool? isEvent;
 
   GroupChat(
       {this.groupName,
@@ -22,7 +25,9 @@ class GroupChat {
       this.lastMessage,
       this.lastMessageSender,
       this.membersId,
-      this.timestamp});
+      this.timestamp,
+      this.eventDate,
+      this.isEvent = false});
 
   Map<String, dynamic> toJson() {
     return {
@@ -35,6 +40,8 @@ class GroupChat {
       ApiConstant.lastMessage: lastMessage,
       ApiConstant.lastMessageSender: lastMessageSender,
       ApiConstant.timestamp: timestamp,
+      ApiConstant.isEvent: isEvent,
+      ApiConstant.eventDate: eventDate
     };
   }
 
@@ -48,6 +55,8 @@ class GroupChat {
     String lastMessage = doc.get(ApiConstant.lastMessage);
     String lastMessageSender = doc.get(ApiConstant.lastMessageSender);
     String timestamp = doc.get(ApiConstant.timestamp);
+    String eventDate = doc.get(ApiConstant.eventDate);
+    bool isEvent = doc.get(ApiConstant.isEvent);
     return GroupChat(
       groupName: groupName,
       groupIcon: groupIcon,
@@ -58,6 +67,8 @@ class GroupChat {
       lastMessage: lastMessage,
       lastMessageSender: lastMessageSender,
       timestamp: timestamp,
+      isEvent: isEvent,
+      eventDate: eventDate,
     );
   }
 }

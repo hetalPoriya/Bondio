@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csc_picker/csc_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -47,6 +50,8 @@ class AppWidget {
   // );
 
   static AuthController authController = Get.put(AuthController());
+  static EventController eventController = Get.put(EventController());
+  static ChatController chatController = Get.put(ChatController());
 
   static SocialLoginController socialLoginController =
       Get.put(SocialLoginController());
@@ -272,6 +277,49 @@ class AppWidget {
         cursorColor: color ?? ColorConstant.backGroundColorOrange,
       );
 
+  static textFormFiledForEvent(
+          {String? hintText,
+          IconData? icon,
+          TextInputAction? textInputAction,
+          TextInputType? textInputType,
+          bool? obscureText,
+          void Function()? suffixOnTap,
+          void Function()? onTapReadOnly,
+          TextStyle? textStyle,
+          Color? color,
+          bool? readOnly,
+          TextEditingController? textEditingController,
+          String? Function(String?)? validator}) =>
+      TextFormField(
+        textInputAction: textInputAction ?? TextInputAction.next,
+        keyboardType: textInputType ?? TextInputType.text,
+        obscureText: obscureText ?? false,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        readOnly: readOnly ?? false,
+        onTap: onTapReadOnly,
+        controller: textEditingController,
+        validator: validator,
+        decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: textStyle ??
+                AppStyles.smallTextStyle.copyWith(color: Colors.black),
+            contentPadding: paddingAll(paddingAll: 3.w),
+            prefixIcon: GestureDetector(
+              onTap: suffixOnTap,
+              child: Icon(icon, color: const Color(0xffFFB574)),
+            ),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                    color: color ?? ColorConstant.backGroundColorOrange)),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                    color: color ?? ColorConstant.backGroundColorOrange)),
+            border: UnderlineInputBorder(
+                borderSide: BorderSide(
+                    color: color ?? ColorConstant.backGroundColorOrange))),
+        cursorColor: color ?? ColorConstant.backGroundColorOrange,
+      );
+
   static elevatedButton(
           {required String text,
           required void Function()? onTap,
@@ -340,7 +388,7 @@ class AppWidget {
                     authController.fullNameController.value.text = '';
                     authController.mobileController.value.text = '';
                     authController.dobController.value.text = '';
-                    authController.referCodeController.value.text = '';
+                    authController.referByController.value.text = '';
                     Get.back();
                     // if (index == 0) {
                     //   authController.isGoogle.value = 'Outlook';
@@ -590,10 +638,9 @@ class AppWidget {
       );
 
   static List<DrawerText> drawerText = [
-    DrawerText(text: 'Events', routeString: ''),
-    DrawerText(text: 'Privacy', routeString: ''),
+    DrawerText(text: 'Host Events', routeString: ''),
+    DrawerText(text: 'Why Bondio', routeString: ''),
     DrawerText(text: 'Help & Support', routeString: ''),
-    DrawerText(text: 'About Us', routeString: ''),
     DrawerText(text: 'Sign Out', routeString: ''),
   ];
 
@@ -639,7 +686,9 @@ class AppWidget {
                     maxRadius: 50,
                     backgroundColor: Colors.black12,
                     backgroundImage: ChatWidget.displayImage(
-                        image: authController.userModel.value.user?.photo),
+                        image: authController.userModel.value.user?.photo,
+                        socialImage:
+                            authController.userModel.value.user?.photoSocial),
                   ),
                   smallerSizedBox,
                   Padding(
@@ -684,7 +733,7 @@ class AppWidget {
               itemBuilder: ((context, index) {
                 return GestureDetector(
                   onTap: () {
-                    if (drawerText[index].text == 'About Us') {
+                    if (index == 1) {
                       Get.back();
                       Get.toNamed(RouteHelper.aboutUs);
                     }
@@ -807,6 +856,115 @@ class AppWidget {
               authController.update();
             },
           ));
+
+  static checkChatAvailableOrNot() async {
+    await chatController.userCollection
+        .doc(authController.userModel.value.user?.id.toString())
+        .get()
+        .then((data) async {
+      log('ChatExits ${data.exists}');
+
+      if (data.exists) {
+        SharedPrefClass.setBool(
+            SharedPrefStrings.isDisplayContactScreenFirstTime, false);
+        // QuerySnapshot<Map<String, dynamic>> data = await chatController
+        //     .personalChatListCollection
+        //     .doc(authController.userModel.value.user?.id.toString())
+        //     .collection(authController.userModel.value.user!.id.toString())
+        //     .get();
+        // log('DATA ${data.size.toString()}');
+        // if (data.size.toString() != 0) {
+        //   SharedPrefClass.setBool(
+        //       SharedPrefStrings.isDisplayContactScreenFirstTime, false);
+        // }
+      }
+    });
+
+    // await chatController.groupChatListCollection
+    //     .doc(authController.userModel.value.user?.id.toString())
+    //     .get()
+    //     .then((value) {
+    //   if (value.exists) {
+    //     SharedPrefClass.setBool(
+    //         SharedPrefStrings.isDisplayContactScreenFirstTime, false);
+    //   }
+    //   log('${value.exists}');
+    // });
+  }
+
+  static selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        initialDatePickerMode: DatePickerMode.day,
+        firstDate: DateTime.now(),
+        lastDate: DateTime.now().add(Duration(days: 200)),
+        builder: (context, child) {
+          return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                  primary: ColorConstant.mainAppColorNew, // <-- SEE HERE
+                  onPrimary: Colors.white, // <-- SEE HERE
+                  onSurface: Colors.black, // <-- SEE HERE
+                ),
+              ),
+              child: child!);
+        });
+    if (picked != null) {
+      eventController.selectedDate.value =
+          DateFormat('dd-MM-yyyy').format(picked);
+      eventController.update();
+      log(eventController.selectedDate.value);
+    }
+  }
+
+  static selectTime({
+    required BuildContext context,
+  }) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+        initialTime: TimeOfDay.now(),
+        context: context,
+        helpText:
+            eventController.startTime.value.isEmpty ? 'Start Time' : 'End Time',
+        builder: (context, child) {
+          return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                  primary: ColorConstant.mainAppColorNew, // <-- SEE HERE
+                  onPrimary: Colors.white, // <-- SEE HERE
+                  onSurface: Colors.black, // <-- SEE HERE
+                ),
+              ),
+              child: child!);
+        });
+
+    if (pickedTime != null) {
+      if (eventController.startTime.value.isEmpty) {
+        if (pickedTime.period == DayPeriod.am) {
+          eventController.startTime.value = '${pickedTime.format(context)} Am';
+        } else {
+          eventController.startTime.value = '${pickedTime.format(context)} Pm';
+        }
+      } else {
+        if (pickedTime.period == DayPeriod.am) {
+          eventController.endTime.value = '${pickedTime.format(context)} Am';
+        } else {
+          eventController.endTime.value = '${pickedTime.format(context)} Pm';
+        }
+      }
+      print(eventController.startTime.value.isEmpty);
+      print(eventController.endTime.value.isEmpty);
+      if (eventController.startTime.value.isEmpty ||
+          eventController.endTime.value.isEmpty) {
+        eventController.startTime.value.isEmpty
+            ? eventController.startTime.value = pickedTime.format(context)
+            : selectTime(context: context);
+      }
+      eventController.selectedTime.value =
+          '${eventController.startTime.value} - ${eventController.endTime.value}';
+      eventController.update();
+    }
+  }
 
 // static progressBar() => CircularProgressIndicator(
 //       valueColor: AlwaysStoppedAnimation<Color>(

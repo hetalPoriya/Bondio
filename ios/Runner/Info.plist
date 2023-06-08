@@ -2,22 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-
-<key>CFBundleURLTypes</key>
-<array>
-  <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>fb754280139332528</string>
-      </array>
-      </dict>
-    </array>
-    <key>FacebookAppID</key>
-    <string>754280139332528</string>
-    <key>FacebookClientToken</key>
-    <string>0392690966cf1d9d783f3a4b1c806701</string>
-    <key>FacebookDisplayName</key>
-    <string>Bondiomeet</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -50,8 +34,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CFBundleURLTypes</key>
 
+<!-- GOOGLE -->
+
+    <key>CFBundleURLTypes</key>
     <array>
     	<dict>
     		<key>CFBundleTypeRole</key>
@@ -64,6 +50,23 @@
     		</array>
     	</dict>
     </array>
+
+<!-- FACEBOOK -->
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+         <string>fb754280139332528</string>
+      </array>
+      </dict>
+    </array>
+    <key>FacebookAppID</key>
+    <string>754280139332528</string>
+    <key>FacebookClientToken</key>
+    <string>0392690966cf1d9d783f3a4b1c806701</string>
+    <key>FacebookDisplayName</key>
+    <string>Bondiomeet</string>
 
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

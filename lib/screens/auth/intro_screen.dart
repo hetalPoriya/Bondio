@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:linkedin_login/linkedin_login.dart';
 import 'package:linkwell/linkwell.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sizer/sizer.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -89,6 +92,29 @@ class _IntroScreenState extends State<IntroScreen>
                                           color: Colors.black)),
                                   smallSizedBox,
                                   AppWidget.socialLogin(),
+                                  if (Platform.isIOS) smallSizedBox,
+                                  if (Platform.isIOS)
+                                    Padding(
+                                      padding:
+                                          paddingSymmetric(horizontalPad: 6.w),
+                                      child: SignInWithAppleButton(
+                                        borderRadius:
+                                            BorderRadius.circular(2.w),
+                                        style: SignInWithAppleButtonStyle
+                                            .whiteOutlined,
+                                        onPressed: () async {
+                                          final credential = await SignInWithApple.getAppleIDCredential(
+                                            scopes: [
+                                              AppleIDAuthorizationScopes.email,
+                                              AppleIDAuthorizationScopes.fullName,
+                                            ],
+                                          );
+
+                                          print(credential);
+                                        },
+                                      ),
+                                    ),
+
                                   // _socialButton(
                                   //     text: AppStrings.signInWithGoogle,
                                   //     icon: AppAssets.google,

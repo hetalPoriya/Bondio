@@ -6,6 +6,7 @@ import 'package:bondio/screens/chat/chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:bondio/controller/controller.dart';
@@ -489,33 +490,27 @@ class _ContactScreenState extends State<ContactScreen> {
 
                     chatController.searchContactListModel.refresh();
                     chatController.update();
-                    chatController.addContactToFirebase(
-                        mobileNumber: phoneNumber,
-                        userName: userName,
-                        status: 'Invited',
-                        id: '',
-                        fcmToken: '');
-                    AppWidget.toast(text: 'Invited');
-                    // await sendSMS(
-                    //         message:
-                    //             'Bondio app\nhttps://play.google.com/store/apps/details?id=com.app.bondio',
-                    //         recipients: [phoneNumber.toString()],
-                    //         sendDirect: false)
-                    //     .then((value) {
-                    //   log('PhoneNUmber $phoneNumber');
-                    //   firebaseController
-                    //       .addContactToFirebase(
-                    //           mobileNumber: phoneNumber,
-                    //           userName: userName,
-                    //           status: 'Invited',
-                    //           id: '',
-                    //           fcmToken: '')
-                    //       .then((value) => log('Edded'));
 
-                    /*
+                    await sendSMS(
+                            message:
+                                'Bondio app  \nPlease use this invite code to get points ${authController.userModel.value.user?.referCode.toString()} \nhttps://play.google.com/store/apps/details?id=com.app.bondiomeet',
+                            recipients: [phoneNumber.toString()],
+                            sendDirect: false)
+                        .then((value) {
+                      log('PhoneNUmber $phoneNumber');
+                      chatController.addContactToFirebase(
+                          mobileNumber: phoneNumber,
+                          userName: userName,
+                          status: 'Invited',
+                          id: '',
+                          fcmToken: '');
+                      AppWidget.toast(text: 'Invited');
+
+                      /*
         }).catchError((onError) {
           log(onError.toString());
         });*/
+                    });
                   },
         child: Container(
           width: 20.w,
@@ -561,6 +556,8 @@ class _ContactScreenState extends State<ContactScreen> {
                         .get();
 
                 String peerId = data.get(ApiConstant.id);
+                chatController.peerId.value = peerId;
+                chatController.update();
                 log('PEERID ${peerId}');
                 DocumentSnapshot<Map<String, dynamic>> peerInfo =
                     await chatController.userCollection.doc(peerId).get();
@@ -572,14 +569,19 @@ class _ContactScreenState extends State<ContactScreen> {
 
                 chatController.personalChatListCollection
                     .doc(authController.userModel.value.user!.id.toString())
-                    .set({
-                  ApiConstant.chatPersonList: FieldValue.arrayUnion([roomId])
-                });
+                    .collection(
+                        authController.userModel.value.user!.id.toString())
+                    .doc(roomId)
+                    .set({ApiConstant.id: roomId, ApiConstant.peerId: peerId});
 
                 chatController.personalChatListCollection
-                    .doc(authController.userModel.value.user!.id.toString())
+                    .doc(peerId.toString())
+                    .collection(peerId.toString())
+                    .doc(roomId)
                     .set({
-                  ApiConstant.chatPersonList: FieldValue.arrayUnion([roomId])
+                  ApiConstant.id: roomId,
+                  ApiConstant.peerId:
+                      authController.userModel.value.user!.id.toString()
                 });
 
                 chatController.collectionId.value = roomId.toString();

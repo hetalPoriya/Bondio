@@ -52,7 +52,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     maxRadius: 6.h,
                     backgroundColor: Colors.black12,
                     backgroundImage: ChatWidget.displayImage(
-                        image: authController.userModel.value.user?.photo),
+                        image: authController.userModel.value.user?.photo,
+                        socialImage:
+                            authController.userModel.value.user?.photoSocial),
                   ),
                   Align(
                     alignment: Alignment.bottomRight,
@@ -96,6 +98,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           validator: FormValidation.emptyValidation(
                               value:
                                   authController.fullNameController.value.text),
+                          textInputType: TextInputType.name),
+                      smallSizedBox,
+                      AppWidget.textFormFiledProfilePage(
+                          textEditingController:
+                              authController.lastNameController.value,
+                          hintText: AppStrings.lastName,
+                          validator: FormValidation.emptyValidation(
+                              value:
+                                  authController.lastNameController.value.text),
                           textInputType: TextInputType.name),
                       smallSizedBox,
                       AppWidget.textFormFiledProfilePage(

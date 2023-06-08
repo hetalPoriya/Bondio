@@ -18,39 +18,63 @@ class CreateGroup extends StatelessWidget {
     return ChatBackground(
         appBarWidget:
             ChatWidget.appBarWidget(userName: 'Group title', status: 'Users'),
-        floatingButton: GestureDetector(
-          onTap: () async {
-            await chatController.createGroup(
-                userName: authController.userModel.value.user!.name.toString(),
-                groupName: chatController.groupNameController.value.text);
-            homeController.onTapOnAddContact.value = false;
-            homeController.onTapOnAddGroupMember.value = false;
-            Get.back();
-            homeController.selectedIndex.value = 1;
-            homeController.innerTabSelectedIndex.value = 1;
-            homeController.update();
-          },
-          child: Container(
-            alignment: Alignment.center,
-            width: 25.w,
-            height: 4.h,
-            decoration: BoxDecoration(
-              color: ColorConstant.backGroundColorOrange,
-              boxShadow: const [
-                BoxShadow(
-                    blurRadius: 1,
-                    offset: Offset(
-                      0.0,
-                      0.0,
-                    ),
-                    color: Colors.black12,
-                    spreadRadius: 1)
-              ],
-              borderRadius: BorderRadius.circular(4.w),
-            ),
-            child: Text('done', style: AppStyles.smallTextStyle),
-          ),
-        ),
+        floatingButton: Obx(() => Padding(
+              padding: EdgeInsets.only(left: 20.w, right: 12.w),
+              child: AppWidget.elevatedButton(
+                text: 'done',
+                loading: chatController.isLoading.value,
+                onTap: chatController.groupNameController.value.text.isEmpty
+                    ? () {
+                        AppWidget.toast(text: 'Please add your GroupName');
+                      }
+                    : () async {
+                        await chatController.createGroup(
+                            userName: authController.userModel.value.user!.name
+                                .toString(),
+                            groupName:
+                                chatController.groupNameController.value.text);
+                        homeController.onTapOnAddContact.value = false;
+                        homeController.onTapOnAddGroupMember.value = false;
+                        Get.back();
+                        homeController.selectedIndex.value = 1;
+                        homeController.innerTabSelectedIndex.value = 1;
+                        homeController.update();
+                      },
+              ),
+            )),
+        // GestureDetector(
+        //   onTap: () async {
+        //     await chatController.createGroup(
+        //         userName: authController.userModel.value.user!.name.toString(),
+        //         groupName: chatController.groupNameController.value.text);
+        //     homeController.onTapOnAddContact.value = false;
+        //     homeController.onTapOnAddGroupMember.value = false;
+        //     Get.back();
+        //     homeController.selectedIndex.value = 1;
+        //     homeController.innerTabSelectedIndex.value = 1;
+        //     homeController.update();
+        //   },
+        //   child: Container(
+        //     alignment: Alignment.center,
+        //     width: 25.w,
+        //     height: 4.h,
+        //     decoration: BoxDecoration(
+        //       color: ColorConstant.backGroundColorOrange,
+        //       boxShadow: const [
+        //         BoxShadow(
+        //             blurRadius: 1,
+        //             offset: Offset(
+        //               0.0,
+        //               0.0,
+        //             ),
+        //             color: Colors.black12,
+        //             spreadRadius: 1)
+        //       ],
+        //       borderRadius: BorderRadius.circular(4.w),
+        //     ),
+        //     child: Text('done', style: AppStyles.smallTextStyle),
+        //   ),
+        // ),
         bodyWidget: ListView(
           shrinkWrap: true,
           physics: const ClampingScrollPhysics(),
@@ -151,26 +175,30 @@ class CreateGroup extends StatelessWidget {
                     ),
                     Expanded(
                         flex: 6,
-                        child: TextField(
-                          controller: chatController.groupNameController.value,
-                          decoration: InputDecoration(
-                              hintText: 'Add group title..',
-                              hintStyle: AppStyles.smallerTextStyle,
-                              suffixIcon: const Icon(
-                                Icons.emoji_emotions_outlined,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: ColorConstant.lightOrange)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: ColorConstant.lightOrange))),
-                          cursorColor: ColorConstant.lightOrange,
+                        child: Obx(
+                          () => TextField(
+                            controller:
+                                chatController.groupNameController.value,
+                            decoration: InputDecoration(
+                                hintText: 'Add group title..',
+                                hintStyle: AppStyles.smallerTextStyle,
+                                suffixIcon: const Icon(
+                                  Icons.emoji_emotions_outlined,
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: ColorConstant.lightOrange)),
+                                focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: ColorConstant.lightOrange))),
+                            cursorColor: ColorConstant.lightOrange,
+                          ),
                         ))
                   ],
                 ),
               ),
             ),
+            largeSizedBox,
           ],
         ),
         title: '',

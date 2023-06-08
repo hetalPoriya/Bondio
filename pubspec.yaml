@@ -53,6 +53,7 @@ dependencies:
   flutter_webview_plugin: ^0.4.0
   linkwell: ^2.0.6
   twitter_login: ^4.4.0
+  sign_in_with_apple: ^4.3.0
 
   country_code_picker: ^3.0.0
   intl: ^0.17.0
@@ -66,7 +67,7 @@ dependencies:
   firebase_storage: ^11.0.16
   firebase_messaging: ^14.3.0
   flutter_local_notifications: ^13.0.0
-
+  google_maps_flutter: ^2.3.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2

@@ -75,7 +75,7 @@ class InviteFriend extends StatelessWidget {
                       text:
                           'Hey! I\'ve been using Bondio App. Enter my code ${authController.userModel.value.user?.referCode.toString()} while signing up and increase your chances of getting rewards! 😍',
                       linkUrl:
-                          'https://play.google.com/store/apps/details?id=com.app.bondio'),
+                          'https://play.google.com/store/apps/details?id=com.app.bondiomeet'),
               child: DottedBorder(
                 color: ColorConstant.backGroundColorOrange,
                 radius: Radius.circular(10.w),

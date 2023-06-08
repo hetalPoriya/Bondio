@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
-import 'package:cross_file/src/types/interface.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +32,9 @@ class AuthController extends GetxController {
   RxString isGoogle = ''.obs;
   var token = ''.obs;
 
+  //forgotPassword string
+  RxString emailOrPhone = ''.obs;
+
   // //for login remember
   // var emailLoginController = TextEditingController().obs;
   // var passLoginController = TextEditingController().obs;
@@ -46,9 +48,12 @@ class AuthController extends GetxController {
   var emailController = TextEditingController().obs;
   var countryCodeController = TextEditingController().obs;
   var passController = TextEditingController().obs;
+  var newPassController = TextEditingController().obs;
+
   var mobileController = TextEditingController().obs;
   var conPassController = TextEditingController().obs;
-  var referCodeController = TextEditingController().obs;
+  var myReferCodeController = TextEditingController().obs;
+  var referByController = TextEditingController().obs;
   var zipCodeController = TextEditingController().obs;
   var aboutMeController = TextEditingController().obs;
 
@@ -76,6 +81,13 @@ class AuthController extends GetxController {
 
   RxBool rememberOrNot = true.obs;
   RxBool agree = false.obs;
+
+  //main screen values
+  RxInt earned = 0.obs;
+  RxInt friend = 0.obs;
+  RxInt attendance = 0.obs;
+  RxInt upcomingEvent = 0.obs;
+  Rx<CustomerDetails> customerDetails = CustomerDetails().obs;
 
   FirebaseController firebaseController = Get.put(FirebaseController());
   ChatController chatController = Get.put(ChatController());
@@ -107,9 +119,9 @@ class AuthController extends GetxController {
         OtpModel data = OtpModel.fromMap(response.data);
         otpValue.value = data.data!.service.toString();
         AppWidget.toast(text: data.msg.toString());
-        Get.toNamed(RouteHelper.verifyEmail);
+        Get.toNamed(RouteHelper.verifyEmail, arguments: [0]);
       } else {
-        AppWidget.toast(text: 'Please enter valid phone number');
+        AppWidget.toast(text: '${response.data['Data'][0]}');
       }
     } catch (e) {
       log(e.toString());
@@ -122,27 +134,40 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
       String? token = await FirebaseMessaging.instance.getToken();
-      log('Token $token');
-      log('Token $token');
-      log(' otpValue.value ${otpValue.value}');
-      log(' otpValue.value ${enterOtpByUser.value}');
+      // log('Token $token');
+      // log('phto ${imageController.value.text.toString()}');
+      // log('phto ${chatController.pickedImage?.value?.path.isNotEmpty}');
+      // log('phto ${lastNameController.value.text}');
+      // photo: image?.value.path.isNotEmpty == true
+      //     ? await MultipartFile.fromFile(image?.value.path ?? '',
+      //     filename: fileName)
+      //     : imageController.value.text.toString(),
 
+      String fileName =
+          chatController.pickedImage?.value?.path.split('/').last ?? '';
       SignUpBody signUpBody = SignUpBody(
           email: emailController.value.text.toString(),
           mobile:
               '${countryCodeController.value.text}${mobileController.value.text}',
           name: fullNameController.value.text,
+          lName: lastNameController.value.text,
+          onlineStatus: '',
           company: companyNameController.value.text,
           dob: dobController.value.text,
           password: passController.value.text.isNotEmpty
               ? passController.value.text
               : 'Synram@125',
-          referBy: referCodeController.value.text,
+          referBy: referByController.value.text,
           deviceToken: token ?? (await FirebaseMessaging.instance.getToken())!,
           aboutMe: ' ',
           city: ' ',
           country: ' ',
-          photo: imageController.value.text.toString(),
+          photoSocial: imageController.value.text.toString(),
+          photo: fileName.isNotEmpty
+              ? await MultipartFile.fromFile(
+                  chatController.pickedImage?.value?.path ?? '',
+                  filename: fileName)
+              : userModel.value.user?.photo.toString(),
           state: ' ',
           zipCode: ' ',
           outlookToken: outlookToken.value,
@@ -161,12 +186,16 @@ class AuthController extends GetxController {
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.registerApi),
         data: signUpBodyToMap(signUpBody),
-        options: Options(headers: {
-          'Accept': 'application/json',
-        }),
+        // options: Options(headers: {
+        //   'Accept': 'application/json',
+        // }),
       );
       log('RegisterResponse ${response.data}');
       if (response.data['Status'] == true) {
+        enterOtpByUser.value = '';
+        otpValue.value = '';
+        update();
+
         LoginModel data = LoginModel.fromMap(response.data);
         SharedPrefClass.setUserData(json.encode(response.data['Data']));
         AppWidget.toast(text: data.msg.toString());
@@ -197,7 +226,7 @@ class AuthController extends GetxController {
         passController.value.clear();
         mobileController.value.clear();
         conPassController.value.clear();
-        referCodeController.value.clear();
+        referByController.value.clear();
         zipCodeController.value.clear();
         Get.offNamedUntil(RouteHelper.homeScreen, (route) => false);
       } else {
@@ -235,7 +264,7 @@ class AuthController extends GetxController {
         SharedPrefClass.setString(
             SharedPrefStrings.userName, data.data!.user!.name.toString());
         await ChatWidget.getUserInfo();
-
+        await AppWidget.checkChatAvailableOrNot();
         Get.offNamedUntil(RouteHelper.homeScreen, (route) => false);
       } else {
         AppWidget.toast(text: response.data['Msg'].toString());
@@ -262,6 +291,7 @@ class AuthController extends GetxController {
         AppWidget.toast(text: data.msg.toString());
         SharedPrefClass.setBool(SharedPrefStrings.isLogin, true);
         await ChatWidget.getUserInfo();
+        await AppWidget.checkChatAvailableOrNot();
         Get.offNamedUntil(RouteHelper.homeScreen, (route) => false);
       } else {
         Get.toNamed(RouteHelper.socialSignUpPage);
@@ -271,20 +301,24 @@ class AuthController extends GetxController {
     }
   }
 
-  checkInviteCodeApi() async {
+  checkInviteCodeApi({required String referCode}) async {
     try {
       isLoading(true);
-      log('refercode ${referCodeController.value.text}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.customerDetailApi),
-        data: {'refer_code': referCodeController.value.text},
+        data: {'refer_code': referCode},
       );
 
-      log('refer code response $response');
       if (response.data['Status'] == true) {
-        AppWidget.toast(text: 'Code applied successfully');
-        Timer(const Duration(seconds: 2),
-            () => Get.toNamed(RouteHelper.signUpPage));
+        CustomerDetails custom = customerDetailsFromMap(response.toString());
+        customerDetails(custom);
+
+        if (customerDetails.value.data?.referCode !=
+            userModel.value.user?.referCode) {
+          AppWidget.toast(text: 'Code applied successfully');
+          Timer(const Duration(seconds: 2),
+              () => Get.toNamed(RouteHelper.signUpPage));
+        }
       } else {
         AppWidget.toast(text: 'Entered invite code is not valid');
       }
@@ -343,6 +377,10 @@ class AuthController extends GetxController {
                   filename: fileName)
               : userModel.value.user!.photo.toString(),
           "name": fullNameController.value.text,
+          "lname": lastNameController.value.text,
+          "photo_social": fileName.toString().isNotEmpty == true
+              ? 'null'
+              : userModel.value.user?.photoSocial.toString(),
           "zip_code": zipCodeController.value.text,
           "country": countryValue.value,
           "state": stateValue.value,
@@ -357,6 +395,7 @@ class AuthController extends GetxController {
       log('RegisterResponse ${response.data}');
       if (response.data['Status'] == true) {
         LoginModel data = LoginModel.fromMap(response.data);
+        log('Model ${data.data?.user?.toMap()}');
         SharedPrefClass.setUserData(json.encode(response.data['Data']));
         AppWidget.toast(text: data.msg.toString());
         SharedPrefClass.setBool(SharedPrefStrings.isLogin, true);
@@ -371,6 +410,8 @@ class AuthController extends GetxController {
             .update({
           "photo": data.data?.user?.photo.toString() ?? '',
           "name": data.data?.user?.name.toString() ?? '',
+          "lname": data.data?.user?.lName.toString() ?? '',
+          "photo_social": data.data?.user?.photoSocial.toString() ?? '',
           "zip_code": data.data?.user?.zipCode.toString() ?? '',
           "country": data.data?.user?.country.toString() ?? '',
           "state": data.data?.user?.state.toString() ?? '',
@@ -381,6 +422,130 @@ class AuthController extends GetxController {
         Get.offNamedUntil(RouteHelper.homeScreen, (route) => false);
       } else {
         AppWidget.toast(text: response.data['Data'][0].toString());
+      }
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  updatePasswordApiCall(
+      {required String oldPass, required String newPass}) async {
+    try {
+      isLoading(true);
+
+      log('Old ${oldPass.toString()}');
+      log('New ${newPass.toString()}');
+
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.updatePasswordApi),
+        data: FormData.fromMap({
+          "old_password": oldPass,
+          "new_password": newPass,
+        }),
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${userModel.value.token.toString()}'
+        }),
+      );
+      log('UpdatePassword  ${response.data}');
+      if (response.data['Status'] == true) {
+        AppWidget.toast(text: response.data['Msg']);
+
+        Get.back();
+      } else {
+        AppWidget.toast(text: response.data['Msg']);
+      }
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  forgotPasswordOtpApiCall() async {
+    try {
+      isLoading(true);
+
+      log('Email ${emailOrPhone.toString()}');
+
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.forgotPasswordOtpApi),
+        data: {'username': emailOrPhone.toString()},
+        //options: NetworkHandler.options,
+      );
+      log('ForgotPassOtpResponse ${response.data}');
+      if (response.data['Status'] == true) {
+        OtpModel data = OtpModel.fromMap(response.data);
+        otpValue.value = data.data!.service.toString();
+        AppWidget.toast(text: data.msg.toString());
+        Get.toNamed(RouteHelper.verifyEmail, arguments: [1]);
+      } else {
+        AppWidget.toast(text: response.data['Msg']);
+      }
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  forgotPasswordVerifyOtpApiCall() async {
+    try {
+      isLoading(true);
+
+      log('username ${emailOrPhone}');
+      log('username ${enterOtpByUser.value}');
+      log('username ${otpValue.value}');
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.forgotPasswordVerifyOtpApi),
+        data: {
+          'username': emailOrPhone.toString(),
+          "otp": enterOtpByUser.value,
+          "service": otpValue.value,
+        },
+        //options: NetworkHandler.options,
+      );
+      log('ForgotPassVerifyOtpResponse ${response.data}');
+
+      AppWidget.toast(text: response.data['Msg']);
+      if (response.data['Status'] == true) {
+        newPassController.value.text = '';
+        conPassController.value.text = '';
+        update();
+        Get.toNamed(RouteHelper.newPassword);
+      }
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  forgotPasswordUpdateApiCall() async {
+    try {
+      isLoading(true);
+      log('username ${emailOrPhone}');
+      log('username ${newPassController.value.text}');
+      log('username ${conPassController.value.text}');
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.forgotPasswordUpdateApi),
+        data: {
+          'username': emailOrPhone.toString(),
+          "password": newPassController.value.text,
+          "cpassword": conPassController.value.text,
+        },
+        //options: NetworkHandler.options,
+      );
+      log('ForgotPassVerifyOtpResponse ${response.data}');
+
+      if (response.data['Status'] == true) {
+        AppWidget.toast(text: response.data['Msg']);
+        Get.offNamedUntil(RouteHelper.loginPage, (route) => false);
+      } else {
+        AppWidget.toast(
+            text: 'The New password and Confirm password must match.');
       }
     } catch (e) {
       log(e.toString());

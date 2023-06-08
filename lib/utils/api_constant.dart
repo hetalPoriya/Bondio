@@ -19,6 +19,14 @@ class ApiConstant {
   static String logoutApi = 'api/v1/logout';
   static String customerDetailApi = 'api/v1/customer-detail';
   static String updateProfileApi = 'api/v1/update-profile';
+  static String updatePasswordApi = 'api/v1/change-password';
+  static String forgotPasswordOtpApi = 'api/v1/forget-password-otp';
+  static String forgotPasswordVerifyOtpApi =
+      'api/v1/forget-password-verify-otp';
+  static String forgotPasswordUpdateApi = 'api/v1/forget-password-update';
+  static String getEventApi = 'api/v1/get-event';
+  static String createEventApi = 'api/v1/create-event';
+  static String updateEventApi = 'api/v1/update-event';
 
   //firebase collections
   static String userCollection = 'user';
@@ -39,6 +47,9 @@ class ApiConstant {
   static String lastMessage = 'last_message';
   static String lastMessageSender = 'last_message_sender';
   static String timestamp = 'timestamp';
+  static String eventDate = 'event_date';
+  static String isEvent = 'isEvent';
+  static String isPinned = 'isPinned';
 
   //contact model
   static String phoneNumber = 'phone_number';
@@ -49,6 +60,7 @@ class ApiConstant {
 
   //message
   static String idFrom = 'idFrom';
+  static String deletedUserList = 'deletedBy';
   static String idTo = 'idTo';
   static String isRead = 'isRead';
   static String senderName = 'sender_name';
@@ -58,4 +70,13 @@ class ApiConstant {
   static String chatPersonList = 'chatPersonList';
   static String peerId = 'peerId';
   static String image = 'image';
+
+  //event
+  static String eventName = 'Event Name: ';
+  static String eventDes = 'Event Description: ';
+  static String totalMembers = 'Total Members: ';
+  static String invitedBy = 'Invited By: ';
+  static String eventTime = 'Event Time: ';
+  static String eveDate = 'Event Date: ';
+  static String eventLocation = 'Event Location: ';
 }

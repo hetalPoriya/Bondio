@@ -366,6 +366,8 @@
 //   }
 // }
 
+import 'dart:developer';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/model/model.dart';
 
@@ -474,32 +476,33 @@ class _GroupChatPageState extends State<GroupChatPage> {
           ),
           Expanded(
               child: GestureDetector(
-            onTap: () async {
-              if (chatController.typeMessageCon.value.text.isNotEmpty) {
-                chatController.sendMessageForGroupChat(
-                    groupId: chatController.groupInfo.value.groupId.toString(),
-                    msg: chatController.typeMessageCon.value.text);
+                onTap: () async {
+                  if (chatController.typeMessageCon.value.text.isNotEmpty) {
+                    chatController.sendMessageForGroupChat(
+                        groupId: chatController.groupInfo.value.groupId
+                            .toString(),
+                        msg: chatController.typeMessageCon.value.text);
 
-                chatController.typeMessageCon.value.clear();
-              } else {
-                Fluttertoast.showToast(msg: 'Nothing to sent');
-              }
-            },
-            // child: Icon(
-            //   Icons.send_sharp,
-            //   color: Colors.white,
-            //   size: 4.h,
-            // ),
-            child: Container(
-              height: 5.h,
-              color: Colors.transparent,
-              child: Icon(
-                Icons.send_sharp,
-                color: Colors.white,
-                size: 4.h,
-              ),
-            ),
-          )),
+                    chatController.typeMessageCon.value.clear();
+                  } else {
+                    Fluttertoast.showToast(msg: 'Nothing to sent');
+                  }
+                },
+                // child: Icon(
+                //   Icons.send_sharp,
+                //   color: Colors.white,
+                //   size: 4.h,
+                // ),
+                child: Container(
+                  height: 5.h,
+                  color: Colors.transparent,
+                  child: Icon(
+                    Icons.send_sharp,
+                    color: Colors.white,
+                    size: 4.h,
+                  ),
+                ),
+              )),
         ],
       ),
     );
@@ -517,6 +520,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
           return AppWidget.progressIndicator(color: Colors.transparent);
         } else {
           listMessage = snapshot.data!.docs;
+
           return ListView.builder(
             padding: paddingAll(paddingAll: 10.0),
             itemBuilder: (context, index) =>
@@ -544,7 +548,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
           Get.back();
         },
         child:
-            Icon(Icons.arrow_back_ios_outlined, color: Colors.white, size: 8.w),
+        Icon(Icons.arrow_back_ios_outlined, color: Colors.white, size: 8.w),
       ),
       title: Row(
         children: [
@@ -559,8 +563,9 @@ class _GroupChatPageState extends State<GroupChatPage> {
             width: 4.w,
           ),
           Obx(
-            () => Text(chatController.groupInfo.value.groupName.toString(),
-                style: AppStyles.mediumTextStyle),
+                () =>
+                Text(chatController.groupInfo.value.groupName.toString(),
+                    style: AppStyles.mediumTextStyle),
           ),
         ],
       ),
@@ -587,9 +592,13 @@ class _GroupChatPageState extends State<GroupChatPage> {
                     value: 1,
                     child: Text("Remove Participants"),
                   ),
+                  const PopupMenuItem<int>(
+                    value: 2,
+                    child: Text("Leave Group"),
+                  ),
                 ];
               },
-              onSelected: (value) {
+              onSelected: (value) async {
                 chatController.addParticipantList.value = [];
                 chatController.addParticipantList.refresh();
                 chatController.removeParticipantList.value = [];
@@ -603,6 +612,28 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   Get.toNamed(
                     RouteHelper.removeParticipant,
                   );
+                } else if (value == 2) {
+                  await chatController.groupChatRoomCollection
+                      .doc(chatController.collectionId.toString())
+                      .update({
+                    ApiConstant.members: FieldValue.arrayRemove([
+                      '${authController.userModel.value.user
+                          ?.id}_${authController.userModel.value.user?.name}'
+                    ]),
+                    ApiConstant.membersId: FieldValue.arrayRemove(
+                        [authController.userModel.value.user?.id.toString()]),
+                  });
+
+                  DocumentReference<Map<String, dynamic>> userDocRef =
+                  chatController.groupChatListCollection.doc(
+                      authController.userModel.value.user?.id.toString());
+
+                  await userDocRef.update({
+                    ApiConstant.groupId: FieldValue.arrayRemove(
+                        [authController.userModel.value.user?.id])
+                  });
+                  Get.back();
+                  AppWidget.toast(text: 'Success');
                 }
               }),
         ),
@@ -683,23 +714,29 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   Widget buildItem(int index, DocumentSnapshot? document) {
     if (document != null) {
+      log('${document.data()}');
       ChatMessages messageChat = ChatMessages.fromDocument(document);
+
+
       if (messageChat.idFrom ==
           SharedPrefClass.getString(SharedPrefStrings.userId)) {
         // Right (my message)
-        return Row(
+        return messageChat.deletedUserList?.contains(
+            authController.userModel.value.user?.id.toString()) == true
+            ? Container()
+            : Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Flexible(
                 child: Padding(
-              padding: EdgeInsets.only(left: 20.w),
-              child: _textContainer(
-                  isSender: false,
-                  content: messageChat.content ?? '',
-                  index: index,
-                  timestamp: messageChat.timestamp ?? '',
-                  senderName: messageChat.senderName),
-            )),
+                  padding: EdgeInsets.only(left: 20.w),
+                  child: _textContainer(
+                      isSender: false,
+                      content: messageChat.content ?? '',
+                      index: index,
+                      timestamp: messageChat.timestamp ?? '',
+                      senderName: messageChat.senderName),
+                )),
 
             // Container(
             //   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
@@ -715,7 +752,10 @@ class _GroupChatPageState extends State<GroupChatPage> {
         );
       } else {
         // Left (peer message)
-        return Container(
+        return messageChat.deletedUserList?.contains(
+            authController.userModel.value.user?.id.toString()) == true
+            ? Container()
+            : Container(
           margin: EdgeInsets.only(bottom: 1.w),
           child: Column(
             children: <Widget>[
@@ -764,8 +804,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
-            listMessage[index - 1].get('idFrom') !=
-                authController.userModel.value.user?.id.toString()) ||
+        listMessage[index - 1].get('idFrom') !=
+            authController.userModel.value.user?.id.toString()) ||
         index == 0) {
       return true;
     } else {
@@ -791,9 +831,9 @@ class _GroupChatPageState extends State<GroupChatPage> {
             topLeft: Radius.circular(3.w),
             topRight: Radius.circular(3.w),
             bottomLeft:
-                radius == 0 ? Radius.circular(3.w) : Radius.circular(0.w),
+            radius == 0 ? Radius.circular(3.w) : Radius.circular(0.w),
             bottomRight:
-                radius == 1 ? Radius.circular(3.w) : Radius.circular(0.w),
+            radius == 1 ? Radius.circular(3.w) : Radius.circular(0.w),
           ),
           color: containerColor ?? Colors.white),
       //width: 50.w,

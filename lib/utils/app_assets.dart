@@ -48,4 +48,6 @@ class AppAssets {
   static String inviteFriendImage = 'assets/invite_friend_image.png';
   static String bondioGif = 'assets/bondio.gif';
   static String user = 'assets/user.png';
+  static String addEvent = 'assets/add_event.png';
+  static String eventMembers = 'assets/event_members.png';
 }

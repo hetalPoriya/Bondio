@@ -47,7 +47,7 @@ class OtpModel {
 }
 
 class OtpData {
-  String? service;
+  dynamic? service;
 
   OtpData({
     this.service,

@@ -36,7 +36,7 @@ class AboutUs extends StatelessWidget {
                     children: [
                       const SizedBox(height: 1),
                       AppWidget.backIcon(onTap: () => Get.back()),
-                      Text('About Us',
+                      Text('Why Bondio',
                           style: AppStyles.largeTextStyle,
                           textAlign: TextAlign.center),
                       largeSizedBox,

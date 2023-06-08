@@ -9,13 +9,16 @@ class ChatMessages {
   String? senderName = '';
   bool? isRead;
 
+  List<dynamic>? deletedUserList = [];
+
   ChatMessages(
       {this.idFrom,
       this.idTo,
       this.timestamp,
       this.content,
       this.isRead,
-      this.senderName});
+      this.senderName,
+      this.deletedUserList});
 
   Map<String, dynamic> toJson() {
     return {
@@ -25,6 +28,9 @@ class ChatMessages {
       ApiConstant.lastMessage: content,
       ApiConstant.isRead: isRead,
       ApiConstant.senderName: senderName,
+      ApiConstant.deletedUserList: deletedUserList == null
+          ? []
+          : List<dynamic>.from(deletedUserList!.map((x) => x))
     };
   }
 
@@ -35,12 +41,14 @@ class ChatMessages {
     String content = doc.get(ApiConstant.lastMessage);
     bool isRead = doc.get(ApiConstant.isRead);
     String senderName = doc.get(ApiConstant.senderName);
+    List<dynamic> deletedUserList = doc.get(ApiConstant.deletedUserList) ?? [];
     return ChatMessages(
         idFrom: idFrom,
         idTo: idTo,
         timestamp: timestamp,
         content: content,
         isRead: isRead,
-        senderName: senderName);
+        senderName: senderName,
+        deletedUserList: deletedUserList);
   }
 }

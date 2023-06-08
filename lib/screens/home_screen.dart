@@ -93,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       curve: Curves.easeIn,
                       onItemSelected: (index) {
                         homeController.selectedIndex.value = index;
+                        homeController.hostEvent.value = 0;
                         homeController.innerTabSelectedIndex.value = 0;
                         homeController.onTapOnAddContact.value = false;
                         homeController.personalChatPage.value = false;

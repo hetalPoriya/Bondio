@@ -480,16 +480,16 @@ class _SignUpPageState extends State<SignUpPage> {
                                 authController.fullNameController.value.text),
                         // icon: Icons.person_outline,
                       ),
-                      // smallerSizedBox,
-                      // AppWidget.textFormFiledWhite(
-                      //   textEditingController:
-                      //       authController.lastNameController.value,
-                      //   hintText: AppStrings.lastName,
-                      //   validator: FormValidation.emptyValidation(
-                      //       value:
-                      //           authController.lastNameController.value.text),
-                      //   // icon: Icons.person_outline,
-                      // ),
+                      smallerSizedBox,
+                      AppWidget.textFormFiledWhite(
+                        textEditingController:
+                            authController.lastNameController.value,
+                        hintText: AppStrings.lastName,
+                        validator: FormValidation.emptyValidation(
+                            value:
+                                authController.lastNameController.value.text),
+                        // icon: Icons.person_outline,
+                      ),
                       Text(AppStrings.yourMobileNumber,
                           style: AppStyles.mediumTextStyle),
                       smallerSizedBox,
@@ -798,7 +798,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           onTap: () async {
                             // log('CountryCOde ${authController.countryCodeController.value.text}');
                             if (_formkey.currentState!.validate()) {
-                              log('REFRE ${authController.referCodeController.value.text}');
+                              log('REFRE ${authController.referByController.value.text}');
 
                               await authController.registerOtpApiCall();
                             }

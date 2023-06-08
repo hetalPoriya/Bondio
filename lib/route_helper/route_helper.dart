@@ -3,6 +3,7 @@ import 'package:bondio/screens/auth/auth.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/dashboard.dart';
 import 'package:bondio/screens/home_screen.dart';
+import 'package:bondio/screens/host_event/add_event.dart';
 import 'package:bondio/screens/instagram_login.dart';
 import 'package:bondio/screens/profile_page.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ class RouteHelper {
   static String inviteCodeSignUp = '/inviteCodeSignUp';
   static String socialSignUpPage = '/socialSignUpPage';
   static String verifyEmail = '/verifyEmail';
+  static String newPassword = '/newPassword';
   static String homeScreen = '/homeScreen';
   static String inviteFriend = '/inviteFriend';
   static String sendEmail = '/sendEmail';
@@ -37,12 +39,16 @@ class RouteHelper {
   static String profilePage = '/profilePage';
   static String aboutUs = '/aboutUs';
   static String instagramLogin = '/instagramLogin';
+  static String addEvent = '/addEvent';
+
+  //pages
   static List<GetPage> getPages = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
     GetPage(name: introScreen, page: () => const IntroScreen()),
     GetPage(name: dashBoard, page: () => DashBoard()),
     GetPage(name: loginPage, page: () => const LoginPage()),
     GetPage(name: signUpPage, page: () => const SignUpPage()),
+    GetPage(name: newPassword, page: () => NewPassword()),
     GetPage(name: inviteCodeSignUp, page: () => const InviteCodeSignUp()),
     GetPage(name: socialSignUpPage, page: () => const SocialLoginScreen()),
     GetPage(name: verifyEmail, page: () => const VerifyEmail()),
@@ -66,5 +72,6 @@ class RouteHelper {
     GetPage(name: removeParticipant, page: () => const RemoveParticipant()),
     GetPage(name: createGroup, page: () => CreateGroup()),
     GetPage(name: instagramLogin, page: () => InstagramLogin()),
+    GetPage(name: addEvent, page: () => AddEvent()),
   ];
 }

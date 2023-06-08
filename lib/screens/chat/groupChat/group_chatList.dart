@@ -100,6 +100,7 @@ class _GroupChatListState extends State<GroupChatList> {
                 homeController.update();
                 log('GROUP ${groupChatList[index].toString()}');
                 log('GROUP ${groupInfo.groupName.toString()}');
+                log('GROUP ${groupInfo.isAdmin.toString()}');
                 chatController.collectionId.value =
                     groupInfo.groupId.toString();
                 chatController.groupInfo.value = groupInfo;
@@ -107,13 +108,28 @@ class _GroupChatListState extends State<GroupChatList> {
                 chatController.groupInfo.refresh();
                 Get.toNamed(RouteHelper.groupChatPage);
               },
-              child: ChatWidget.chatContainer(
-                  titleText: groupInfo.groupName.toString(),
-                  imageString: groupInfo.groupIcon.toString(),
-                  subText: groupInfo.lastMessage.toString(),
-                  time: DateFormat('kk:mm a').format(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          int.parse(groupInfo.timestamp.toString()))))),
+              child: groupInfo.isEvent == false
+                  ? ChatWidget.chatContainer(
+                      titleText: groupInfo.groupName.toString(),
+                      imageString: groupInfo.groupIcon.toString(),
+                      subText: groupInfo.lastMessage.toString(),
+                      time: DateFormat('kk:mm a').format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(groupInfo.timestamp.toString()))))
+                  : ChatWidget.eventContainer(
+                      invitedBy: (groupInfo.isAdmin?[0] ==
+                              authController.userModel.value.user?.id
+                                  .toString())
+                          ? 'Invited by you'
+                          : '',
+                      title: groupInfo.groupName.toString(),
+                      imageString: groupInfo.groupIcon.toString(),
+                      description: groupInfo.lastMessage.toString(),
+                      time: DateFormat('kk:mm a').format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(groupInfo.timestamp.toString()))),
+                      date: groupInfo.eventDate.toString(),
+                      memberList: groupInfo.members!.length.toString())),
         );
       }));
 }

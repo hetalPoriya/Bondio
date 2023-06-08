@@ -7,3 +7,4 @@ export 'verify_email.dart';
 export 'signUp_page.dart';
 export 'bigPolygon_background.dart';
 export 'inviteCode_signUp.dart';
+export 'new_password.dart';

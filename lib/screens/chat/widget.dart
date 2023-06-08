@@ -26,6 +26,8 @@ class ChatWidget {
       authController.userModel.refresh();
       authController.fullNameController.value.text =
           authController.userModel.value.user?.name.toString() ?? '';
+      authController.lastNameController.value.text =
+          authController.userModel.value.user?.lName.toString() ?? '';
       authController.zipCodeController.value.text =
           authController.userModel.value.user?.zipCode.toString() ?? '';
       authController.countryValue.value =
@@ -36,6 +38,8 @@ class ChatWidget {
           authController.userModel.value.user?.state.toString() ?? '';
       authController.aboutMeController.value.text =
           authController.userModel.value.user?.aboutMe.toString() ?? '';
+      authController.imageController.value.text =
+          authController.userModel.value.user?.photoSocial.toString() ?? '';
       authController.update();
       log('UserResponse ${authController.userModel.value.toMap()}');
       log('UserResponse ${authController.userModel.value.user?.id.toString()}');
@@ -44,9 +48,11 @@ class ChatWidget {
 
   static Widget chatContainer(
           {String? imageString,
+          String? photoSocial,
           String? titleText,
           String? subText,
-          String? time}) =>
+          String? time,
+          bool? isPinned}) =>
       Material(
         elevation: 2.w,
         borderRadius: BorderRadius.circular(4.w),
@@ -69,7 +75,8 @@ class ChatWidget {
                         color: Colors.black26,
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                            image: ChatWidget.displayImage(image: imageString),
+                            image: ChatWidget.displayImage(
+                                image: imageString, socialImage: photoSocial),
                             fit: BoxFit.cover)),
                   ),
                 ],
@@ -94,15 +101,128 @@ class ChatWidget {
                                       fontSize: 8.sp, color: Colors.black))),
                         ],
                       ),
-                      Text(
-                        subText ?? ' ',
-                        maxLines: 2,
-                        style: AppStyles.smallerTextStyle
-                            .copyWith(color: Colors.grey.shade800),
-                        overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: EdgeInsets.only(right: 2.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              subText ?? ' ',
+                              maxLines: 2,
+                              style: AppStyles.smallerTextStyle
+                                  .copyWith(color: Colors.grey.shade800),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (isPinned == true)
+                              Icon(
+                                Icons.archive,
+                                color: ColorConstant.greyBorder,
+                              )
+                          ],
+                        ),
                       )
                     ])),
           ]),
+        ),
+      );
+
+  static Widget eventContainer(
+          {String? imageString,
+          required String title,
+          required String description,
+          required String date,
+          required String time,
+          required String invitedBy,
+          required String memberList}) =>
+      Material(
+        elevation: 2.w,
+        borderRadius: BorderRadius.circular(4.w),
+        child: Container(
+          height: 10.h,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4.w),
+            color: Colors.white,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: paddingAll(paddingAll: 4.w),
+                  height: 6.h,
+                  decoration: BoxDecoration(
+                      color: Colors.black26,
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: ChatWidget.displayImage(image: imageString),
+                          fit: BoxFit.cover)),
+                ),
+              ),
+              Expanded(
+                  flex: 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            title,
+                            style: AppStyles.smallTextStyle.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500),
+                            maxLines: 2,
+                          ),
+                          // Text(
+                          //   '($memberList)Invited',
+                          //   style: AppStyles.smallerTextStyle
+                          //       .copyWith(fontSize: 8.sp, color: Colors.black),
+                          //   maxLines: 2,
+                          // ),
+                        ],
+                      ),
+                      Text(
+                        description,
+                        style: AppStyles.smallerTextStyle
+                            .copyWith(color: Colors.black, fontSize: 9.sp),
+                        maxLines: 2,
+                      )
+                    ],
+                  )),
+              Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 2.w),
+                    // color: Colors.grey,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            date,
+                            style: AppStyles.smallerTextStyle
+                                .copyWith(fontSize: 9.sp, color: Colors.black),
+                          ),
+                          SizedBox(height: 1.w),
+                          Text(
+                            time,
+                            style: AppStyles.smallerTextStyle.copyWith(
+                                fontSize: 7.sp,
+                                color: ColorConstant.backGroundColorOrange),
+                          ),
+                          SizedBox(height: 1.w),
+                          if (invitedBy.toString().isNotEmpty)
+                            Text(
+                              invitedBy,
+                              style: AppStyles.smallerTextStyle.copyWith(
+                                  fontSize: 7.sp,
+                                  color: ColorConstant.backGroundColorOrange),
+                            )
+                        ]),
+                  )),
+            ],
+          ),
         ),
       );
 
@@ -116,6 +236,7 @@ class ChatWidget {
                 child: CircleAvatar(
               maxRadius: 4.h,
               minRadius: 4.h,
+              backgroundColor: Colors.black38,
             )),
             Expanded(
                 flex: 4,
@@ -164,7 +285,7 @@ class ChatWidget {
           Center(
             child: Text(
               'No Conversion found',
-              style: AppStyles.smallerTextStyle,
+              style: AppStyles.smallTextStyle.copyWith(color: Colors.grey),
             ),
           ),
         ],
@@ -215,6 +336,8 @@ class ChatWidget {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) return;
     chatController.pickedImage?.value = File(image.path);
+    authController.imageController.value.clear();
+    authController.update();
     await authController.updateProfileApiCall(imagePath: File(image.path));
     // firebaseController.uploadPic(image: File(image.path));
     chatController.update();
@@ -224,14 +347,18 @@ class ChatWidget {
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null) return;
     chatController.pickedImage?.value = File(image.path);
+    authController.imageController.value.clear();
+    authController.update();
     await authController.updateProfileApiCall(imagePath: File(image.path));
     // firebaseController.uploadPic(image: File(image.path));
     chatController.update();
   }
 
-  static displayImage({String? image}) {
-    return ((image.toString().isEmpty || image.toString() == ' '))
-        ? AssetImage(AppAssets.addContact) as ImageProvider
-        : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
+  static displayImage({String? image, String? socialImage}) {
+    return (socialImage?.isNotEmpty == true && socialImage.toString() != 'null')
+        ? NetworkImage(socialImage.toString())
+        : ((image.toString().isEmpty || image.toString() == ' '))
+            ? AssetImage(AppAssets.addContact) as ImageProvider
+            : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
   }
 }
