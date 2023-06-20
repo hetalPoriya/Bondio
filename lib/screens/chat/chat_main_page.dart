@@ -33,7 +33,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
   ChatController chatController = Get.put(ChatController());
   AuthController authController = Get.put(AuthController());
 
-
   @override
   Widget build(BuildContext context) {
     return Obx(() =>
@@ -41,41 +40,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
         ? const ContactScreen()
         : _chatAndGroupTabScreen());
   }
-
-  tabContainer({required String text, required int index}) =>
-      Obx(
-            () {
-          return GestureDetector(
-            onTap: () {
-              homeController.innerTabSelectedIndex.value = index;
-              homeController.update();
-            },
-            child: Container(
-                height: 3.h,
-                width: 21.w,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4.w),
-                    color: Colors.white,
-                    gradient: LinearGradient(
-                        colors: homeController.innerTabSelectedIndex.value ==
-                            index
-                            ? [ColorConstant.darkRed, ColorConstant.lightRed]
-                            : [Colors.white, Colors.white]),
-                    boxShadow: const [
-                      BoxShadow(
-                          color: Colors.black26, spreadRadius: 1, blurRadius: 6)
-                    ]),
-                child: Text(
-                  text,
-                  style: AppStyles.smallerTextStyle.copyWith(
-                      color: homeController.innerTabSelectedIndex.value == index
-                          ? Colors.white
-                          : Colors.grey),
-                )),
-          );
-        },
-      );
 
   Widget _addContactContainer() {
     return Column(children: [
@@ -150,14 +114,67 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            tabContainer(text: 'Chats', index: 0),
-                            SizedBox(
-                              width: 4.w,
-                            ),
-                            tabContainer(text: 'Groups', index: 1),
-                          ],
+                        Obx(
+                              () =>
+                              Row(
+                                children: [
+                                  ChatWidget.tabContainer(
+                                    textColor: homeController
+                                        .innerTabSelectedIndex.value ==
+                                        0
+                                        ? Colors.white
+                                        : Colors.grey,
+                                    color: homeController
+                                        .innerTabSelectedIndex.value ==
+                                        0
+                                        ? [
+                                      ColorConstant.darkRed,
+                                      ColorConstant.lightRed
+                                    ]
+                                        : [Colors.white, Colors.white],
+                                    text: 'Chats',
+                                    index: 0,
+                                    onTap: () {
+                                      homeController.innerTabSelectedIndex
+                                          .value =
+                                      0;
+                                      homeController
+                                          .innerTabForActiveAndArchiveIndex
+                                          .value = 0;
+                                      homeController.update();
+                                    },
+                                  ),
+                                  SizedBox(
+                                    width: 4.w,
+                                  ),
+                                  ChatWidget.tabContainer(
+                                    textColor: homeController
+                                        .innerTabSelectedIndex.value ==
+                                        1
+                                        ? Colors.white
+                                        : Colors.grey,
+                                    color: homeController
+                                        .innerTabSelectedIndex.value ==
+                                        1
+                                        ? [
+                                      ColorConstant.darkRed,
+                                      ColorConstant.lightRed
+                                    ]
+                                        : [Colors.white, Colors.white],
+                                    text: 'Groups',
+                                    index: 1,
+                                    onTap: () {
+                                      homeController.innerTabSelectedIndex
+                                          .value =
+                                      1;
+                                      homeController
+                                          .innerTabForActiveAndArchiveIndexForGroup
+                                          .value = 0;
+                                      homeController.update();
+                                    },
+                                  ),
+                                ],
+                              ),
                         ),
                         if (homeController.innerTabSelectedIndex.value == 0)
                           GestureDetector(
@@ -186,6 +203,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                             onTap: () {
                               homeController.onTapOnAddGroupMember.value = true;
                               homeController.onTapOnGroupCreate.value = false;
+
                               chatController.selectedGroupMember.value = [];
                               chatController.update();
                               homeController.update();

@@ -476,33 +476,32 @@ class _GroupChatPageState extends State<GroupChatPage> {
           ),
           Expanded(
               child: GestureDetector(
-                onTap: () async {
-                  if (chatController.typeMessageCon.value.text.isNotEmpty) {
-                    chatController.sendMessageForGroupChat(
-                        groupId: chatController.groupInfo.value.groupId
-                            .toString(),
-                        msg: chatController.typeMessageCon.value.text);
+            onTap: () async {
+              if (chatController.typeMessageCon.value.text.isNotEmpty) {
+                chatController.sendMessageForGroupChat(
+                    groupId: chatController.groupInfo.value.groupId.toString(),
+                    msg: chatController.typeMessageCon.value.text);
 
-                    chatController.typeMessageCon.value.clear();
-                  } else {
-                    Fluttertoast.showToast(msg: 'Nothing to sent');
-                  }
-                },
-                // child: Icon(
-                //   Icons.send_sharp,
-                //   color: Colors.white,
-                //   size: 4.h,
-                // ),
-                child: Container(
-                  height: 5.h,
-                  color: Colors.transparent,
-                  child: Icon(
-                    Icons.send_sharp,
-                    color: Colors.white,
-                    size: 4.h,
-                  ),
-                ),
-              )),
+                chatController.typeMessageCon.value.clear();
+              } else {
+                Fluttertoast.showToast(msg: 'Nothing to sent');
+              }
+            },
+            // child: Icon(
+            //   Icons.send_sharp,
+            //   color: Colors.white,
+            //   size: 4.h,
+            // ),
+            child: Container(
+              height: 5.h,
+              color: Colors.transparent,
+              child: Icon(
+                Icons.send_sharp,
+                color: Colors.white,
+                size: 4.h,
+              ),
+            ),
+          )),
         ],
       ),
     );
@@ -548,7 +547,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
           Get.back();
         },
         child:
-        Icon(Icons.arrow_back_ios_outlined, color: Colors.white, size: 8.w),
+            Icon(Icons.arrow_back_ios_outlined, color: Colors.white, size: 8.w),
       ),
       title: Row(
         children: [
@@ -563,9 +562,69 @@ class _GroupChatPageState extends State<GroupChatPage> {
             width: 4.w,
           ),
           Obx(
-                () =>
+            () => Row(
+              children: [
                 Text(chatController.groupInfo.value.groupName.toString(),
                     style: AppStyles.mediumTextStyle),
+                IconButton(
+                    onPressed: () {
+                      chatController.groupNameController.value.text =
+                          chatController.groupInfo.value.groupName.toString();
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                            content: AppWidget.textFormFiledProfilePage(
+                                hintText: 'Group name',
+                                textEditingController:
+                                    chatController.groupNameController.value),
+                            actions: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: AppWidget.elevatedButton(
+                                          text: 'Cancel',
+                                          onTap: () {
+                                            Get.back();
+                                          })),
+                                  SizedBox(
+                                    width: 2.w,
+                                  ),
+                                  Expanded(
+                                      child: AppWidget.elevatedButton(
+                                          text: 'Ok',
+                                          onTap: () {
+                                            chatController
+                                                .groupChatRoomCollection
+                                                .doc(chatController
+                                                    .groupInfo.value.groupId
+                                                    .toString())
+                                                .update({
+                                              ApiConstant.groupName:
+                                                  chatController
+                                                      .groupNameController
+                                                      .value
+                                                      .text
+                                            });
+                                            Get.back();
+                                            chatController
+                                                    .groupInfo.value.groupName =
+                                                chatController
+                                                    .groupNameController
+                                                    .value
+                                                    .text;
+                                            chatController.groupInfo.refresh();
+                                          })),
+                                ],
+                              )
+                            ]),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ))
+              ],
+            ),
           ),
         ],
       ),
@@ -594,6 +653,10 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   ),
                   const PopupMenuItem<int>(
                     value: 2,
+                    child: Text("Archive Group"),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 3,
                     child: Text("Leave Group"),
                   ),
                 ];
@@ -605,28 +668,77 @@ class _GroupChatPageState extends State<GroupChatPage> {
                 chatController.removeParticipantList.refresh();
 
                 if (value == 0) {
-                  Get.toNamed(
-                    RouteHelper.addParticipant,
-                  );
+                  if (chatController.groupInfo.value.isAdmin?.first
+                          .toString() ==
+                      authController.userModel.value.user?.id.toString()) {
+                    Get.toNamed(
+                      RouteHelper.addParticipant,
+                    );
+                  } else {
+                    AppWidget.toast(
+                        text:
+                            'Sorry, you are not an admin you cannot access this feature');
+                  }
                 } else if (value == 1) {
-                  Get.toNamed(
-                    RouteHelper.removeParticipant,
-                  );
+                  if (chatController.groupInfo.value.isAdmin?.first
+                          .toString() ==
+                      authController.userModel.value.user?.id.toString()) {
+                    Get.toNamed(
+                      RouteHelper.removeParticipant,
+                    );
+                  } else {
+                    AppWidget.toast(
+                        text:
+                            'Sorry, you are not an admin you cannot access this feature');
+                  }
                 } else if (value == 2) {
+                  return showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(
+                          chatController.groupInfo.value.isPinned == true
+                              ? 'Remove from Archive'
+                              : 'Add to Archive',
+                          style: AppStyles.largeTextStyle.copyWith(
+                              color: ColorConstant.backGroundColorOrange)),
+                      actions: [
+                        AppWidget.elevatedButton(
+                            text: 'Yes',
+                            onTap: () {
+                              chatController.groupChatRoomCollection
+                                  .doc(chatController.groupInfo.value.groupId
+                                      .toString())
+                                  .update({
+                                ApiConstant.isPinned:
+                                    chatController.groupInfo.value.isPinned ==
+                                            true
+                                        ? false
+                                        : true
+                              }).then((value) => Get.back());
+                            }),
+                        smallSizedBox,
+                        AppWidget.elevatedButton(
+                            text: 'No', onTap: () => Get.back()),
+                      ],
+                    ),
+                  );
+                } else if (value == 3) {
+                  // if (chatController.groupInfo.value.isAdmin?.first
+                  //         .toString() ==
+                  //     authController.userModel.value.user?.id.toString()) {
                   await chatController.groupChatRoomCollection
                       .doc(chatController.collectionId.toString())
                       .update({
                     ApiConstant.members: FieldValue.arrayRemove([
-                      '${authController.userModel.value.user
-                          ?.id}_${authController.userModel.value.user?.name}'
+                      '${authController.userModel.value.user?.id}_${authController.userModel.value.user?.name}'
                     ]),
                     ApiConstant.membersId: FieldValue.arrayRemove(
                         [authController.userModel.value.user?.id.toString()]),
                   });
 
                   DocumentReference<Map<String, dynamic>> userDocRef =
-                  chatController.groupChatListCollection.doc(
-                      authController.userModel.value.user?.id.toString());
+                      chatController.groupChatListCollection.doc(
+                          authController.userModel.value.user?.id.toString());
 
                   await userDocRef.update({
                     ApiConstant.groupId: FieldValue.arrayRemove(
@@ -635,6 +747,12 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   Get.back();
                   AppWidget.toast(text: 'Success');
                 }
+                // else {
+                //   AppWidget.toast(
+                //       text:
+                //           'Sorry, you are not an admin you cannot access this feature');
+                // }
+                //}
               }),
         ),
       ],
@@ -717,74 +835,75 @@ class _GroupChatPageState extends State<GroupChatPage> {
       log('${document.data()}');
       ChatMessages messageChat = ChatMessages.fromDocument(document);
 
-
       if (messageChat.idFrom ==
           SharedPrefClass.getString(SharedPrefStrings.userId)) {
         // Right (my message)
         return messageChat.deletedUserList?.contains(
-            authController.userModel.value.user?.id.toString()) == true
+                    authController.userModel.value.user?.id.toString()) ==
+                true
             ? Container()
             : Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Flexible(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20.w),
-                  child: _textContainer(
-                      isSender: false,
-                      content: messageChat.content ?? '',
-                      index: index,
-                      timestamp: messageChat.timestamp ?? '',
-                      senderName: messageChat.senderName),
-                )),
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Flexible(
+                      child: Padding(
+                    padding: EdgeInsets.only(left: 20.w),
+                    child: _textContainer(
+                        isSender: false,
+                        content: messageChat.content ?? '',
+                        index: index,
+                        timestamp: messageChat.timestamp ?? '',
+                        senderName: messageChat.senderName),
+                  )),
 
-            // Container(
-            //   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-            //   width: 200,
-            //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-            //   margin: EdgeInsets.only(
-            //       bottom: isLastMessageRight(index) ? 20 : 10, right: 10),
-            //   child: Text(
-            //     messageChat.content,
-            //   ),
-            // )
-          ],
-        );
+                  // Container(
+                  //   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  //   width: 200,
+                  //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                  //   margin: EdgeInsets.only(
+                  //       bottom: isLastMessageRight(index) ? 20 : 10, right: 10),
+                  //   child: Text(
+                  //     messageChat.content,
+                  //   ),
+                  // )
+                ],
+              );
       } else {
         // Left (peer message)
         return messageChat.deletedUserList?.contains(
-            authController.userModel.value.user?.id.toString()) == true
+                    authController.userModel.value.user?.id.toString()) ==
+                true
             ? Container()
             : Container(
-          margin: EdgeInsets.only(bottom: 1.w),
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                  ),
-                  SizedBox(
-                    width: 2.w,
-                  ),
-                  Flexible(
-                    child: Padding(
-                        padding: EdgeInsets.only(right: 20.w),
-                        child: _textContainer(
-                            isSender: true,
-                            content: messageChat.content ?? '',
-                            index: index,
-                            timestamp: messageChat.timestamp ?? '',
-                            radius: 1,
-                            senderName: messageChat.senderName)),
-                  )
-                ],
-              ),
-            ],
-          ),
-        );
+                margin: EdgeInsets.only(bottom: 1.w),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const CircleAvatar(
+                          backgroundColor: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 2.w,
+                        ),
+                        Flexible(
+                          child: Padding(
+                              padding: EdgeInsets.only(right: 20.w),
+                              child: _textContainer(
+                                  isSender: true,
+                                  content: messageChat.content ?? '',
+                                  index: index,
+                                  timestamp: messageChat.timestamp ?? '',
+                                  radius: 1,
+                                  senderName: messageChat.senderName)),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              );
       }
     } else {
       return const SizedBox.shrink();
@@ -804,8 +923,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
-        listMessage[index - 1].get('idFrom') !=
-            authController.userModel.value.user?.id.toString()) ||
+            listMessage[index - 1].get('idFrom') !=
+                authController.userModel.value.user?.id.toString()) ||
         index == 0) {
       return true;
     } else {
@@ -831,9 +950,9 @@ class _GroupChatPageState extends State<GroupChatPage> {
             topLeft: Radius.circular(3.w),
             topRight: Radius.circular(3.w),
             bottomLeft:
-            radius == 0 ? Radius.circular(3.w) : Radius.circular(0.w),
+                radius == 0 ? Radius.circular(3.w) : Radius.circular(0.w),
             bottomRight:
-            radius == 1 ? Radius.circular(3.w) : Radius.circular(0.w),
+                radius == 1 ? Radius.circular(3.w) : Radius.circular(0.w),
           ),
           color: containerColor ?? Colors.white),
       //width: 50.w,

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bondio/controller/controller.dart';
@@ -8,6 +9,7 @@ import 'package:linkedin_login/linkedin_login.dart';
 import 'package:linkwell/linkwell.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sizer/sizer.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
@@ -103,10 +105,13 @@ class _IntroScreenState extends State<IntroScreen>
                                         style: SignInWithAppleButtonStyle
                                             .whiteOutlined,
                                         onPressed: () async {
-                                          final credential = await SignInWithApple.getAppleIDCredential(
+                                          final credential =
+                                              await SignInWithApple
+                                                  .getAppleIDCredential(
                                             scopes: [
                                               AppleIDAuthorizationScopes.email,
-                                              AppleIDAuthorizationScopes.fullName,
+                                              AppleIDAuthorizationScopes
+                                                  .fullName,
                                             ],
                                           );
 
@@ -190,15 +195,45 @@ class _IntroScreenState extends State<IntroScreen>
                                     },
                                   ),
 
-                                  LinkWell(AppStrings.acceptPrivacyPolicy,
-                                      textAlign: TextAlign.center,
-                                      style: AppStyles.smallTextStyle.copyWith(
-                                        color: Colors.grey,
+                                  Wrap(
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      Text(
+                                        'By continuing you also accept our ',
+                                        style: AppStyles.smallTextStyle
+                                            .copyWith(color: Colors.black),
                                       ),
-                                      linkStyle:
-                                          AppStyles.smallTextStyle.copyWith(
-                                        color: Colors.blue,
-                                      )),
+                                      GestureDetector(
+                                          onTap: () => _showPrivacyDialog(),
+                                          child: Text(
+                                            'Privacy-policy',
+                                            style: AppStyles.smallTextStyle
+                                                .copyWith(color: Colors.blue),
+                                          )),
+                                      Text(
+                                        'and ',
+                                        style: AppStyles.smallTextStyle
+                                            .copyWith(color: Colors.black),
+                                      ),
+                                      GestureDetector(
+                                          onTap: () =>
+                                              _showTermAndConditionDialog(),
+                                          child: Text(
+                                            'Terms and Conditions',
+                                            style: AppStyles.smallTextStyle
+                                                .copyWith(color: Colors.blue),
+                                          )),
+                                    ],
+                                  ),
+                                  // LinkWell(AppStrings.acceptPrivacyPolicy,
+                                  //     textAlign: TextAlign.center,
+                                  //     style: AppStyles.smallTextStyle.copyWith(
+                                  //       color: Colors.grey,
+                                  //     ),
+                                  //     linkStyle:
+                                  //         AppStyles.smallTextStyle.copyWith(
+                                  //       color: Colors.blue,
+                                  //     )),
 
                                   smallSizedBox
                                 ],
@@ -258,6 +293,80 @@ class _IntroScreenState extends State<IntroScreen>
                 AppStyles.smallTextStyle.copyWith(color: Colors.blue.shade800),
           ),
         ),
+      );
+
+  _showPrivacyDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)),
+        contentPadding: EdgeInsets.zero,
+        content: Container(
+          height: 70.h,
+          width: 100.w,
+          child: WebViewWidget(
+              controller: WebViewController()
+                ..loadRequest(
+                    Uri.parse('https://bondiomeet.com/privacy-policy'))),
+        ),
+        actionsPadding: EdgeInsets.zero,
+        actions: [
+          TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Ok',
+                style: AppStyles.mediumTextStyle.copyWith(color: Colors.black),
+              ))
+        ],
+      ),
+    );
+  }
+
+  _showTermAndConditionDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)),
+        contentPadding: EdgeInsets.zero,
+        content: Container(
+          height: 70.h,
+          width: 100.w,
+          child: WebViewWidget(
+              controller: WebViewController()
+                ..loadRequest(
+                    Uri.parse('https://bondiomeet.com/term-conditions'))),
+        ),
+        actionsPadding: EdgeInsets.zero,
+        actions: [
+          TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Ok',
+                style: AppStyles.mediumTextStyle.copyWith(color: Colors.black),
+              ))
+        ],
+      ),
+    );
+  }
+
+  static normalText({String? text}) => Text(
+        text.toString(),
+        textAlign: TextAlign.justify,
+        style: AppStyles.smallerTextStyle.copyWith(
+          color: Colors.black,
+        ),
+      );
+
+  static normalTextDark({String? text}) => Text(
+        text.toString(),
+        textAlign: TextAlign.justify,
+        style: AppStyles.smallerTextStyle
+            .copyWith(color: Colors.black, fontWeight: FontWeight.w600),
+      );
+
+  static titleText({String? text}) => Text(
+        text.toString(),
+        style: AppStyles.mediumTextStyle.copyWith(color: Colors.black),
       );
 }
 

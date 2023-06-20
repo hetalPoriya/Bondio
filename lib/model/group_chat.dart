@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 class GroupChat {
   String? groupName;
   String? groupIcon;
+  bool? isPinned;
 
   List<dynamic>? members;
   List<dynamic>? membersId;
@@ -16,23 +17,24 @@ class GroupChat {
   final String? eventDate;
   bool? isEvent;
 
-  GroupChat(
-      {this.groupName,
-      this.groupIcon,
-      this.members,
-      this.groupId,
-      this.isAdmin,
-      this.lastMessage,
-      this.lastMessageSender,
-      this.membersId,
-      this.timestamp,
-      this.eventDate,
-      this.isEvent = false});
+  GroupChat({this.groupName,
+    this.groupIcon,
+    this.isPinned,
+    this.members,
+    this.groupId,
+    this.isAdmin,
+    this.lastMessage,
+    this.lastMessageSender,
+    this.membersId,
+    this.timestamp,
+    this.eventDate,
+    this.isEvent = false});
 
   Map<String, dynamic> toJson() {
     return {
       ApiConstant.groupName: groupName,
       ApiConstant.groupIcon: groupIcon,
+      ApiConstant.isPinned: isPinned,
       ApiConstant.members: members,
       ApiConstant.membersId: membersId,
       ApiConstant.isAdmin: isAdmin,
@@ -48,6 +50,7 @@ class GroupChat {
   factory GroupChat.fromDocument(DocumentSnapshot doc) {
     String groupName = doc.get(ApiConstant.groupName);
     String groupIcon = doc.get(ApiConstant.groupIcon);
+    bool isPinned = doc.get(ApiConstant.isPinned);
     List<dynamic> members = doc.get(ApiConstant.members);
     List<dynamic> membersId = doc.get(ApiConstant.membersId);
     List<dynamic> isAdmin = doc.get(ApiConstant.isAdmin);
@@ -60,6 +63,7 @@ class GroupChat {
     return GroupChat(
       groupName: groupName,
       groupIcon: groupIcon,
+      isPinned: isPinned,
       groupId: groupId,
       members: members,
       membersId: membersId,

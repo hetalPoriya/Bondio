@@ -25,7 +25,7 @@ class SocialLoginController extends GetxController {
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication? googleAuth =
-          await userData?.authentication;
+      await userData?.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -42,6 +42,7 @@ class SocialLoginController extends GetxController {
       // Once signed in, return the UserCredential
       await FirebaseAuth.instance.signInWithCredential(credential);
 
+      log('EE ${userData?.id}');
       await authController.userExistOrNotApi(
           tokenType: 'google_token', token: userData?.id ?? '');
       authController.isLoading(false);
@@ -64,7 +65,7 @@ class SocialLoginController extends GetxController {
 
     // Create a credential from the access token
     final OAuthCredential facebookAuthCredential =
-        FacebookAuthProvider.credential(result.accessToken!.token);
+    FacebookAuthProvider.credential(result.accessToken!.token);
 
     // Once signed in, return the UserCredential
     FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
@@ -102,44 +103,46 @@ class SocialLoginController extends GetxController {
     String clientId = '77qs3v01ir4zv2';
     String clientSecret = '5ZzZmoAjn3KtZblB';
 
-    Get.to(() => SafeArea(
+    Get.to(() =>
+        SafeArea(
           child: Obx(
-            () => Stack(
-              children: [
-                LinkedInUserWidget(
-                  destroySession: true,
-                  redirectUrl: redirectUrl,
-                  clientId: clientId,
-                  clientSecret: clientSecret,
-                  projection: const [
-                    ProjectionParameters.id,
-                    ProjectionParameters.localizedFirstName,
-                    ProjectionParameters.localizedLastName,
-                    ProjectionParameters.firstName,
-                    ProjectionParameters.lastName,
-                    ProjectionParameters.profilePicture,
-                  ],
-                  onError: (final UserFailedAction e) {
-                    authController.isLoading(false);
-                    log('Error: ${e.toString()}');
-                  },
-                  onGetUserProfile:
-                      (final UserSucceededAction linkedInUser) async {
-                    log(
-                      'Access token ${linkedInUser.user.token.accessToken}',
-                    );
+                () =>
+                Stack(
+                  children: [
+                    LinkedInUserWidget(
+                      destroySession: true,
+                      redirectUrl: redirectUrl,
+                      clientId: clientId,
+                      clientSecret: clientSecret,
+                      projection: const [
+                        ProjectionParameters.id,
+                        ProjectionParameters.localizedFirstName,
+                        ProjectionParameters.localizedLastName,
+                        ProjectionParameters.firstName,
+                        ProjectionParameters.lastName,
+                        ProjectionParameters.profilePicture,
+                      ],
+                      onError: (final UserFailedAction e) {
+                        authController.isLoading(false);
+                        log('Error: ${e.toString()}');
+                      },
+                      onGetUserProfile:
+                          (final UserSucceededAction linkedInUser) async {
+                        log(
+                          'Access token ${linkedInUser.user.token.accessToken}',
+                        );
 
-                    authController.fullNameController.value.text =
-                        linkedInUser.user.firstName?.localized?.label ?? '';
-                    authController.emailController.value.text = linkedInUser
+                        authController.fullNameController.value.text =
+                            linkedInUser.user.firstName?.localized?.label ?? '';
+                        authController.emailController.value.text = linkedInUser
                             .user
                             .email
                             ?.elements
                             ?.first
                             .handleDeep
                             ?.emailAddress ??
-                        '';
-                    authController.imageController.value.text = linkedInUser
+                            '';
+                        authController.imageController.value.text = linkedInUser
                             .user
                             .profilePicture
                             ?.displayImageContent
@@ -148,24 +151,34 @@ class SocialLoginController extends GetxController {
                             .identifiers
                             ?.first
                             .identifier ??
-                        '';
-                    authController.linkedinToken.value =
-                        linkedInUser.user.userId ?? '';
-                    authController.update();
-                    await authController.userExistOrNotApi(
-                        tokenType: 'linkedin_token',
-                        token: linkedInUser.user.userId ?? '');
-                    log('User id: ${linkedInUser.user.userId}');
-                    log('User id: ${linkedInUser.user.userId}');
-                    log('User id: ${linkedInUser.user.profilePicture?.displayImageContent?.elements?.first.identifiers?.first.identifier}');
-                    log('User id: ${linkedInUser.user.email?.elements?.first.handleDeep?.emailAddress.toString()}');
-                    log('User id: ${linkedInUser.user.firstName?.localized?.label.toString()}');
-                  },
+                            '';
+                        authController.linkedinToken.value =
+                            linkedInUser.user.userId ?? '';
+                        authController.update();
+                        await authController.userExistOrNotApi(
+                            tokenType: 'linkedin_token',
+                            token: linkedInUser.user.userId ?? '');
+                        log('User id: ${linkedInUser.user.userId}');
+                        log('User id: ${linkedInUser.user.userId}');
+                        log('User id: ${linkedInUser
+                            .user
+                            .profilePicture
+                            ?.displayImageContent
+                            ?.elements
+                            ?.first
+                            .identifiers
+                            ?.first
+                            .identifier}');
+                        log('User id: ${linkedInUser.user.email?.elements?.first
+                            .handleDeep?.emailAddress.toString()}');
+                        log('User id: ${linkedInUser.user.firstName?.localized
+                            ?.label.toString()}');
+                      },
+                    ),
+                    if (authController.isLoading.value == true)
+                      AppWidget.containerIndicator()
+                  ],
                 ),
-                if (authController.isLoading.value == true)
-                  AppWidget.containerIndicator()
-              ],
-            ),
           ),
         ));
     // return LinkedInUserWidget(

@@ -39,6 +39,7 @@ class InstagramLogin extends StatelessWidget {
     SocialLoginController socialLoginController =
         Get.put(SocialLoginController());
     webview.onUrlChanged.listen((String url) async {
+      log('Utl ${InstagramConstant.redirectUri}');
       if (url.contains(InstagramConstant.redirectUri)) {
         instagram.getAuthorizationCode(url);
         await instagram.getTokenAndUserID().then((isDone) async {

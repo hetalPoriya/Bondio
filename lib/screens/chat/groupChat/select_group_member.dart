@@ -20,82 +20,90 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
   ChatController chatController = Get.put(ChatController());
 
   @override
+  void initState() {
+    ChatWidget.fetchContacts();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(
-      () {
+          () {
         return (homeController.onTapOnAddGroupMember.value == true &&
-                homeController.onTapOnGroupCreate.value == false)
+            homeController.onTapOnGroupCreate.value == false)
             ? ChatBackground(
-                floatingButton: FloatingActionButton(
-                  onPressed: () {
-                    if (chatController.selectedGroupMember.length >= 2) {
-                      homeController.onTapOnGroupCreate.value = true;
-                      homeController.update();
-                    } else {
-                      Fluttertoast.showToast(
-                          msg:
-                              'Please select minimum two members to create group.');
-                    }
-                  },
-                  backgroundColor: ColorConstant.darkOrange,
-                  child: Icon(Icons.arrow_forward, size: 4.h),
-                ),
-                onBackButtonPressed: () {
-                  homeController.onTapOnAddGroupMember.value = false;
-                  homeController.onTapOnGroupCreate.value = false;
+            floatingButton: FloatingActionButton(
+              onPressed: () {
+                if (chatController.selectedGroupMember.length >= 2) {
+                  homeController.onTapOnGroupCreate.value = true;
                   homeController.update();
-                  Get.back();
-                },
-                bodyWidget: ListView(
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    children: [
-                      smallSizedBox,
-                      Padding(
-                        padding: paddingSymmetric(
-                            horizontalPad: 8.w, verticalPad: 0.0),
-                        child: AppWidget.searchField(
-                            controller: chatController.searchController.value,
-                            onChanged: (v) {
-                              chatController
-                                      .availableChatPersonSearchList.value =
-                                  chatController.availableChatPersonFromContacts
-                                      .where((x) => (x.name
-                                              .toString()
-                                              .toLowerCase()
-                                              .contains(chatController
-                                                  .searchController
-                                                  .value
-                                                  .text) ||
-                                          x.name
-                                              .toString()
-                                              .toUpperCase()
-                                              .contains(chatController
-                                                  .searchController
-                                                  .value
-                                                  .text)))
-                                      .toList();
-                              chatController.availableChatPersonSearchList
-                                  .refresh();
+                } else {
+                  Fluttertoast.showToast(
+                      msg:
+                      'Please select minimum two members to create group.');
+                }
+              },
+              backgroundColor: ColorConstant.darkOrange,
+              child: Icon(Icons.arrow_forward, size: 4.h),
+            ),
+            onBackButtonPressed: () {
+              homeController.onTapOnAddGroupMember.value = false;
+              homeController.onTapOnGroupCreate.value = false;
+              homeController.update();
+              Get.back();
+            },
+            bodyWidget: ListView(
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                children: [
+                  smallSizedBox,
+                  Padding(
+                    padding: paddingSymmetric(
+                        horizontalPad: 8.w, verticalPad: 0.0),
+                    child: AppWidget.searchField(
+                        controller: chatController.searchController.value,
+                        onChanged: (v) {
+                          chatController
+                              .availableChatPersonSearchList.value =
                               chatController.availableChatPersonFromContacts
-                                  .refresh();
-                            }),
-                      ),
-                      smallerSizedBox,
-                      if (chatController.selectedGroupMember.isNotEmpty)
-                        Container(
-                          height: 10.h,
-                          alignment: Alignment.centerLeft,
-                          //color: Colors.green,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 7.w),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: List.generate(
-                                    chatController.selectedGroupMember.length,
+                                  .where((x) =>
+                              (x.name
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(chatController
+                                  .searchController
+                                  .value
+                                  .text) ||
+                                  x.name
+                                      .toString()
+                                      .toUpperCase()
+                                      .contains(chatController
+                                      .searchController
+                                      .value
+                                      .text)))
+                                  .toList();
+                          chatController.availableChatPersonSearchList
+                              .refresh();
+                          chatController.availableChatPersonFromContacts
+                              .refresh();
+                        }),
+                  ),
+                  smallerSizedBox,
+                  if (chatController.selectedGroupMember.isNotEmpty)
+                    Container(
+                      height: 10.h,
+                      alignment: Alignment.centerLeft,
+                      //color: Colors.green,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 7.w),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(
+                                chatController.selectedGroupMember.length,
                                     (index) {
-                                  log('LoginId ${chatController.selectedGroupMember[index].id}');
+                                  log('LoginId ${chatController
+                                      .selectedGroupMember[index].id}');
                                   return Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -104,7 +112,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                         width: 18.w,
                                         child: Column(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                           children: [
                                             GestureDetector(
                                               onTap: () {
@@ -134,7 +142,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                                                 .addContact),
                                                         fit: BoxFit.cover)),
                                                 alignment:
-                                                    Alignment.bottomRight,
+                                                Alignment.bottomRight,
                                                 child: Container(
                                                   decoration: BoxDecoration(
                                                       color: Colors.grey,
@@ -155,15 +163,15 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                             ),
                                             Text(
                                                 chatController
-                                                        .selectedGroupMember[
-                                                            index]
-                                                        .name ??
+                                                    .selectedGroupMember[
+                                                index]
+                                                    .name ??
                                                     '',
                                                 overflow: TextOverflow.ellipsis,
                                                 style: AppStyles
                                                     .smallerTextStyle
                                                     .copyWith(
-                                                        color: Colors.black)),
+                                                    color: Colors.black)),
                                           ],
                                         ),
                                       ),
@@ -173,32 +181,33 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                                     ],
                                   );
                                 }),
-                              ),
-                            ),
                           ),
                         ),
-                      smallerSizedBox,
-                      if (chatController.selectedGroupMember.isNotEmpty)
-                        Padding(
-                          padding: paddingSymmetric(
-                              horizontalPad: 5.w, verticalPad: 0.0),
-                          child: Divider(
-                            color: Colors.grey.shade300,
-                            thickness: 1,
-                          ),
-                        ),
-                      Obx(
-                        () => chatController.searchController.value.text.isEmpty
-                            ? buildListView(
-                                availableChatPersonFromContacts: chatController
-                                    .availableChatPersonFromContacts)
-                            : buildListView(
-                                availableChatPersonFromContacts: chatController
-                                    .availableChatPersonSearchList),
-                      )
-                    ]),
-                textStyle: AppStyles.largeTextStyle,
-                title: 'Create Group')
+                      ),
+                    ),
+                  smallerSizedBox,
+                  if (chatController.selectedGroupMember.isNotEmpty)
+                    Padding(
+                      padding: paddingSymmetric(
+                          horizontalPad: 5.w, verticalPad: 0.0),
+                      child: Divider(
+                        color: Colors.grey.shade300,
+                        thickness: 1,
+                      ),
+                    ),
+                  Obx(
+                        () =>
+                    chatController.searchController.value.text.isEmpty
+                        ? buildListView(
+                        availableChatPersonFromContacts: chatController
+                            .availableChatPersonFromContacts)
+                        : buildListView(
+                        availableChatPersonFromContacts: chatController
+                            .availableChatPersonSearchList),
+                  )
+                ]),
+            textStyle: AppStyles.largeTextStyle,
+            title: 'Create Group')
             : CreateGroup();
       },
     );
@@ -214,7 +223,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
           return GestureDetector(
             onTap: () {
               if (chatController.selectedGroupMember.contains(
-                      chatController.availableChatPersonFromContacts[index]) ==
+                  chatController.availableChatPersonFromContacts[index]) ==
                   false) {
                 chatController.selectedGroupMember
                     .add(availableChatPersonFromContacts[index]);
@@ -255,7 +264,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                           //     true)
                           Text(
                             availableChatPersonFromContacts[index]
-                                    .phoneNumber ??
+                                .phoneNumber ??
                                 '(none)',
                             style: AppStyles.smallTextStyle.copyWith(
                                 color: Colors.black,

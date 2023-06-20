@@ -28,41 +28,41 @@ class LoginBody {
     required this.password,
   });
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() =>
+      {
         "email": email,
         "password": password,
       };
 }
 
 class SignUpBody {
-  SignUpBody(
-      {this.name,
-      this.lName,
-      this.photoSocial,
-      this.onlineStatus,
-      this.email,
-      this.mobile,
-      this.zipCode,
-      this.country,
-      this.state,
-      this.city,
-      this.aboutMe,
-      this.photo,
-      this.company,
-      this.dob,
-      this.gender,
-      this.password,
-      this.referCode,
-      this.referBy,
-      this.deviceToken,
-      this.googleToken,
-      this.facebookToken,
-      this.outlookToken,
-      this.twitterToken,
-      this.linkedinToken,
-      this.instagramToken,
-      this.otp,
-      this.service});
+  SignUpBody({this.name,
+    this.lName,
+    this.photoSocial,
+    this.onlineStatus,
+    this.email,
+    this.mobile,
+    this.zipCode,
+    this.country,
+    this.state,
+    this.city,
+    this.aboutMe,
+    this.photo,
+    this.company,
+    this.dob,
+    this.gender,
+    this.password,
+    this.referCode,
+    this.referBy,
+    this.deviceToken,
+    this.googleToken,
+    this.facebookToken,
+    this.outlookToken,
+    this.twitterToken,
+    this.linkedinToken,
+    this.instagramToken,
+    this.otp,
+    this.service});
 
   String? name;
   String? email;
@@ -92,7 +92,8 @@ class SignUpBody {
   String? otp;
   String? service;
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() =>
+      {
         "name": name,
         "email": email,
         "lname": lName,
@@ -134,13 +135,15 @@ class LoginModel {
   String? msg;
   LoginData? data;
 
-  factory LoginModel.fromMap(Map<String, dynamic> json) => LoginModel(
+  factory LoginModel.fromMap(Map<String, dynamic> json) =>
+      LoginModel(
         status: json["Status"],
         msg: json["Msg"],
         data: json["Data"] == null ? null : LoginData.fromMap(json["Data"]),
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() =>
+      {
         "Status": status,
         "Msg": msg,
         "Data": data?.toMap(),
@@ -156,12 +159,14 @@ class LoginData {
   User? user;
   String? token;
 
-  factory LoginData.fromMap(Map<String, dynamic> json) => LoginData(
+  factory LoginData.fromMap(Map<String, dynamic> json) =>
+      LoginData(
         user: json["user"] == null ? null : User.fromMap(json["user"]),
         token: json["token"],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() =>
+      {
         "user": user?.toMap(),
         "token": token,
       };
@@ -219,10 +224,11 @@ class User {
   dynamic googleToken;
   dynamic facebookToken;
   dynamic outlookToken;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
 
-  factory User.fromMap(Map<String, dynamic> json) => User(
+  factory User.fromMap(Map<String, dynamic> json) =>
+      User(
         id: json["id"] ?? '',
         name: json["name"] ?? '',
         lName: json["lname"] ?? '',
@@ -246,15 +252,12 @@ class User {
         googleToken: json["google_token"] ?? '',
         facebookToken: json["facebook_token"] ?? '',
         outlookToken: json["outlook_token"] ?? '',
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
+        createdAt: json["created_at"],
+        updatedAt: json["updated_at"],
       );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() =>
+      {
         "id": id,
         "name": name,
         "lname": lName,
@@ -278,8 +281,8 @@ class User {
         "google_token": googleToken,
         "facebook_token": facebookToken,
         "outlook_token": outlookToken,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
+        "created_at": createdAt,
+        "updated_at": updatedAt,
       };
 
 //
@@ -307,8 +310,8 @@ class User {
     dynamic googleToken = doc.get('google_token');
     dynamic facebookToken = doc.get('facebook_token');
     dynamic outlookToken = doc.get('outlook_token');
-    DateTime? createdAt = doc.get('created_at');
-    DateTime? updatedAt = doc.get('updated_at');
+    String? createdAt = doc.get('created_at');
+    String? updatedAt = doc.get('updated_at');
 
     return User(
       id: id,

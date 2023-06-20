@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bondio/controller/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,26 +23,31 @@ class CreateGroup extends StatelessWidget {
         floatingButton: Obx(() => Padding(
               padding: EdgeInsets.only(left: 20.w, right: 12.w),
               child: AppWidget.elevatedButton(
-                text: 'done',
-                loading: chatController.isLoading.value,
-                onTap: chatController.groupNameController.value.text.isEmpty
-                    ? () {
-                        AppWidget.toast(text: 'Please add your GroupName');
-                      }
-                    : () async {
-                        await chatController.createGroup(
-                            userName: authController.userModel.value.user!.name
-                                .toString(),
-                            groupName:
-                                chatController.groupNameController.value.text);
-                        homeController.onTapOnAddContact.value = false;
-                        homeController.onTapOnAddGroupMember.value = false;
-                        Get.back();
-                        homeController.selectedIndex.value = 1;
-                        homeController.innerTabSelectedIndex.value = 1;
-                        homeController.update();
-                      },
-              ),
+                  text: 'done',
+                  loading: chatController.isLoading.value,
+                  onTap: chatController.isLoading.value == true
+                      ? () {}
+                      : () async {
+                          log('${chatController.groupNameController.value.text.isEmpty}');
+                          if (chatController
+                                  .groupNameController.value.text.isEmpty ==
+                              true) {
+                            AppWidget.toast(text: 'Please add your GroupName');
+                          } else {
+                            await chatController.createGroup(
+                                userName: authController
+                                    .userModel.value.user!.name
+                                    .toString(),
+                                groupName: chatController
+                                    .groupNameController.value.text);
+                            homeController.onTapOnAddContact.value = false;
+                            homeController.onTapOnAddGroupMember.value = false;
+                            Get.back();
+                            homeController.selectedIndex.value = 1;
+                            homeController.innerTabSelectedIndex.value = 1;
+                            homeController.update();
+                          }
+                        }),
             )),
         // GestureDetector(
         //   onTap: () async {

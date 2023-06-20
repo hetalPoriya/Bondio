@@ -29,9 +29,9 @@
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBvSGkabjx7zIokuwjhIGq8atYFmqhHI7A" />
+        <!--        <meta-data-->
+        <!--            android:name="com.google.android.geo.API_KEY"-->
+        <!--            android:value="AIzaSyBvSGkabjx7zIokuwjhIGq8atYFmqhHI7A" />-->
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

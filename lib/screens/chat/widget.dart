@@ -5,22 +5,27 @@ import 'dart:io';
 import 'package:bondio/controller/controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../model/contact_list.dart';
 import '../../model/model.dart';
 
 class ChatWidget {
   static ChatController chatController = Get.put(ChatController());
   static AuthController authController = Get.put(AuthController());
+  static HomeController homeController = Get.put(HomeController());
 
   static Future<void> getUserInfo() async {
     AuthController authController = Get.put(AuthController());
     var response = await SharedPrefClass.getUserData();
     log('Response $response');
-    if (response.toString().isNotEmpty) {
+    if (response
+        .toString()
+        .isNotEmpty) {
       authController
           .userModel(LoginData.fromMap(jsonDecode(response.toString())));
       authController.userModel.refresh();
@@ -46,13 +51,12 @@ class ChatWidget {
     }
   }
 
-  static Widget chatContainer(
-          {String? imageString,
-          String? photoSocial,
-          String? titleText,
-          String? subText,
-          String? time,
-          bool? isPinned}) =>
+  static Widget chatContainer({String? imageString,
+    String? photoSocial,
+    String? titleText,
+    String? subText,
+    String? time,
+    bool? isPinned}) =>
       Material(
         elevation: 2.w,
         borderRadius: BorderRadius.circular(4.w),
@@ -126,14 +130,13 @@ class ChatWidget {
         ),
       );
 
-  static Widget eventContainer(
-          {String? imageString,
-          required String title,
-          required String description,
-          required String date,
-          required String time,
-          required String invitedBy,
-          required String memberList}) =>
+  static Widget eventContainer({String? imageString,
+    required String title,
+    required String description,
+    required String date,
+    required String time,
+    required String invitedBy,
+    required String memberList}) =>
       Material(
         elevation: 2.w,
         borderRadius: BorderRadius.circular(4.w),
@@ -212,7 +215,9 @@ class ChatWidget {
                                 color: ColorConstant.backGroundColorOrange),
                           ),
                           SizedBox(height: 1.w),
-                          if (invitedBy.toString().isNotEmpty)
+                          if (invitedBy
+                              .toString()
+                              .isNotEmpty)
                             Text(
                               invitedBy,
                               style: AppStyles.smallerTextStyle.copyWith(
@@ -228,21 +233,22 @@ class ChatWidget {
 
   static Widget customDrawer() => Container();
 
-  static Widget appBarWidget({String? userName, String? status}) => SizedBox(
+  static Widget appBarWidget({String? userName, String? status}) =>
+      SizedBox(
         height: 10.h,
         child: Row(
           children: [
             Expanded(
                 child: CircleAvatar(
-              maxRadius: 4.h,
-              minRadius: 4.h,
-              backgroundColor: Colors.black38,
-            )),
+                  maxRadius: 4.h,
+                  minRadius: 4.h,
+                  backgroundColor: Colors.black38,
+                )),
             Expanded(
                 flex: 4,
                 child: Padding(
                     padding:
-                        paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
+                    paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -262,22 +268,26 @@ class ChatWidget {
       );
 
   static Widget imageCircleAvatar(
-          {Uint8List? imageString, required BuildContext context}) =>
+      {Uint8List? imageString, required BuildContext context}) =>
       SizedBox(
         height: 6.h,
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         child: (imageString != null && imageString.isNotEmpty)
             ? CircleAvatar(
-                backgroundImage: MemoryImage(imageString),
-              )
+          backgroundImage: MemoryImage(imageString),
+        )
             : CircleAvatar(
-                backgroundColor: ColorConstant.backGroundColorOrange,
-                child: Image.asset(AppAssets.user,
-                    height: 3.h, color: Colors.white),
-              ),
+          backgroundColor: ColorConstant.backGroundColorOrange,
+          child: Image.asset(AppAssets.user,
+              height: 3.h, color: Colors.white),
+        ),
       );
 
-  static Widget noConversionFound() => Column(
+  static Widget noConversionFound() =>
+      Column(
         children: [
           largeSizedBox,
           largeSizedBox,
@@ -299,7 +309,10 @@ class ChatWidget {
         content: Padding(
           padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 0),
           child: SizedBox(
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -311,7 +324,7 @@ class ChatWidget {
                   child: Text(
                     'Gallery',
                     style:
-                        AppStyles.smallTextStyle.copyWith(color: Colors.black),
+                    AppStyles.smallTextStyle.copyWith(color: Colors.black),
                   ),
                 ),
                 smallerSizedBox,
@@ -323,7 +336,7 @@ class ChatWidget {
                   child: Text(
                     'Camera',
                     style:
-                        AppStyles.smallTextStyle.copyWith(color: Colors.black),
+                    AppStyles.smallTextStyle.copyWith(color: Colors.black),
                   ),
                 )
               ],
@@ -357,8 +370,244 @@ class ChatWidget {
   static displayImage({String? image, String? socialImage}) {
     return (socialImage?.isNotEmpty == true && socialImage.toString() != 'null')
         ? NetworkImage(socialImage.toString())
-        : ((image.toString().isEmpty || image.toString() == ' '))
-            ? AssetImage(AppAssets.addContact) as ImageProvider
-            : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
+        : ((image
+        .toString()
+        .isEmpty || image.toString() == ' '))
+        ? AssetImage(AppAssets.addContact) as ImageProvider
+        : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
   }
+
+  static Future fetchContacts() async {
+    chatController.searchControllerForContact.value.clear();
+    chatController.contacts.value = [];
+    chatController.contacts.refresh();
+    chatController.searchContactListModel.value = [];
+    chatController.searchContactListModel.refresh();
+    chatController.availableChatPersonFromContacts.value = [];
+    chatController.availableChatPersonFromContacts.refresh();
+    chatController.update();
+
+    // List<Contact> loadedList =
+    //     await SharedPrefClass.getListFromSharedPreferences();
+    //
+    // // chatController.contacts.value = loadedList;
+    // // chatController.update();
+    // //
+    // // log(loadedList.length.toString());
+    // // log('${chatController.contacts.length}');
+    // // log('${chatController.contacts.toString()}');
+    // if (!await FlutterContacts.requestPermission(readonly: true)) {
+    // } else {
+    //   FlutterContacts.getContacts(withProperties: true, withPhoto: true)
+    //       .then((contacts) {
+    //     chatController.contacts.addAll(contacts);
+    //     chatController.contacts.asMap().entries.map((e) async {
+    //       if (chatController.contacts[e.key].phones.isNotEmpty) {
+    //         await chatController.contactCollection
+    //             .doc(chatController
+    //                 .contacts[e.key].phones.first.normalizedNumber
+    //                 .toString())
+    //             .get()
+    //             .then((value) {
+    //           if (value.exists) {
+    //             chatController.contacts[e.key].status = value.get('status');
+    //             chatController.contacts[e.key].loginId = value.get('id');
+    //             chatController.contacts.refresh();
+    //             chatController.update();
+    //             if (chatController.contacts[e.key].status == 'Chat') {
+    //               chatController.availableChatPersonFromContacts
+    //                   .add(chatController.contacts[e.key]);
+    //               chatController.availableChatPersonFromContacts.refresh();
+    //             }
+    //             chatController.contacts.refresh();
+    //           }
+    //         });
+    //       }
+    //     }).toList();
+    //   }).then((value) async {
+    //     SharedPrefClass.saveListToSharedPreferences(
+    //         chatController.contacts.value);
+    //
+    //     // List<Contact> loadedList = await SharedPrefClass.getListFromSharedPreferences();
+    //     // setState(() {
+    //     //   persons = loadedList;
+    //     // });
+    //   });
+    // }
+
+    List<ContactListModel> loadedList =
+    await SharedPrefClass.getListFromSharedPreferences(
+        sharedPrefString: SharedPrefStrings.myContacts);
+    List<ContactListModel> availableList =
+    await SharedPrefClass.getListFromSharedPreferences(
+        sharedPrefString: SharedPrefStrings.availableContacts);
+
+    //log('MY SHERED ${loadedList.first.toMap()}');
+
+    if (!await FlutterContacts.requestPermission(readonly: true)) {} else {
+      if (loadedList.isNotEmpty) {
+        chatController.contacts.value = loadedList;
+        chatController.availableChatPersonFromContacts.value = availableList;
+        chatController.update();
+        chatController.contacts.refresh();
+        chatController.availableChatPersonFromContacts.refresh();
+      } else {
+        FlutterContacts.getContacts(withProperties: true, withPhoto: true)
+            .then((contacts) async {
+          contacts.map((data) {
+            String phone = data.phones.isNotEmpty
+                ? data.phones.first.normalizedNumber
+                .toString()
+                .isNotEmpty
+                ? data.phones.first.normalizedNumber.toString()
+                : 'none'
+                : 'none';
+
+            chatController.contactCollection.doc(phone).get().then((value) {
+              if (value.exists) {
+                chatController.contacts.value.add(ContactListModel(
+                    id: value.get('id'),
+                    name: data.displayName,
+                    phoneNumber: phone,
+                    status: value.get('status')));
+                chatController.contacts.refresh();
+                chatController.update();
+                SharedPrefClass.saveListToSharedPreferences(
+                    con: chatController.contacts.value,
+                    sharedPrefString: SharedPrefStrings.myContacts);
+                if (value.get('status') == 'Chat') {
+                  chatController.availableChatPersonFromContacts.add(
+                      ContactListModel(
+                          id: value.get('id'),
+                          name: data.displayName,
+                          phoneNumber: phone,
+                          status: value.get('status')));
+                  chatController.availableChatPersonFromContacts.refresh();
+                  chatController.update();
+                  SharedPrefClass.saveListToSharedPreferences(
+                      con: chatController.availableChatPersonFromContacts.value,
+                      sharedPrefString: SharedPrefStrings.availableContacts);
+                }
+              } else {
+                chatController.contacts.value.add(ContactListModel(
+                    id: data.loginId,
+                    name: data.displayName,
+                    phoneNumber: phone,
+                    status: data.status.toString()));
+                chatController.contacts.refresh();
+                chatController.update();
+                SharedPrefClass.saveListToSharedPreferences(
+                    con: chatController.contacts.value,
+                    sharedPrefString: SharedPrefStrings.myContacts);
+              }
+            });
+            // SharedPrefClass.saveListToSharedPreferences(
+            //     chatController.contacts.value);
+
+            //log('contactList ${chatController.contacts.value.first.toMap()}');
+            // log('ISEXITS ${isExits}');
+            // return ContactListModel(
+            //     id: data.loginId,
+            //     name: data.displayName,
+            //     phoneNumber: phone,
+            //     status: data.status.toString());
+          }).toList();
+
+          // SharedPrefClass.saveListToSharedPreferences(
+          //     chatController.contacts.value);
+          // log('contactList ${chatController.contacts.value.length}');
+          // log('contactList ${chatController.contacts.value.first.toMap()}');
+
+          // chatController.contacts.asMap().entries.map((data) async {
+          //   if (chatController.contacts[data.key].phoneNumber
+          //       .toString()
+          //       .isNotEmpty) {
+          //     await chatController.contactCollection
+          //         .doc(chatController.contacts[data.key].phoneNumber
+          //                 .toString()
+          //                 .isNotEmpty
+          //             ? chatController.contacts[data.key].phoneNumber
+          //             : 'none')
+          //         .get()
+          //         .then((value) {
+          //       log('ENter');
+          //       if (value.exists) {
+          //         log('MYNUMBER ${chatController.contacts[data.key].phoneNumber}');
+          //         chatController.contacts[data.key].status = value.get('status');
+          //         chatController.contacts[data.key].id = value.get('id');
+          //
+          //         chatController.contacts.refresh();
+          //         chatController.update();
+          //         SharedPrefClass.saveListToSharedPreferences(
+          //             chatController.contacts.value);
+          //
+          //         if (chatController.contacts[data.key].status == 'Chat') {
+          //           chatController.availableChatPersonFromContacts.add(data);
+          //           chatController.availableChatPersonFromContacts.refresh();
+          //           chatController.update();
+          //         }
+          //         chatController.contacts.refresh();
+          //       }
+          //     });
+          //     SharedPrefClass.saveListToSharedPreferences(
+          //         chatController.contacts.value);
+          //   }
+          // });
+        });
+        // }
+
+        // chatController.contacts.addAll(contacts);
+        // chatController.contacts.asMap().entries.map((e) async {
+        //   if (chatController.contacts[e.key].phones.isNotEmpty) {
+        //     await chatController.contactCollection
+        //         .doc(chatController
+        //             .contacts[e.key].phones.first.normalizedNumber
+        //             .toString())
+        //         .get()
+        //         .then((value) {
+        //       if (value.exists) {
+        //         chatController.contacts[e.key].status = value.get('status');
+        //         chatController.contacts[e.key].loginId = value.get('id');
+        //         chatController.contacts.refresh();
+        //         chatController.update();
+        //         if (chatController.contacts[e.key].status == 'Chat') {
+        //           chatController.availableChatPersonFromContacts
+        //               .add(chatController.contacts[e.key]);
+        //           chatController.availableChatPersonFromContacts.refresh();
+        //         }
+        //         chatController.contacts.refresh();
+        //       }
+        //     });
+      }
+      // }).toList();
+    }
+  }
+
+  static tabContainer({required String text,
+    required int index,
+    required List<Color> color,
+    required Color textColor,
+    required VoidCallback onTap}) =>
+
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+            height: 3.h,
+            width: 21.w,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.w),
+                color: Colors.white,
+                gradient: LinearGradient(colors: color),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Colors.black26, spreadRadius: 1, blurRadius: 6)
+                ]),
+            child: Text(
+              text,
+              style: AppStyles.smallerTextStyle.copyWith(color: textColor),
+            )),
+      );
+
+
 }

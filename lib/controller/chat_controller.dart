@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:bondio/model/contact_list.dart';
+import 'package:bondio/model/user_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -70,11 +71,13 @@ class ChatController extends GetxController {
 
   //chat snapshot
   RxList userInfoList = [].obs;
+  Rx<User> user = User().obs;
   RxList searchUserInfoList = [].obs;
   RxList groupInfoList = [].obs;
   RxList searchGroupInfoList = [].obs;
 
   Rx<GroupChat> groupInfo = GroupChat().obs;
+  Rx<UserInfo> chatInfo = UserInfo().obs;
   Rx<User> peerInfo = User().obs;
 
   //add users
@@ -125,6 +128,8 @@ class ChatController extends GetxController {
     required String peerId,
     required String roomId,
   }) async {
+    log('Perr Id ${userId}');
+    log('Perr Id ${peerId}');
     DocumentSnapshot<Map<String, dynamic>> userInfo =
         await userCollection.doc(userId).get();
 
@@ -216,6 +221,7 @@ class ChatController extends GetxController {
           isAdmin: [],
           //'messages': ,
           groupId: '',
+          isPinned: false,
           lastMessage: eventDes ?? '',
           lastMessageSender: '',
           timestamp: DateTime.now().millisecondsSinceEpoch.toString(),

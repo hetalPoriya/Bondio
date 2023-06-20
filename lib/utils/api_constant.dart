@@ -13,8 +13,10 @@ class ApiConstant {
   //static String registerOtpApi = 'register-otp';
   static String imageBaseUrl = 'https://bondiomeet.com/storage/app/';
   static String registerOtpApi = 'api/v1/registration-otp';
-  static String registerApi = 'api/v1/register';
-  static String isRegisterApi = 'api/v1/is-register';
+
+  //static String registerApi = 'api/v1/register';
+  static String registerApi = 'api/v1/register-user';
+  static String isRegisterApi = 'api/v1/is-registered';
   static String loginApi = 'api/v1/login';
   static String logoutApi = 'api/v1/logout';
   static String customerDetailApi = 'api/v1/customer-detail';

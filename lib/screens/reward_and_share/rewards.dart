@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:bondio/controller/controller.dart';
@@ -10,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
@@ -36,7 +38,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
     QuerySnapshot<Map<String, dynamic>> count = await chatController
         .personalChatListCollection
         .doc(authController.userModel.value.user?.id.toString())
-        .collection(authController.userModel.value.user!.id.toString())
+        .collection(authController.userModel.value.user?.id.toString() ?? '')
         .get();
 
     log(count.docs.length.toString());
@@ -48,9 +50,16 @@ class _RewardsScreenState extends State<RewardsScreen> {
 
   @override
   void initState() {
-    getFriendCount();
-    authController.checkInviteCodeApi(
-        referCode: authController.userModel.value.user?.referCode ?? '');
+    if (SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == true) {
+      getFriendCount();
+    }
+    if (SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == true) {
+      Timer(
+          Duration(seconds: 1),
+          () => authController.checkInviteCodeApi(
+              referCode:
+                  authController.userModel.value.user?.referCode ?? '00001'));
+    }
     super.initState();
   }
 
@@ -279,18 +288,37 @@ class _RewardsScreenState extends State<RewardsScreen> {
                   padding:
                       paddingSymmetric(horizontalPad: 3.w, verticalPad: 00),
                   child: Container(
-                      height: 35.h,
-                      padding: paddingSymmetric(
-                          horizontalPad: 1.w, verticalPad: 1.h),
-                      decoration: BoxDecoration(
-                          color: ColorConstant.lightGrey,
-                          border: Border.all(color: ColorConstant.greyBorder),
-                          borderRadius: BorderRadius.circular(4.w)),
-                      child: Obx(
-                        () => Column(
-                          children: [
-                            smallerSizedBox,
-                            containerListWidget(
+                    height: 35.h,
+                    padding:
+                        paddingSymmetric(horizontalPad: 1.w, verticalPad: 1.h),
+                    decoration: BoxDecoration(
+                        color: ColorConstant.lightGrey,
+                        border: Border.all(color: ColorConstant.greyBorder),
+                        borderRadius: BorderRadius.circular(4.w)),
+                    child: Column(
+                      children: [
+                        smallerSizedBox,
+                        if (SharedPrefClass.getBool(
+                                SharedPrefStrings.isLogin, false) ==
+                            false) ...[
+                          containerListWidget(
+                              image1: AppAssets.dollar,
+                              count1: '0',
+                              text1: 'Earned',
+                              text2: 'Friends',
+                              count2: '0',
+                              image2: AppAssets.chatMessage),
+                          smallerSizedBox,
+                          containerListWidget(
+                              image1: AppAssets.partyAttendance,
+                              count1: '0',
+                              text1: 'Event Attendance',
+                              text2: 'Upcoming Events',
+                              count2: '0',
+                              image2: AppAssets.upcomingEvent),
+                        ] else ...[
+                          Obx(
+                            () => containerListWidget(
                                 image1: AppAssets.dollar,
                                 count1: authController
                                         .customerDetails.value.data?.balance
@@ -302,8 +330,10 @@ class _RewardsScreenState extends State<RewardsScreen> {
                                     authController.friend.value.toString() ??
                                         '0',
                                 image2: AppAssets.chatMessage),
-                            smallerSizedBox,
-                            containerListWidget(
+                          ),
+                          smallerSizedBox,
+                          Obx(
+                            () => containerListWidget(
                                 image1: AppAssets.partyAttendance,
                                 count1: authController
                                         .customerDetails.value.data?.attendance
@@ -316,10 +346,12 @@ class _RewardsScreenState extends State<RewardsScreen> {
                                         .toString() ??
                                     '0',
                                 image2: AppAssets.upcomingEvent),
-                            smallerSizedBox,
-                          ],
-                        ),
-                      )),
+                          ),
+                        ],
+                        smallerSizedBox,
+                      ],
+                    ),
+                  ),
                 ),
                 smallSizedBox,
                 GestureDetector(
@@ -395,7 +427,11 @@ class _RewardsScreenState extends State<RewardsScreen> {
       String? image2,
       String? count2}) {
     return Expanded(
-        child: Row(children: [
+        child:
+            // (SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
+            //         false)
+            //     ?
+            Row(children: [
       SizedBox(
         width: 2.w,
       ),
@@ -407,7 +443,25 @@ class _RewardsScreenState extends State<RewardsScreen> {
       SizedBox(
         width: 2.w,
       ),
-    ]));
+    ])
+        //:
+        // Obx(
+        //       () =>
+        //       Row(children: [
+        //         SizedBox(
+        //           width: 2.w,
+        //         ),
+        //         commanContainer(text: text1, image: image1, count: count1),
+        //         SizedBox(
+        //           width: 4.w,
+        //         ),
+        //         commanContainer(text: text2, image: image2, count: count2),
+        //         SizedBox(
+        //           width: 2.w,
+        //         ),
+        //       ]),
+        // )
+        );
   }
 
   Widget commanContainer({String? text, String? image, String? count}) {

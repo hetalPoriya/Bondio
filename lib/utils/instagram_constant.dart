@@ -10,7 +10,7 @@ class InstagramConstant {
 
   static const String clientID = '749483436869266';
   static const String appSecret = 'cf0b2e50d04d0bc52b76b36cbf2526ed';
-  static const String redirectUri = 'https://bondiomeet.com/coming-soon';
+  static const String redirectUri = 'https://bondiomeet.com/';
   static const String scope = 'user_profile,user_media';
   static const String responseType = 'code';
   final String url =

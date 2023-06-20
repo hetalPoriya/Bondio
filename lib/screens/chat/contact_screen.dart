@@ -25,219 +25,217 @@ class _ContactScreenState extends State<ContactScreen> {
   HomeController homeController = Get.put(HomeController());
   AuthController authController = Get.put(AuthController());
 
-  Future fetchContacts() async {
-    chatController.searchControllerForContact.value.clear();
-    chatController.contacts.value = [];
-    chatController.contacts.refresh();
-    chatController.searchContactListModel.value = [];
-    chatController.searchContactListModel.refresh();
-    chatController.availableChatPersonFromContacts.value = [];
-    chatController.availableChatPersonFromContacts.refresh();
-    chatController.update();
-
-    // List<Contact> loadedList =
-    //     await SharedPrefClass.getListFromSharedPreferences();
-    //
-    // // chatController.contacts.value = loadedList;
-    // // chatController.update();
-    // //
-    // // log(loadedList.length.toString());
-    // // log('${chatController.contacts.length}');
-    // // log('${chatController.contacts.toString()}');
-    // if (!await FlutterContacts.requestPermission(readonly: true)) {
-    // } else {
-    //   FlutterContacts.getContacts(withProperties: true, withPhoto: true)
-    //       .then((contacts) {
-    //     chatController.contacts.addAll(contacts);
-    //     chatController.contacts.asMap().entries.map((e) async {
-    //       if (chatController.contacts[e.key].phones.isNotEmpty) {
-    //         await chatController.contactCollection
-    //             .doc(chatController
-    //                 .contacts[e.key].phones.first.normalizedNumber
-    //                 .toString())
-    //             .get()
-    //             .then((value) {
-    //           if (value.exists) {
-    //             chatController.contacts[e.key].status = value.get('status');
-    //             chatController.contacts[e.key].loginId = value.get('id');
-    //             chatController.contacts.refresh();
-    //             chatController.update();
-    //             if (chatController.contacts[e.key].status == 'Chat') {
-    //               chatController.availableChatPersonFromContacts
-    //                   .add(chatController.contacts[e.key]);
-    //               chatController.availableChatPersonFromContacts.refresh();
-    //             }
-    //             chatController.contacts.refresh();
-    //           }
-    //         });
-    //       }
-    //     }).toList();
-    //   }).then((value) async {
-    //     SharedPrefClass.saveListToSharedPreferences(
-    //         chatController.contacts.value);
-    //
-    //     // List<Contact> loadedList = await SharedPrefClass.getListFromSharedPreferences();
-    //     // setState(() {
-    //     //   persons = loadedList;
-    //     // });
-    //   });
-    // }
-
-    List<ContactListModel> loadedList =
-        await SharedPrefClass.getListFromSharedPreferences(
-            sharedPrefString: SharedPrefStrings.myContacts);
-    List<ContactListModel> availableList =
-        await SharedPrefClass.getListFromSharedPreferences(
-            sharedPrefString: SharedPrefStrings.availableContacts);
-    log('MY SHERED ${loadedList.length}');
-    log('MY SHERED ${availableList.length}');
-    //log('MY SHERED ${loadedList.first.toMap()}');
-
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-    } else {
-      if (loadedList.isNotEmpty) {
-        chatController.contacts.value = loadedList;
-        chatController.availableChatPersonFromContacts.value = availableList;
-        chatController.update();
-        chatController.contacts.refresh();
-        chatController.availableChatPersonFromContacts.refresh();
-      } else {
-        FlutterContacts.getContacts(withProperties: true, withPhoto: true)
-            .then((contacts) async {
-          log('Con ${contacts.first.toString()}');
-
-          contacts.map((data) {
-            String phone = data.phones.isNotEmpty
-                ? data.phones.first.normalizedNumber.toString().isNotEmpty
-                    ? data.phones.first.normalizedNumber.toString()
-                    : 'none'
-                : 'none';
-            log('PHONE ${phone}');
-            chatController.contactCollection.doc(phone).get().then((value) {
-              if (value.exists) {
-                chatController.contacts.value.add(ContactListModel(
-                    id: value.get('id'),
-                    name: data.displayName,
-                    phoneNumber: phone,
-                    status: value.get('status')));
-                chatController.contacts.refresh();
-                chatController.update();
-                SharedPrefClass.saveListToSharedPreferences(
-                    con: chatController.contacts.value,
-                    sharedPrefString: SharedPrefStrings.myContacts);
-                if (value.get('status') == 'Chat') {
-                  chatController.availableChatPersonFromContacts.add(
-                      ContactListModel(
-                          id: value.get('id'),
-                          name: data.displayName,
-                          phoneNumber: phone,
-                          status: value.get('status')));
-                  chatController.availableChatPersonFromContacts.refresh();
-                  chatController.update();
-                  SharedPrefClass.saveListToSharedPreferences(
-                      con: chatController.availableChatPersonFromContacts.value,
-                      sharedPrefString: SharedPrefStrings.availableContacts);
-                  log('AvailableList ${chatController.availableChatPersonFromContacts.value.length}');
-                }
-              } else {
-                chatController.contacts.value.add(ContactListModel(
-                    id: data.loginId,
-                    name: data.displayName,
-                    phoneNumber: phone,
-                    status: data.status.toString()));
-                chatController.contacts.refresh();
-                chatController.update();
-                SharedPrefClass.saveListToSharedPreferences(
-                    con: chatController.contacts.value,
-                    sharedPrefString: SharedPrefStrings.myContacts);
-                log('contactList ${chatController.contacts.value.length}');
-              }
-            });
-            // SharedPrefClass.saveListToSharedPreferences(
-            //     chatController.contacts.value);
-            log('contactList ${chatController.contacts.value.length}');
-            //log('contactList ${chatController.contacts.value.first.toMap()}');
-            // log('ISEXITS ${isExits}');
-            // return ContactListModel(
-            //     id: data.loginId,
-            //     name: data.displayName,
-            //     phoneNumber: phone,
-            //     status: data.status.toString());
-          }).toList();
-
-          // SharedPrefClass.saveListToSharedPreferences(
-          //     chatController.contacts.value);
-          // log('contactList ${chatController.contacts.value.length}');
-          // log('contactList ${chatController.contacts.value.first.toMap()}');
-
-          // chatController.contacts.asMap().entries.map((data) async {
-          //   if (chatController.contacts[data.key].phoneNumber
-          //       .toString()
-          //       .isNotEmpty) {
-          //     await chatController.contactCollection
-          //         .doc(chatController.contacts[data.key].phoneNumber
-          //                 .toString()
-          //                 .isNotEmpty
-          //             ? chatController.contacts[data.key].phoneNumber
-          //             : 'none')
-          //         .get()
-          //         .then((value) {
-          //       log('ENter');
-          //       if (value.exists) {
-          //         log('MYNUMBER ${chatController.contacts[data.key].phoneNumber}');
-          //         chatController.contacts[data.key].status = value.get('status');
-          //         chatController.contacts[data.key].id = value.get('id');
-          //
-          //         chatController.contacts.refresh();
-          //         chatController.update();
-          //         SharedPrefClass.saveListToSharedPreferences(
-          //             chatController.contacts.value);
-          //
-          //         if (chatController.contacts[data.key].status == 'Chat') {
-          //           chatController.availableChatPersonFromContacts.add(data);
-          //           chatController.availableChatPersonFromContacts.refresh();
-          //           chatController.update();
-          //         }
-          //         chatController.contacts.refresh();
-          //       }
-          //     });
-          //     SharedPrefClass.saveListToSharedPreferences(
-          //         chatController.contacts.value);
-          //   }
-          // });
-        });
-        // }
-
-        // chatController.contacts.addAll(contacts);
-        // chatController.contacts.asMap().entries.map((e) async {
-        //   if (chatController.contacts[e.key].phones.isNotEmpty) {
-        //     await chatController.contactCollection
-        //         .doc(chatController
-        //             .contacts[e.key].phones.first.normalizedNumber
-        //             .toString())
-        //         .get()
-        //         .then((value) {
-        //       if (value.exists) {
-        //         chatController.contacts[e.key].status = value.get('status');
-        //         chatController.contacts[e.key].loginId = value.get('id');
-        //         chatController.contacts.refresh();
-        //         chatController.update();
-        //         if (chatController.contacts[e.key].status == 'Chat') {
-        //           chatController.availableChatPersonFromContacts
-        //               .add(chatController.contacts[e.key]);
-        //           chatController.availableChatPersonFromContacts.refresh();
-        //         }
-        //         chatController.contacts.refresh();
-        //       }
-        //     });
-      }
-      // }).toList();
-    }
-  }
+  //  Future fetchContacts() async {
+  //   chatController.searchControllerForContact.value.clear();
+  //   chatController.contacts.value = [];
+  //   chatController.contacts.refresh();
+  //   chatController.searchContactListModel.value = [];
+  //   chatController.searchContactListModel.refresh();
+  //   chatController.availableChatPersonFromContacts.value = [];
+  //   chatController.availableChatPersonFromContacts.refresh();
+  //   chatController.update();
+  //
+  //   // List<Contact> loadedList =
+  //   //     await SharedPrefClass.getListFromSharedPreferences();
+  //   //
+  //   // // chatController.contacts.value = loadedList;
+  //   // // chatController.update();
+  //   // //
+  //   // // log(loadedList.length.toString());
+  //   // // log('${chatController.contacts.length}');
+  //   // // log('${chatController.contacts.toString()}');
+  //   // if (!await FlutterContacts.requestPermission(readonly: true)) {
+  //   // } else {
+  //   //   FlutterContacts.getContacts(withProperties: true, withPhoto: true)
+  //   //       .then((contacts) {
+  //   //     chatController.contacts.addAll(contacts);
+  //   //     chatController.contacts.asMap().entries.map((e) async {
+  //   //       if (chatController.contacts[e.key].phones.isNotEmpty) {
+  //   //         await chatController.contactCollection
+  //   //             .doc(chatController
+  //   //                 .contacts[e.key].phones.first.normalizedNumber
+  //   //                 .toString())
+  //   //             .get()
+  //   //             .then((value) {
+  //   //           if (value.exists) {
+  //   //             chatController.contacts[e.key].status = value.get('status');
+  //   //             chatController.contacts[e.key].loginId = value.get('id');
+  //   //             chatController.contacts.refresh();
+  //   //             chatController.update();
+  //   //             if (chatController.contacts[e.key].status == 'Chat') {
+  //   //               chatController.availableChatPersonFromContacts
+  //   //                   .add(chatController.contacts[e.key]);
+  //   //               chatController.availableChatPersonFromContacts.refresh();
+  //   //             }
+  //   //             chatController.contacts.refresh();
+  //   //           }
+  //   //         });
+  //   //       }
+  //   //     }).toList();
+  //   //   }).then((value) async {
+  //   //     SharedPrefClass.saveListToSharedPreferences(
+  //   //         chatController.contacts.value);
+  //   //
+  //   //     // List<Contact> loadedList = await SharedPrefClass.getListFromSharedPreferences();
+  //   //     // setState(() {
+  //   //     //   persons = loadedList;
+  //   //     // });
+  //   //   });
+  //   // }
+  //
+  //   List<ContactListModel> loadedList =
+  //       await SharedPrefClass.getListFromSharedPreferences(
+  //           sharedPrefString: SharedPrefStrings.myContacts);
+  //   List<ContactListModel> availableList =
+  //       await SharedPrefClass.getListFromSharedPreferences(
+  //           sharedPrefString: SharedPrefStrings.availableContacts);
+  //
+  //   //log('MY SHERED ${loadedList.first.toMap()}');
+  //
+  //   if (!await FlutterContacts.requestPermission(readonly: true)) {
+  //   } else {
+  //     if (loadedList.isNotEmpty) {
+  //       chatController.contacts.value = loadedList;
+  //       chatController.availableChatPersonFromContacts.value = availableList;
+  //       chatController.update();
+  //       chatController.contacts.refresh();
+  //       chatController.availableChatPersonFromContacts.refresh();
+  //     } else {
+  //       FlutterContacts.getContacts(withProperties: true, withPhoto: true)
+  //           .then((contacts) async {
+  //
+  //         contacts.map((data) {
+  //           String phone = data.phones.isNotEmpty
+  //               ? data.phones.first.normalizedNumber.toString().isNotEmpty
+  //                   ? data.phones.first.normalizedNumber.toString()
+  //                   : 'none'
+  //               : 'none';
+  //
+  //           chatController.contactCollection.doc(phone).get().then((value) {
+  //             if (value.exists) {
+  //               chatController.contacts.value.add(ContactListModel(
+  //                   id: value.get('id'),
+  //                   name: data.displayName,
+  //                   phoneNumber: phone,
+  //                   status: value.get('status')));
+  //               chatController.contacts.refresh();
+  //               chatController.update();
+  //               SharedPrefClass.saveListToSharedPreferences(
+  //                   con: chatController.contacts.value,
+  //                   sharedPrefString: SharedPrefStrings.myContacts);
+  //               if (value.get('status') == 'Chat') {
+  //                 chatController.availableChatPersonFromContacts.add(
+  //                     ContactListModel(
+  //                         id: value.get('id'),
+  //                         name: data.displayName,
+  //                         phoneNumber: phone,
+  //                         status: value.get('status')));
+  //                 chatController.availableChatPersonFromContacts.refresh();
+  //                 chatController.update();
+  //                 SharedPrefClass.saveListToSharedPreferences(
+  //                     con: chatController.availableChatPersonFromContacts.value,
+  //                     sharedPrefString: SharedPrefStrings.availableContacts);
+  //
+  //               }
+  //             } else {
+  //               chatController.contacts.value.add(ContactListModel(
+  //                   id: data.loginId,
+  //                   name: data.displayName,
+  //                   phoneNumber: phone,
+  //                   status: data.status.toString()));
+  //               chatController.contacts.refresh();
+  //               chatController.update();
+  //               SharedPrefClass.saveListToSharedPreferences(
+  //                   con: chatController.contacts.value,
+  //                   sharedPrefString: SharedPrefStrings.myContacts);
+  //
+  //             }
+  //           });
+  //           // SharedPrefClass.saveListToSharedPreferences(
+  //           //     chatController.contacts.value);
+  //
+  //           //log('contactList ${chatController.contacts.value.first.toMap()}');
+  //           // log('ISEXITS ${isExits}');
+  //           // return ContactListModel(
+  //           //     id: data.loginId,
+  //           //     name: data.displayName,
+  //           //     phoneNumber: phone,
+  //           //     status: data.status.toString());
+  //         }).toList();
+  //
+  //         // SharedPrefClass.saveListToSharedPreferences(
+  //         //     chatController.contacts.value);
+  //         // log('contactList ${chatController.contacts.value.length}');
+  //         // log('contactList ${chatController.contacts.value.first.toMap()}');
+  //
+  //         // chatController.contacts.asMap().entries.map((data) async {
+  //         //   if (chatController.contacts[data.key].phoneNumber
+  //         //       .toString()
+  //         //       .isNotEmpty) {
+  //         //     await chatController.contactCollection
+  //         //         .doc(chatController.contacts[data.key].phoneNumber
+  //         //                 .toString()
+  //         //                 .isNotEmpty
+  //         //             ? chatController.contacts[data.key].phoneNumber
+  //         //             : 'none')
+  //         //         .get()
+  //         //         .then((value) {
+  //         //       log('ENter');
+  //         //       if (value.exists) {
+  //         //         log('MYNUMBER ${chatController.contacts[data.key].phoneNumber}');
+  //         //         chatController.contacts[data.key].status = value.get('status');
+  //         //         chatController.contacts[data.key].id = value.get('id');
+  //         //
+  //         //         chatController.contacts.refresh();
+  //         //         chatController.update();
+  //         //         SharedPrefClass.saveListToSharedPreferences(
+  //         //             chatController.contacts.value);
+  //         //
+  //         //         if (chatController.contacts[data.key].status == 'Chat') {
+  //         //           chatController.availableChatPersonFromContacts.add(data);
+  //         //           chatController.availableChatPersonFromContacts.refresh();
+  //         //           chatController.update();
+  //         //         }
+  //         //         chatController.contacts.refresh();
+  //         //       }
+  //         //     });
+  //         //     SharedPrefClass.saveListToSharedPreferences(
+  //         //         chatController.contacts.value);
+  //         //   }
+  //         // });
+  //       });
+  //       // }
+  //
+  //       // chatController.contacts.addAll(contacts);
+  //       // chatController.contacts.asMap().entries.map((e) async {
+  //       //   if (chatController.contacts[e.key].phones.isNotEmpty) {
+  //       //     await chatController.contactCollection
+  //       //         .doc(chatController
+  //       //             .contacts[e.key].phones.first.normalizedNumber
+  //       //             .toString())
+  //       //         .get()
+  //       //         .then((value) {
+  //       //       if (value.exists) {
+  //       //         chatController.contacts[e.key].status = value.get('status');
+  //       //         chatController.contacts[e.key].loginId = value.get('id');
+  //       //         chatController.contacts.refresh();
+  //       //         chatController.update();
+  //       //         if (chatController.contacts[e.key].status == 'Chat') {
+  //       //           chatController.availableChatPersonFromContacts
+  //       //               .add(chatController.contacts[e.key]);
+  //       //           chatController.availableChatPersonFromContacts.refresh();
+  //       //         }
+  //       //         chatController.contacts.refresh();
+  //       //       }
+  //       //     });
+  //     }
+  //     // }).toList();
+  //   }
+  // }
 
   @override
   void initState() {
-    fetchContacts();
+    ChatWidget.fetchContacts();
     super.initState();
   }
 
@@ -246,8 +244,14 @@ class _ContactScreenState extends State<ContactScreen> {
     return SafeArea(
       child: Scaffold(
         body: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           child: Padding(
             padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
             child: Column(children: [
@@ -262,7 +266,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   height: 11.h,
                   widget: Padding(
                     padding:
-                        paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
+                    paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -295,7 +299,8 @@ class _ContactScreenState extends State<ContactScreen> {
                     ),
                   )),
               smallSizedBox,
-              Obx(() => AppWidget.searchField(
+              Obx(() =>
+                  AppWidget.searchField(
                     controller: chatController.searchControllerForContact.value,
                     onChanged: (v) => _searchData(searchString: v),
                     onFieldSubmitted: (v) => _searchData(searchString: v),
@@ -319,24 +324,28 @@ class _ContactScreenState extends State<ContactScreen> {
               smallerSizedBox,
               Expanded(
                   child: Obx(
-                () => (chatController.contacts.isNotEmpty &&
+                        () =>
+                    (chatController.contacts.isNotEmpty &&
                         chatController.contacts != [])
-                    ? Obx(
-                        () => (chatController
-                                    .searchContactListModel.isNotEmpty &&
-                                chatController.searchContactListModel != [])
-                            ? Obx(
-                                () => listViewBuilder(
-                                    listModel:
-                                        chatController.searchContactListModel),
-                              )
-                            : Obx(
-                                () => listViewBuilder(
-                                    listModel: chatController.contacts),
-                              ),
+                        ? Obx(
+                          () =>
+                      (chatController
+                          .searchContactListModel.isNotEmpty &&
+                          chatController.searchContactListModel != [])
+                          ? Obx(
+                            () =>
+                            listViewBuilder(
+                                listModel:
+                                chatController.searchContactListModel),
                       )
-                    : AppWidget.progressIndicator(),
-              ))
+                          : Obx(
+                            () =>
+                            listViewBuilder(
+                                listModel: chatController.contacts),
+                      ),
+                    )
+                        : AppWidget.progressIndicator(),
+                  ))
             ]),
           ),
         ),
@@ -349,90 +358,93 @@ class _ContactScreenState extends State<ContactScreen> {
 
     return listModel!.isEmpty
         ? Center(
-            child: Text(
-              'No Contact Found',
-              style: AppStyles.smallTextStyle.copyWith(color: Colors.grey),
-            ),
-          )
+      child: Text(
+        'No Contact Found',
+        style: AppStyles.smallTextStyle.copyWith(color: Colors.grey),
+      ),
+    )
         : ListView.builder(
-            shrinkWrap: true,
-            itemCount: listModel.length,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemBuilder: ((context, index) {
-              ContactListModel contactListModel = listModel[index];
-              log('MYSM ${contactListModel.toMap()}');
-              return Column(
-                children: [
-                  SizedBox(
-                    height: 7.h,
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: ChatWidget.imageCircleAvatar(context: context),
-                        ),
-                        Expanded(
-                          flex: 4,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        contactListModel.name ?? '',
-                                        style: AppStyles.smallTextStyle
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w500),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        contactListModel.phoneNumber ??
-                                            '(none)',
-                                        style: AppStyles.smallTextStyle
-                                            .copyWith(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w500),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+        shrinkWrap: true,
+        itemCount: listModel.length,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemBuilder: ((context, index) {
+          ContactListModel contactListModel = listModel[index];
+          log('MYSM ${contactListModel.toMap()}');
+          return Column(
+            children: [
+              SizedBox(
+                height: 7.h,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ChatWidget.imageCircleAvatar(context: context),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    contactListModel.name ?? '',
+                                    style: AppStyles.smallTextStyle
+                                        .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                Flexible(
-                                  child: contactListModel.status == 'Invite'
-                                      ? inviteButton(
-                                          index: index,
-                                          phoneNumber:
-                                              contactListModel.phoneNumber ??
-                                                  '',
-                                          userName: contactListModel.name ?? '')
-                                      : contactListModel.status == 'Invited'
-                                          ? invitedButton()
-                                          : chatButton(
-                                              phoneNumber: contactListModel
-                                                      .phoneNumber ??
-                                                  ' ',
-                                            ),
-                                )
-                              ]),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: 15.w,
-                    ),
-                    child: const Divider(),
-                  )
-                ],
-              );
-            }));
+                                  Text(
+                                    contactListModel.phoneNumber ??
+                                        '(none)',
+                                    style: AppStyles.smallTextStyle
+                                        .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Flexible(
+                              child: contactListModel.status == 'Invite'
+                                  ? inviteButton(
+                                  index: index,
+                                  phoneNumber:
+                                  contactListModel.phoneNumber ??
+                                      '',
+                                  userName: contactListModel.name ?? '')
+                                  : contactListModel.status == 'Invited'
+                                  ? invitedButton()
+                                  : chatButton(
+                                phoneNumber: contactListModel
+                                    .phoneNumber ??
+                                    ' ',
+                              ),
+                            )
+                          ]),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 15.w,
+                ),
+                child: const Divider(),
+              )
+            ],
+          );
+        }));
   }
 
   String createRoom({
@@ -456,62 +468,63 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
-  inviteButton(
-          {required int index,
-          required String phoneNumber,
-          required userName}) =>
+  inviteButton({required int index,
+    required String phoneNumber,
+    required userName}) =>
       GestureDetector(
         onTap:
-            SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == false
-                ? () {
-                    log("AAasas");
-                    AppWidget.toast(text: 'Please sign up first');
-                    Get.toNamed(RouteHelper.signUpPage);
-                  }
-                : () async {
-                    if (chatController.searchContactListModel.isEmpty) {
-                      chatController.contacts[index].status = 'Invited';
-                      chatController.contacts.refresh();
-                      SharedPrefClass.saveListToSharedPreferences(
-                          con: chatController.contacts.value,
-                          sharedPrefString: SharedPrefStrings.myContacts);
-                    } else {
-                      chatController.searchContactListModel[index].status =
-                          'Invited';
-                      chatController.contacts.where((p0) =>
-                          p0.status ==
-                          chatController.searchContactListModel[index].status);
-                      chatController.contacts.refresh();
-                      SharedPrefClass.saveListToSharedPreferences(
-                          con: chatController.contacts.value,
-                          sharedPrefString: SharedPrefStrings.myContacts);
-                      chatController.searchContactListModel.refresh();
-                    }
+        SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == false
+            ? () {
+          log("AAasas");
+          AppWidget.toast(text: 'Please sign up first');
+          Get.toNamed(RouteHelper.signUpPage);
+        }
+            : () async {
+          if (chatController.searchContactListModel.isEmpty) {
+            chatController.contacts[index].status = 'Invited';
+            chatController.contacts.refresh();
+            SharedPrefClass.saveListToSharedPreferences(
+                con: chatController.contacts.value,
+                sharedPrefString: SharedPrefStrings.myContacts);
+          } else {
+            chatController.searchContactListModel[index].status =
+            'Invited';
+            chatController.contacts.where((p0) =>
+            p0.status ==
+                chatController.searchContactListModel[index].status);
+            chatController.contacts.refresh();
+            SharedPrefClass.saveListToSharedPreferences(
+                con: chatController.contacts.value,
+                sharedPrefString: SharedPrefStrings.myContacts);
+            chatController.searchContactListModel.refresh();
+          }
 
-                    chatController.searchContactListModel.refresh();
-                    chatController.update();
+          chatController.searchContactListModel.refresh();
+          chatController.update();
 
-                    await sendSMS(
-                            message:
-                                'Bondio app  \nPlease use this invite code to get points ${authController.userModel.value.user?.referCode.toString()} \nhttps://play.google.com/store/apps/details?id=com.app.bondiomeet',
-                            recipients: [phoneNumber.toString()],
-                            sendDirect: false)
-                        .then((value) {
-                      log('PhoneNUmber $phoneNumber');
-                      chatController.addContactToFirebase(
-                          mobileNumber: phoneNumber,
-                          userName: userName,
-                          status: 'Invited',
-                          id: '',
-                          fcmToken: '');
-                      AppWidget.toast(text: 'Invited');
+          await sendSMS(
+              message:
+              'Bondio app  \nPlease use this invite code to get points ${authController
+                  .userModel.value.user?.referCode
+                  .toString()} \nhttps://play.google.com/store/apps/details?id=com.app.bondiomeet',
+              recipients: [phoneNumber.toString()],
+              sendDirect: false)
+              .then((value) {
+            log('PhoneNUmber $phoneNumber');
+            chatController.addContactToFirebase(
+                mobileNumber: phoneNumber,
+                userName: userName,
+                status: 'Invited',
+                id: '',
+                fcmToken: '');
+            AppWidget.toast(text: 'Invited');
 
-                      /*
+            /*
         }).catchError((onError) {
           log(onError.toString());
         });*/
-                    });
-                  },
+          });
+        },
         child: Container(
           width: 20.w,
           height: 4.h,
@@ -519,7 +532,7 @@ class _ContactScreenState extends State<ContactScreen> {
               borderRadius: BorderRadius.circular(2.w),
               color: ColorConstant.backGroundColorOrange),
           child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             Icon(Icons.person_add_alt_1_outlined,
                 color: Colors.white, size: 5.w),
             Text(
@@ -530,68 +543,77 @@ class _ContactScreenState extends State<ContactScreen> {
         ),
       );
 
-  invitedButton() => Container(
-      width: 20.w,
-      height: 4.h,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(2.w),
-          color: ColorConstant.greyBorder),
-      child: Text(
-        'Invited',
-        style: AppStyles.smallerTextStyle.copyWith(color: Colors.grey),
-      ));
+  invitedButton() =>
+      Container(
+          width: 20.w,
+          height: 4.h,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2.w),
+              color: ColorConstant.greyBorder),
+          child: Text(
+            'Invited',
+            style: AppStyles.smallerTextStyle.copyWith(color: Colors.grey),
+          ));
 
-  chatButton({required phoneNumber}) => GestureDetector(
+  chatButton({required phoneNumber}) =>
+      GestureDetector(
         onTap: SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
-                false
+            false
             ? () {
-                AppWidget.toast(text: 'Please sign up first');
-                Get.toNamed(RouteHelper.signUpPage);
-              }
+          AppWidget.toast(text: 'Please sign up first');
+          Get.toNamed(RouteHelper.signUpPage);
+        }
             : () async {
-                DocumentSnapshot<Map<String, dynamic>> data =
-                    await chatController.contactCollection
-                        .doc(phoneNumber)
-                        .get();
+          DocumentSnapshot<Map<String, dynamic>> data =
+          await chatController.contactCollection
+              .doc(phoneNumber)
+              .get();
 
-                String peerId = data.get(ApiConstant.id);
-                chatController.peerId.value = peerId;
-                chatController.update();
-                log('PEERID ${peerId}');
-                DocumentSnapshot<Map<String, dynamic>> peerInfo =
-                    await chatController.userCollection.doc(peerId).get();
+          String peerId = data.get(ApiConstant.id);
+          chatController.peerId.value = peerId;
+          chatController.update();
+          log('PEERID ${peerId}');
+          DocumentSnapshot<Map<String, dynamic>> peerInfo =
+          await chatController.userCollection.doc(peerId).get();
 
-                String roomId = createRoom(
-                  userId: authController.userModel.value.user!.id.toString(),
-                  peerId: peerId,
-                );
+          if (authController.userModel.value.user!.id.toString() ==
+              peerId.toString()) {
+            AppWidget.toast(
+                text:
+                'Sorry, you can\'t create chat room with same phone number you add at login time');
+          } else {
+            String roomId = createRoom(
+              userId: authController.userModel.value.user!.id.toString(),
+              peerId: peerId,
+            );
 
-                chatController.personalChatListCollection
-                    .doc(authController.userModel.value.user!.id.toString())
-                    .collection(
-                        authController.userModel.value.user!.id.toString())
-                    .doc(roomId)
-                    .set({ApiConstant.id: roomId, ApiConstant.peerId: peerId});
+            chatController.personalChatListCollection
+                .doc(authController.userModel.value.user!.id.toString())
+                .collection(
+                authController.userModel.value.user!.id.toString())
+                .doc(roomId)
+                .set(
+                {ApiConstant.id: roomId, ApiConstant.peerId: peerId});
 
-                chatController.personalChatListCollection
-                    .doc(peerId.toString())
-                    .collection(peerId.toString())
-                    .doc(roomId)
-                    .set({
-                  ApiConstant.id: roomId,
-                  ApiConstant.peerId:
-                      authController.userModel.value.user!.id.toString()
-                });
+            chatController.personalChatListCollection
+                .doc(peerId.toString())
+                .collection(peerId.toString())
+                .doc(roomId)
+                .set({
+              ApiConstant.id: roomId,
+              ApiConstant.peerId:
+              authController.userModel.value.user!.id.toString()
+            });
 
-                chatController.collectionId.value = roomId.toString();
-                chatController.peerId.value = peerId.toString();
+            chatController.collectionId.value = roomId.toString();
+            chatController.peerId.value = peerId.toString();
 
-                chatController.update();
-
-                Get.toNamed(RouteHelper.chatPage,
-                    arguments: [peerInfo.get('name')]);
-              },
+            chatController.update();
+            log('AAA ${chatController.peerId.toString()}');
+            Get.toNamed(RouteHelper.chatPage);
+          }
+        },
         child: Container(
             width: 20.w,
             height: 4.h,
@@ -609,19 +631,23 @@ class _ContactScreenState extends State<ContactScreen> {
 
   _searchData({String? searchString}) {
     log('Search String ${searchString.toString()}');
-    if (searchString.toString().isEmpty) {
+    if (searchString
+        .toString()
+        .isEmpty) {
       chatController.searchContactListModel.value = [];
       chatController.searchContactListModel.refresh();
     } else {
-      if (searchString.toString().length >= 3) {
+      if (searchString
+          .toString()
+          .length >= 3) {
         chatController.searchContactListModel.value = [];
         chatController.searchContactListModel.refresh();
 
         for (var contactList in chatController.contacts) {
           if (contactList.name
-                  .toString()
-                  .toLowerCase()
-                  .contains(searchString.toString()) ||
+              .toString()
+              .toLowerCase()
+              .contains(searchString.toString()) ||
               contactList.name
                   .toString()
                   .toUpperCase()

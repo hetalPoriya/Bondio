@@ -64,18 +64,19 @@ class InviteFriend extends StatelessWidget {
             ),
             mediumSizedBox,
             GestureDetector(
-              onTap: SharedPrefClass.getBool(
-                          SharedPrefStrings.isLogin, false) ==
-                      false
-                  ? () {
-                      _showDialogToGuest(context);
-                    }
-                  : () => FlutterShare.share(
+              onTap: () {
+                if (SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
+                    false) {
+                  _showDialogToGuest(context);
+                } else {
+                  FlutterShare.share(
                       title: 'Bondio App',
                       text:
                           'Hey! I\'ve been using Bondio App. Enter my code ${authController.userModel.value.user?.referCode.toString()} while signing up and increase your chances of getting rewards! 😍',
                       linkUrl:
-                          'https://play.google.com/store/apps/details?id=com.app.bondiomeet'),
+                          'https://play.google.com/store/apps/details?id=com.app.bondiomeet');
+                }
+              },
               child: DottedBorder(
                 color: ColorConstant.backGroundColorOrange,
                 radius: Radius.circular(10.w),
@@ -98,9 +99,13 @@ class InviteFriend extends StatelessWidget {
                           child: Text(
                             authController.userModel.value.user?.referCode
                                     .toString() ??
-                                ' ',
-                            style: AppStyles.smallTextStyle
-                                .copyWith(color: Colors.black),
+                                'BONDIO0000',
+                            style: AppStyles.smallTextStyle.copyWith(
+                                color: (SharedPrefClass.getBool(
+                                            SharedPrefStrings.isLogin, false) ==
+                                        false)
+                                    ? Colors.black38
+                                    : Colors.black),
                           ),
                         ),
                         Container(

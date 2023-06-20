@@ -232,8 +232,8 @@ class AuthController extends GetxController {
       } else {
         AppWidget.toast(text: response.data['Data'][0].toString());
       }
-    } catch (e) {
-      log(e.toString());
+    } on DioError catch (e) {
+      AppWidget.toast(text: e.toString());
     } finally {
       isLoading(false);
     }
@@ -277,7 +277,9 @@ class AuthController extends GetxController {
   userExistOrNotApi({required String tokenType, required String token}) async {
     try {
       isLoading(true);
-      log('tokenType ${fullNameController.value.text}');
+      log('token ${token}');
+      log('tokenType ${tokenType}');
+      log('tokenType ${ApiConstant.buildUrl(ApiConstant.isRegisterApi)}');
 
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.isRegisterApi),
@@ -296,6 +298,11 @@ class AuthController extends GetxController {
       } else {
         Get.toNamed(RouteHelper.socialSignUpPage);
       }
+    } on DioError catch (e) {
+      log('E ${e.toString()}');
+      // if (e.response?.statusCode == 404) {
+      //   AppWidget.toast(text: 'Unauthenticated');
+      // }
     } finally {
       isLoading(false);
     }
@@ -315,12 +322,12 @@ class AuthController extends GetxController {
 
         if (customerDetails.value.data?.referCode !=
             userModel.value.user?.referCode) {
-          AppWidget.toast(text: 'Code applied successfully');
+          //AppWidget.toast(text: 'Code applied successfully');
           Timer(const Duration(seconds: 2),
               () => Get.toNamed(RouteHelper.signUpPage));
         }
       } else {
-        AppWidget.toast(text: 'Entered invite code is not valid');
+        //  AppWidget.toast(text: 'Entered invite code is not valid');
       }
     } finally {
       isLoading(false);
@@ -527,14 +534,14 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
       log('username ${emailOrPhone}');
-      log('username ${newPassController.value.text}');
-      log('username ${conPassController.value.text}');
+      log('username ${newPassController.value.text.trim()}');
+      log('username ${conPassController.value.text.trim()}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.forgotPasswordUpdateApi),
         data: {
           'username': emailOrPhone.toString(),
-          "password": newPassController.value.text,
-          "cpassword": conPassController.value.text,
+          "password": newPassController.value.text.trim(),
+          "cpassword": conPassController.value.text.trim(),
         },
         //options: NetworkHandler.options,
       );

@@ -869,6 +869,82 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                     //     style: AppStyles.smallerTextStyle),
                   ],
                 ),
+                Spacer(),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: PopupMenuButton(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.w),
+                      ),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      position: PopupMenuPosition.under,
+                      shadowColor: Colors.transparent,
+                      constraints: BoxConstraints(maxHeight: 20.h),
+                      // add icon, by default "3 dot" icon
+                      // icon: Icon(Icons.book)
+                      itemBuilder: (context) {
+                        return [
+                          const PopupMenuItem<int>(
+                            value: 0,
+                            child: Text("Archive Chat"),
+                          ),
+                        ];
+                      },
+                      onSelected: (value) async {
+                        if (value == 0) {
+                          showDialog(
+                            context: context,
+                            builder: (context) =>
+                                AlertDialog(
+                                  title: Text(
+                                      chatController.chatInfo.value.isPinned ==
+                                          true
+                                          ? 'Remove from Archive'
+                                          : 'Add to Archive',
+                                      style: AppStyles.largeTextStyle.copyWith(
+                                          color:
+                                          ColorConstant.backGroundColorOrange)),
+                                  actions: [
+                                    AppWidget.elevatedButton(
+                                        text: 'Yes',
+                                        onTap: () {
+                                          log('COll ${chatController
+                                              .collectionId.toString()}');
+                                          chatController
+                                              .personalChatRoomCollection
+                                              .doc(chatController.collectionId
+                                              .toString())
+                                              .update({
+                                            ApiConstant.isPinned: chatController
+                                                .chatInfo.value.isPinned ==
+                                                true
+                                                ? false
+                                                : true
+                                          }).then((value) {
+                                            Get.back();
+                                            if (chatController
+                                                .chatInfo.value.isPinned ==
+                                                true) {
+                                              chatController.chatInfo.value
+                                                  .isPinned = false;
+                                              chatController.chatInfo.refresh();
+                                            } else {
+                                              chatController.chatInfo.value
+                                                  .isPinned = true;
+                                              chatController.chatInfo.refresh();
+                                            }
+                                          });
+                                        }),
+                                    smallSizedBox,
+                                    AppWidget.elevatedButton(
+                                        text: 'No', onTap: () => Get.back()),
+                                  ],
+                                ),
+                          );
+                        }
+                      }),
+                ),
               ]);
         });
   }
@@ -876,7 +952,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   buildItem(int index, DocumentSnapshot? document) {
     if (document != null) {
       ChatMessages messageChat = ChatMessages.fromDocument(document);
-
 
       if (messageChat.idFrom ==
           authController.userModel.value.user?.id.toString()) {

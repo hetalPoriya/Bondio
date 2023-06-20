@@ -1,10 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-
-import 'package:bondio/controller/controller.dart';
 import 'package:bondio/model/contact_list.dart';
-import 'package:flutter_contacts/contact.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefClass {
@@ -94,10 +90,10 @@ class SharedPrefClass {
 
   static Future<void> saveListToSharedPreferences(
       {required List<ContactListModel> con,
-      required String sharedPrefString}) async {
+        required String sharedPrefString}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> jsonList =
-        con.map((contact) => jsonEncode(contact.toMap())).toList();
+    con.map((contact) => jsonEncode(contact.toMap())).toList();
     await prefs.setStringList(sharedPrefString, jsonList);
     log('Added');
   }

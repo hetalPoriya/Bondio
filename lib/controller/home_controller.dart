@@ -16,9 +16,10 @@ class HomeController extends GetxController {
   RxInt hostEvent = 0.obs;
   RxInt viewEvent = 0.obs;
 
-
   //chat main page (chat and group) which tab selected
   RxInt innerTabSelectedIndex = 0.obs;
+  RxInt innerTabForActiveAndArchiveIndex = 0.obs;
+  RxInt innerTabForActiveAndArchiveIndexForGroup = 0.obs;
   RxInt hostEventTabSelectedIndex = 0.obs;
 
   //tap on groupMember add

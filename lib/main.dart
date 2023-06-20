@@ -36,10 +36,17 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+
 class _MyAppState extends State<MyApp> {
   HomeController homeController = Get.put(HomeController());
+  AuthController authController = Get.put(AuthController());
 
   FirebaseController firebaseController = Get.put(FirebaseController());
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   // This widget is the root of your application.
   @override
