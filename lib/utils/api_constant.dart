@@ -52,6 +52,8 @@ class ApiConstant {
   static String eventDate = 'event_date';
   static String isEvent = 'isEvent';
   static String isPinned = 'isPinned';
+  static String isArchive = 'isArchive';
+  static String userToken = 'userToken';
 
   //contact model
   static String phoneNumber = 'phone_number';
@@ -65,12 +67,14 @@ class ApiConstant {
   static String deletedUserList = 'deletedBy';
   static String idTo = 'idTo';
   static String isRead = 'isRead';
+  static String isReadFGroup = 'isRead_group';
   static String senderName = 'sender_name';
 
   static String user1 = 'user1';
   static String user2 = 'user2';
   static String chatPersonList = 'chatPersonList';
   static String peerId = 'peerId';
+  static String peerName = 'peerName';
   static String image = 'image';
 
   //event
@@ -81,4 +85,13 @@ class ApiConstant {
   static String eventTime = 'Event Time: ';
   static String eveDate = 'Event Date: ';
   static String eventLocation = 'Event Location: ';
+
+  //user
+  static String name = 'name';
+  static String photo = 'photo';
+  static String photoSocial = 'photo_social';
+  static String onlineStatus = 'online_status';
+  static String deviceToken = 'device_token';
+  static String isUser2Archived = 'isUser2Archived';
+  static String isUser1Archived = 'isUser1Archived';
 }

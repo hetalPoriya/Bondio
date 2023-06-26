@@ -279,11 +279,10 @@ class AppWidget {
 
   static textFormFiledForEvent(
           {String? hintText,
-          IconData? icon,
+          Widget? iconWidget,
           TextInputAction? textInputAction,
           TextInputType? textInputType,
           bool? obscureText,
-          void Function()? suffixOnTap,
           void Function()? onTapReadOnly,
           TextStyle? textStyle,
           Color? color,
@@ -304,10 +303,7 @@ class AppWidget {
             hintStyle: textStyle ??
                 AppStyles.smallTextStyle.copyWith(color: Colors.black),
             contentPadding: paddingAll(paddingAll: 3.w),
-            prefixIcon: GestureDetector(
-              onTap: suffixOnTap,
-              child: Icon(icon, color: const Color(0xffFFB574)),
-            ),
+            prefixIcon: iconWidget,
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
                     color: color ?? ColorConstant.backGroundColorOrange)),
@@ -484,10 +480,12 @@ class AppWidget {
         ),
       );
 
-  static toast({required String text}) => Fluttertoast.showToast(
-      msg: text,
-      backgroundColor: ColorConstant.mainAppColorNew,
-      textColor: Colors.white);
+  static toast({required String text, Toast? toastLength}) =>
+      Fluttertoast.showToast(
+          msg: text,
+          toastLength: toastLength,
+          backgroundColor: ColorConstant.mainAppColorNew,
+          textColor: Colors.white);
 
   static containerIndicator() => Container(
         color: Colors.black45,
@@ -567,7 +565,7 @@ class AppWidget {
             contentPadding: paddingAll(paddingAll: 1.0),
             //🔍
             hintText: 'Search..',
-            hintStyle: AppStyles.smallerTextStyle,
+            hintStyle: AppStyles.smallerTextStyle.copyWith(color: Colors.black),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(2.w),
                 borderSide: const BorderSide(color: Colors.black)),

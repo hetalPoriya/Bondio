@@ -84,16 +84,15 @@ class SharedPrefClass {
   static Future<String> getUserData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String myModel = pref.getString('currentUser') ?? "";
-    log('MODEL $myModel');
     return myModel;
   }
 
   static Future<void> saveListToSharedPreferences(
       {required List<ContactListModel> con,
-        required String sharedPrefString}) async {
+      required String sharedPrefString}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> jsonList =
-    con.map((contact) => jsonEncode(contact.toMap())).toList();
+        con.map((contact) => jsonEncode(contact.toMap())).toList();
     await prefs.setStringList(sharedPrefString, jsonList);
     log('Added');
   }

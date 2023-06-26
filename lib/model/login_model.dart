@@ -28,41 +28,41 @@ class LoginBody {
     required this.password,
   });
 
-  Map<String, dynamic> toMap() =>
-      {
+  Map<String, dynamic> toMap() => {
         "email": email,
         "password": password,
       };
 }
 
 class SignUpBody {
-  SignUpBody({this.name,
-    this.lName,
-    this.photoSocial,
-    this.onlineStatus,
-    this.email,
-    this.mobile,
-    this.zipCode,
-    this.country,
-    this.state,
-    this.city,
-    this.aboutMe,
-    this.photo,
-    this.company,
-    this.dob,
-    this.gender,
-    this.password,
-    this.referCode,
-    this.referBy,
-    this.deviceToken,
-    this.googleToken,
-    this.facebookToken,
-    this.outlookToken,
-    this.twitterToken,
-    this.linkedinToken,
-    this.instagramToken,
-    this.otp,
-    this.service});
+  SignUpBody(
+      {this.name,
+      this.lName,
+      this.photoSocial,
+      this.onlineStatus,
+      this.email,
+      this.mobile,
+      this.zipCode,
+      this.country,
+      this.state,
+      this.city,
+      this.aboutMe,
+      this.photo,
+      this.company,
+      this.dob,
+      this.gender,
+      this.password,
+      this.referCode,
+      this.referBy,
+      this.deviceToken,
+      this.googleToken,
+      this.facebookToken,
+      this.outlookToken,
+      this.twitterToken,
+      this.linkedinToken,
+      this.instagramToken,
+      this.otp,
+      this.service});
 
   String? name;
   String? email;
@@ -92,14 +92,13 @@ class SignUpBody {
   String? otp;
   String? service;
 
-  Map<String, dynamic> toMap() =>
-      {
-        "name": name,
-        "email": email,
+  Map<String, dynamic> toMap() => {
+        "name1": name,
+        "email1": email,
         "lname": lName,
         "photo_social": photoSocial,
         "online_status": onlineStatus,
-        "mobile": mobile,
+        "mobile1": mobile,
         "zip_code": zipCode,
         "country": country,
         "state": state,
@@ -109,7 +108,7 @@ class SignUpBody {
         "company": company,
         "dob": dob,
         "gender": gender,
-        "password": password,
+        "password1": password,
         "refer_code": referCode,
         "refer_by": referBy,
         "device_token": deviceToken,
@@ -119,8 +118,8 @@ class SignUpBody {
         "instagram_token": instagramToken,
         "linkedin_token": linkedinToken,
         "twitter_token": twitterToken,
-        "otp": otp,
-        "service": service
+        "otp1": otp,
+        "service1": service
       };
 }
 
@@ -135,15 +134,13 @@ class LoginModel {
   String? msg;
   LoginData? data;
 
-  factory LoginModel.fromMap(Map<String, dynamic> json) =>
-      LoginModel(
+  factory LoginModel.fromMap(Map<String, dynamic> json) => LoginModel(
         status: json["Status"],
         msg: json["Msg"],
         data: json["Data"] == null ? null : LoginData.fromMap(json["Data"]),
       );
 
-  Map<String, dynamic> toMap() =>
-      {
+  Map<String, dynamic> toMap() => {
         "Status": status,
         "Msg": msg,
         "Data": data?.toMap(),
@@ -159,14 +156,12 @@ class LoginData {
   User? user;
   String? token;
 
-  factory LoginData.fromMap(Map<String, dynamic> json) =>
-      LoginData(
+  factory LoginData.fromMap(Map<String, dynamic> json) => LoginData(
         user: json["user"] == null ? null : User.fromMap(json["user"]),
         token: json["token"],
       );
 
-  Map<String, dynamic> toMap() =>
-      {
+  Map<String, dynamic> toMap() => {
         "user": user?.toMap(),
         "token": token,
       };
@@ -201,7 +196,7 @@ class User {
     this.updatedAt,
   });
 
-  int? id;
+  dynamic? id;
   String? name;
   String? lName;
   String? photoSocial;
@@ -227,37 +222,35 @@ class User {
   String? createdAt;
   String? updatedAt;
 
-  factory User.fromMap(Map<String, dynamic> json) =>
-      User(
-        id: json["id"] ?? '',
-        name: json["name"] ?? '',
-        lName: json["lname"] ?? '',
-        photoSocial: json["photo_social"] ?? '',
-        onlineStatus: json["online_status"] ?? '',
-        email: json["email"] ?? '',
-        mobile: json["mobile"] ?? '',
-        zipCode: json["zip_code"] ?? '',
-        country: json["country"] ?? '',
-        state: json["state"] ?? '',
-        city: json["city"] ?? '',
-        aboutMe: json["about_me"] ?? '',
-        photo: json["photo"] ?? '',
-        company: json["company"] ?? '',
-        dob: json["dob"] ?? '',
-        gender: json["gender"] ?? '',
-        oPassword: json["o_password"] ?? '',
-        referCode: json["refer_code"] ?? '',
-        referBy: json["refer_by"] ?? '',
-        deviceToken: json["device_token"] ?? '',
-        googleToken: json["google_token"] ?? '',
-        facebookToken: json["facebook_token"] ?? '',
-        outlookToken: json["outlook_token"] ?? '',
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+  factory User.fromMap(Map<String, dynamic>? json) => User(
+        id: json?["id"] ?? '',
+        name: json?["name"] ?? '',
+        lName: json?["lname"] ?? '',
+        photoSocial: json?["photo_social"] ?? '',
+        onlineStatus: json?["online_status"] ?? '',
+        email: json?["email"] ?? '',
+        mobile: json?["mobile"] ?? '',
+        zipCode: json?["zip_code"] ?? '',
+        country: json?["country"] ?? '',
+        state: json?["state"] ?? '',
+        city: json?["city"] ?? '',
+        aboutMe: json?["about_me"] ?? '',
+        photo: json?["photo"] ?? '',
+        company: json?["company"] ?? '',
+        dob: json?["dob"] ?? '',
+        gender: json?["gender"] ?? '',
+        oPassword: json?["o_password"] ?? '',
+        referCode: json?["refer_code"] ?? '',
+        referBy: json?["refer_by"] ?? '',
+        deviceToken: json?["device_token"] ?? '',
+        googleToken: json?["google_token"] ?? '',
+        facebookToken: json?["facebook_token"] ?? '',
+        outlookToken: json?["outlook_token"] ?? '',
+        createdAt: json?["created_at"],
+        updatedAt: json?["updated_at"],
       );
 
-  Map<String, dynamic> toMap() =>
-      {
+  Map<String, dynamic> toMap() => {
         "id": id,
         "name": name,
         "lname": lName,

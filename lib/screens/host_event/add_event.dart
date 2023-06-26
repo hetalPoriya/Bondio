@@ -27,6 +27,9 @@ class _AddEventState extends State<AddEvent>
 
   @override
   void initState() {
+    eventController.eventDesController.value.clear();
+    eventController.eventTitleController.value.clear();
+    eventController.eventLocationController.value.clear();
     tabController = TabController(length: 2, vsync: this);
     super.initState();
   }

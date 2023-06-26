@@ -7,6 +7,7 @@ class SharedPrefStrings {
   static String userInfo = 'userInfo';
   static String userName = 'userName';
   static String myContacts = 'myContacts';
+  static String totalChatCount = 'totalChatCount';
   static String availableContacts = 'availableContacts';
   static String isDisplayContactScreenFirstTime =
       'isDisplayContactScreenFirstTime';

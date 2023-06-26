@@ -10,8 +10,9 @@ String getEventToMap(GetEvent data) => json.encode(data.toMap());
 
 String createEventToMap(CreateEventBody data) => json.encode(data.toMap());
 
+String updateEventToMap(UpdateEventBody data) => json.encode(data.toMap());
+
 class CreateEventBody {
-  String? id;
   String name;
   String location;
   String? date;
@@ -21,7 +22,37 @@ class CreateEventBody {
   dynamic photo;
 
   CreateEventBody(
-      {this.id,
+      {required this.name,
+      required this.location,
+      this.date,
+      required this.time,
+      required this.description,
+      this.photo,
+      this.users});
+
+  Map<String, dynamic> toMap() => {
+        "name": name,
+        "location": location,
+        "date": date,
+        "time": time,
+        "users": users,
+        "description": description,
+        "photo": photo,
+      };
+}
+
+class UpdateEventBody {
+  String id;
+  String name;
+  String location;
+  String? date;
+  String time;
+  String? users;
+  String description;
+  dynamic photo;
+
+  UpdateEventBody(
+      {required this.id,
       required this.name,
       required this.location,
       this.date,

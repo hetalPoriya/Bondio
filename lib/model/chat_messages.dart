@@ -10,15 +10,15 @@ class ChatMessages {
   bool? isRead;
 
   List<dynamic>? deletedUserList = [];
+  List<dynamic>? isReadForGroup = [];
 
-  ChatMessages(
-      {this.idFrom,
-      this.idTo,
-      this.timestamp,
-      this.content,
-      this.isRead,
-      this.senderName,
-      this.deletedUserList});
+  ChatMessages({this.idFrom,
+    this.idTo,
+    this.timestamp,
+    this.content,
+    this.isRead,
+    this.senderName,
+    this.deletedUserList, this.isReadForGroup});
 
   Map<String, dynamic> toJson() {
     return {
@@ -30,7 +30,10 @@ class ChatMessages {
       ApiConstant.senderName: senderName,
       ApiConstant.deletedUserList: deletedUserList == null
           ? []
-          : List<dynamic>.from(deletedUserList!.map((x) => x))
+          : List<dynamic>.from(deletedUserList!.map((x) => x)),
+      ApiConstant.isReadFGroup: isReadForGroup == null
+          ? []
+          : List<dynamic>.from(isReadForGroup!.map((x) => x))
     };
   }
 
@@ -42,6 +45,7 @@ class ChatMessages {
     bool isRead = doc.get(ApiConstant.isRead);
     String senderName = doc.get(ApiConstant.senderName);
     List<dynamic> deletedUserList = doc.get(ApiConstant.deletedUserList) ?? [];
+    List<dynamic> isReadForGroup = doc.get(ApiConstant.isReadFGroup) ?? [];
     return ChatMessages(
         idFrom: idFrom,
         idTo: idTo,
@@ -49,6 +53,7 @@ class ChatMessages {
         content: content,
         isRead: isRead,
         senderName: senderName,
-        deletedUserList: deletedUserList);
+        deletedUserList: deletedUserList,
+        isReadForGroup: isReadForGroup);
   }
 }

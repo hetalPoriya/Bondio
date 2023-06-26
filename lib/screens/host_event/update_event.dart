@@ -47,13 +47,16 @@ class UpdateEvent extends StatelessWidget {
         smallSizedBox,
         AppWidget.textFormFiledForEvent(
           hintText: AppStrings.description,
-          icon: Icons.description,
+          iconWidget: Icon(Icons.description, color: const Color(0xffFFB574)),
+
           textEditingController: eventController.eventDesController.value,
         ),
         smallSizedBox,
         AppWidget.textFormFiledForEvent(
           hintText: AppStrings.location,
-          icon: Icons.location_on_outlined,
+          iconWidget: Icon(
+              Icons.location_on_outlined, color: const Color(0xffFFB574)),
+
           textEditingController: eventController.eventLocationController.value,
         ),
         smallSizedBox,

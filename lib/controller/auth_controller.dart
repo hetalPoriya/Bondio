@@ -59,7 +59,9 @@ class AuthController extends GetxController {
 
   //for date picker
   RxString formattedDate = ''.obs;
-  var pickedDate = DateTime.now().obs;
+  var pickedDate = DateTime
+      .now()
+      .obs;
 
   //for password
   RxBool obscure = true.obs;
@@ -96,10 +98,6 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
 
-      log('Email ${emailController.value.text}');
-      log('Email ${fullNameController.value.text}');
-      log('Email ${countryCodeController.value.text}${mobileController.value.text}');
-
       if (countryCodeController.value.text.isEmpty) {
         countryCodeController.value.text = '+1';
       }
@@ -107,7 +105,7 @@ class AuthController extends GetxController {
           email: emailController.value.text,
           name: fullNameController.value.text,
           mobile:
-              '${countryCodeController.value.text}${mobileController.value.text}');
+          '${countryCodeController.value.text}${mobileController.value.text}');
 
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.registerOtpApi),
@@ -133,40 +131,36 @@ class AuthController extends GetxController {
   registerApiCall() async {
     try {
       isLoading(true);
-      String? token = await FirebaseMessaging.instance.getToken();
-      // log('Token $token');
-      // log('phto ${imageController.value.text.toString()}');
-      // log('phto ${chatController.pickedImage?.value?.path.isNotEmpty}');
-      // log('phto ${lastNameController.value.text}');
-      // photo: image?.value.path.isNotEmpty == true
-      //     ? await MultipartFile.fromFile(image?.value.path ?? '',
-      //     filename: fileName)
-      //     : imageController.value.text.toString(),
+      String? token = await chatController.getFirebaseMessagingToken();
+      log('Token $token');
+
 
       String fileName =
-          chatController.pickedImage?.value?.path.split('/').last ?? '';
+          chatController.pickedImage?.value?.path
+              .split('/')
+              .last ?? '';
       SignUpBody signUpBody = SignUpBody(
           email: emailController.value.text.toString(),
           mobile:
-              '${countryCodeController.value.text}${mobileController.value.text}',
+          '${countryCodeController.value.text}${mobileController.value.text}',
           name: fullNameController.value.text,
           lName: lastNameController.value.text,
-          onlineStatus: '',
+          onlineStatus: 'Online',
           company: companyNameController.value.text,
           dob: dobController.value.text,
           password: passController.value.text.isNotEmpty
               ? passController.value.text
               : 'Synram@125',
           referBy: referByController.value.text,
-          deviceToken: token ?? (await FirebaseMessaging.instance.getToken())!,
+          deviceToken: await chatController.getFirebaseMessagingToken(),
           aboutMe: ' ',
           city: ' ',
           country: ' ',
           photoSocial: imageController.value.text.toString(),
           photo: fileName.isNotEmpty
               ? await MultipartFile.fromFile(
-                  chatController.pickedImage?.value?.path ?? '',
-                  filename: fileName)
+              chatController.pickedImage?.value?.path ?? '',
+              filename: fileName)
               : userModel.value.user?.photo.toString(),
           state: ' ',
           zipCode: ' ',
@@ -181,16 +175,10 @@ class AuthController extends GetxController {
           gender: ' ',
           referCode: ' ');
 
-      log('API ${ApiConstant.buildUrl(ApiConstant.registerApi)}');
-      log('API ${signUpBodyToMap(signUpBody)}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.registerApi),
         data: signUpBodyToMap(signUpBody),
-        // options: Options(headers: {
-        //   'Accept': 'application/json',
-        // }),
       );
-      log('RegisterResponse ${response.data}');
       if (response.data['Status'] == true) {
         enterOtpByUser.value = '';
         otpValue.value = '';
@@ -207,13 +195,13 @@ class AuthController extends GetxController {
         await ChatWidget.getUserInfo();
 
         chatController
-            .addContactToFirebase(
-                mobileNumber:
-                    '${countryCodeController.value.text}${mobileController.value.text}',
-                userName: data.data!.user!.name.toString(),
-                status: 'Chat',
-                id: data.data!.user!.id.toString(),
-                fcmToken: data.data!.user!.deviceToken.toString())
+            .updateContactToFirebase(
+          userName: data.data!.user!.name.toString(),
+          mobileNumber:
+          '${countryCodeController.value.text}${mobileController.value.text}',
+          id: data.data!.user!.id.toString(),
+          fcmToken: data.data!.user!.deviceToken.toString(),
+        )
             .then((value) => log('Edded'));
 
         chatController.addUserInfoToFirebase(userInfo: data.data?.user);
@@ -256,6 +244,8 @@ class AuthController extends GetxController {
       log('LoginResponse ${response.data.toString()}');
       if (response.data['Status'] == true) {
         LoginModel data = LoginModel.fromMap(response.data);
+        log('Re ${await chatController.getFirebaseMessagingToken()}');
+
         SharedPrefClass.setUserData(json.encode(response.data['Data']));
         AppWidget.toast(text: data.msg.toString());
         SharedPrefClass.setBool(SharedPrefStrings.isLogin, true);
@@ -277,18 +267,18 @@ class AuthController extends GetxController {
   userExistOrNotApi({required String tokenType, required String token}) async {
     try {
       isLoading(true);
-      log('token ${token}');
-      log('tokenType ${tokenType}');
-      log('tokenType ${ApiConstant.buildUrl(ApiConstant.isRegisterApi)}');
 
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.isRegisterApi),
         data: {'type': tokenType, 'value': token},
       );
 
-      log('UserExistOrNot $response');
       if (response.data['Status'] == true) {
         LoginModel data = LoginModel.fromMap(response.data);
+        log('AA ${data.data?.user}');
+        String? toekn = await chatController.getFirebaseMessagingToken();
+        log('TOKEN ${toekn}');
+        chatController.addUserInfoToFirebase(userInfo: data.data?.user);
         SharedPrefClass.setUserData(json.encode(response.data['Data']));
         AppWidget.toast(text: data.msg.toString());
         SharedPrefClass.setBool(SharedPrefStrings.isLogin, true);
@@ -299,7 +289,7 @@ class AuthController extends GetxController {
         Get.toNamed(RouteHelper.socialSignUpPage);
       }
     } on DioError catch (e) {
-      log('E ${e.toString()}');
+      AppWidget.toast(text: '${e.toString()}');
       // if (e.response?.statusCode == 404) {
       //   AppWidget.toast(text: 'Unauthenticated');
       // }
@@ -324,7 +314,7 @@ class AuthController extends GetxController {
             userModel.value.user?.referCode) {
           //AppWidget.toast(text: 'Code applied successfully');
           Timer(const Duration(seconds: 2),
-              () => Get.toNamed(RouteHelper.signUpPage));
+                  () => Get.toNamed(RouteHelper.signUpPage));
         }
       } else {
         //  AppWidget.toast(text: 'Entered invite code is not valid');
@@ -341,17 +331,18 @@ class AuthController extends GetxController {
       try {
         isLoading(true);
         var response =
-            await dio.post(ApiConstant.buildUrl(ApiConstant.logoutApi),
-                options: Options(headers: {
-                  'Accept': 'application/json',
-                  'Authorization': 'Bearer ${userModel.value.token.toString()}'
-                }));
+        await dio.post(ApiConstant.buildUrl(ApiConstant.logoutApi),
+            options: Options(headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer ${userModel.value.token.toString()}'
+            }));
 
         if (response.data['Status'] == true) {
           SharedPrefClass.setBool(SharedPrefStrings.isLogin, false);
           SharedPrefClass.remove(SharedPrefStrings.userName);
+          SharedPrefClass.remove('currentUser');
           SharedPrefClass.remove(SharedPrefStrings.userId);
-          userModel.value = LoginData();
+          // userModel.value = LoginData();
 
           SharedPrefClass.clear();
           Get.offNamedUntil(RouteHelper.introScreen, (route) => false);
@@ -373,7 +364,9 @@ class AuthController extends GetxController {
       log('TOKEN ${userModel.value.token.toString()}');
       log('API ${ApiConstant.buildUrl(ApiConstant.updateProfileApi)}');
       log('API ${imagePath.toString()}');
-      String fileName = imagePath?.path.split('/').last ?? '';
+      String fileName = imagePath?.path
+          .split('/')
+          .last ?? '';
 
       log('fileName ${fileName.toString()}');
       var response = await dio.post(
@@ -381,11 +374,13 @@ class AuthController extends GetxController {
         data: FormData.fromMap({
           "photo": fileName.isNotEmpty
               ? await MultipartFile.fromFile(imagePath?.path ?? '',
-                  filename: fileName)
+              filename: fileName)
               : userModel.value.user!.photo.toString(),
           "name": fullNameController.value.text,
           "lname": lastNameController.value.text,
-          "photo_social": fileName.toString().isNotEmpty == true
+          "photo_social": fileName
+              .toString()
+              .isNotEmpty == true
               ? 'null'
               : userModel.value.user?.photoSocial.toString(),
           "zip_code": zipCodeController.value.text,

@@ -1,13 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:bondio/model/contact_list.dart';
+
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:bondio/controller/controller.dart';
 
@@ -244,14 +248,8 @@ class _ContactScreenState extends State<ContactScreen> {
     return SafeArea(
       child: Scaffold(
         body: SizedBox(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
           child: Padding(
             padding: paddingSymmetric(horizontalPad: 4.w, verticalPad: 00),
             child: Column(children: [
@@ -266,7 +264,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   height: 11.h,
                   widget: Padding(
                     padding:
-                    paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
+                        paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -299,8 +297,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     ),
                   )),
               smallSizedBox,
-              Obx(() =>
-                  AppWidget.searchField(
+              Obx(() => AppWidget.searchField(
                     controller: chatController.searchControllerForContact.value,
                     onChanged: (v) => _searchData(searchString: v),
                     onFieldSubmitted: (v) => _searchData(searchString: v),
@@ -324,28 +321,24 @@ class _ContactScreenState extends State<ContactScreen> {
               smallerSizedBox,
               Expanded(
                   child: Obx(
-                        () =>
-                    (chatController.contacts.isNotEmpty &&
+                () => (chatController.contacts.isNotEmpty &&
                         chatController.contacts != [])
-                        ? Obx(
-                          () =>
-                      (chatController
-                          .searchContactListModel.isNotEmpty &&
-                          chatController.searchContactListModel != [])
-                          ? Obx(
-                            () =>
-                            listViewBuilder(
-                                listModel:
-                                chatController.searchContactListModel),
+                    ? Obx(
+                        () => (chatController
+                                    .searchContactListModel.isNotEmpty &&
+                                chatController.searchContactListModel != [])
+                            ? Obx(
+                                () => listViewBuilder(
+                                    listModel:
+                                        chatController.searchContactListModel),
+                              )
+                            : Obx(
+                                () => listViewBuilder(
+                                    listModel: chatController.contacts),
+                              ),
                       )
-                          : Obx(
-                            () =>
-                            listViewBuilder(
-                                listModel: chatController.contacts),
-                      ),
-                    )
-                        : AppWidget.progressIndicator(),
-                  ))
+                    : AppWidget.progressIndicator(),
+              ))
             ]),
           ),
         ),
@@ -356,95 +349,99 @@ class _ContactScreenState extends State<ContactScreen> {
   listViewBuilder({required List? listModel}) {
     log('Model A${listModel?.first.toString()}');
 
-    return listModel!.isEmpty
-        ? Center(
-      child: Text(
-        'No Contact Found',
-        style: AppStyles.smallTextStyle.copyWith(color: Colors.grey),
-      ),
-    )
-        : ListView.builder(
-        shrinkWrap: true,
-        itemCount: listModel.length,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemBuilder: ((context, index) {
-          ContactListModel contactListModel = listModel[index];
-          log('MYSM ${contactListModel.toMap()}');
-          return Column(
-            children: [
-              SizedBox(
-                height: 7.h,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: ChatWidget.imageCircleAvatar(context: context),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              flex: 2,
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    contactListModel.name ?? '',
-                                    style: AppStyles.smallTextStyle
-                                        .copyWith(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    contactListModel.phoneNumber ??
-                                        '(none)',
-                                    style: AppStyles.smallTextStyle
-                                        .copyWith(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Flexible(
-                              child: contactListModel.status == 'Invite'
-                                  ? inviteButton(
-                                  index: index,
-                                  phoneNumber:
-                                  contactListModel.phoneNumber ??
-                                      '',
-                                  userName: contactListModel.name ?? '')
-                                  : contactListModel.status == 'Invited'
-                                  ? invitedButton()
-                                  : chatButton(
-                                phoneNumber: contactListModel
-                                    .phoneNumber ??
-                                    ' ',
-                              ),
-                            )
-                          ]),
-                    )
-                  ],
+    return chatController.isLoading.value == true
+        ? AppWidget.progressIndicator()
+        : listModel!.isEmpty
+            ? Center(
+                child: Text(
+                  'No Contact Found',
+                  style: AppStyles.smallTextStyle.copyWith(color: Colors.grey),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: 15.w,
-                ),
-                child: const Divider(),
               )
-            ],
-          );
-        }));
+            : ListView.builder(
+                shrinkWrap: true,
+                itemCount: listModel.length,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemBuilder: ((context, index) {
+                  ContactListModel contactListModel = listModel[index];
+
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: 7.h,
+                        width: MediaQuery.of(context).size.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: ChatWidget.imageCircleAvatar(
+                                  context: context),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            contactListModel.name ?? '',
+                                            style: AppStyles.smallTextStyle
+                                                .copyWith(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            contactListModel.phoneNumber ??
+                                                '(none)',
+                                            style: AppStyles.smallTextStyle
+                                                .copyWith(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: contactListModel.status == 'Invite'
+                                          ? inviteButton(
+                                              index: index,
+                                              phoneNumber: contactListModel
+                                                      .phoneNumber ??
+                                                  '',
+                                              userName:
+                                                  contactListModel.name ?? '')
+                                          : contactListModel.status == 'Invited'
+                                              ? invitedButton()
+                                              : chatButton(
+                                                  phoneNumber: contactListModel
+                                                          .phoneNumber ??
+                                                      ' ',
+                                                ),
+                                    )
+                                  ]),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 15.w,
+                        ),
+                        child: const Divider(),
+                      )
+                    ],
+                  );
+                }));
   }
 
   String createRoom({
@@ -468,63 +465,81 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
-  inviteButton({required int index,
-    required String phoneNumber,
-    required userName}) =>
+  inviteButton(
+          {required int index,
+          required String phoneNumber,
+          required userName}) =>
       GestureDetector(
-        onTap:
-        SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == false
+        onTap: SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
+                false
             ? () {
-          log("AAasas");
-          AppWidget.toast(text: 'Please sign up first');
-          Get.toNamed(RouteHelper.signUpPage);
-        }
+                AppWidget.toast(text: 'Please sign up first');
+                Get.toNamed(RouteHelper.signUpPage);
+              }
             : () async {
-          if (chatController.searchContactListModel.isEmpty) {
-            chatController.contacts[index].status = 'Invited';
-            chatController.contacts.refresh();
-            SharedPrefClass.saveListToSharedPreferences(
-                con: chatController.contacts.value,
-                sharedPrefString: SharedPrefStrings.myContacts);
-          } else {
-            chatController.searchContactListModel[index].status =
-            'Invited';
-            chatController.contacts.where((p0) =>
-            p0.status ==
-                chatController.searchContactListModel[index].status);
-            chatController.contacts.refresh();
-            SharedPrefClass.saveListToSharedPreferences(
-                con: chatController.contacts.value,
-                sharedPrefString: SharedPrefStrings.myContacts);
-            chatController.searchContactListModel.refresh();
-          }
+                log('Pe ${await Permission.sms.status.isDenied}');
+                log('Pe ${await Permission.sms.status.isPermanentlyDenied}');
+                // await Permission.sms.request();
+                if (await Permission.sms.status.isDenied == true) {
+                  await Permission.sms.request();
+                  openAppSettings();
+                } else if (await Permission.sms.status.isPermanentlyDenied ==
+                    true) {
+                  await Permission.sms.request();
+                  AppWidget.toast(
+                      text: 'Please grant SMS permission',
+                      toastLength: Toast.LENGTH_LONG);
+                  openAppSettings();
+                } else if (await Permission.sms.status.isGranted) {
+                  if (chatController.searchContactListModel.isEmpty) {
+                    chatController.contacts[index].status = 'Invited';
+                    chatController.contacts.refresh();
+                    SharedPrefClass.saveListToSharedPreferences(
+                        con: chatController.contacts.value,
+                        sharedPrefString: SharedPrefStrings.myContacts);
+                  } else {
+                    chatController.searchContactListModel[index].status =
+                        'Invited';
+                    chatController.contacts.where((p0) =>
+                        p0.status ==
+                        chatController.searchContactListModel[index].status);
+                    chatController.contacts.refresh();
+                    SharedPrefClass.saveListToSharedPreferences(
+                        con: chatController.contacts.value,
+                        sharedPrefString: SharedPrefStrings.myContacts);
+                    chatController.searchContactListModel.refresh();
+                  }
 
-          chatController.searchContactListModel.refresh();
-          chatController.update();
+                  chatController.searchContactListModel.refresh();
+                  chatController.update();
+                  await sendSMS(
+                          message:
+                              'Bondio app  \nPlease use this invite code to get points ${authController.userModel.value.user?.referCode.toString()} \nhttps://play.google.com/store/apps/details?id=com.app.bondiomeet',
+                          recipients: [phoneNumber.toString()],
+                          sendDirect: false)
+                      .then((value) {
+                    chatController.addContactToFirebase(
+                        mobileNumber: phoneNumber,
+                        userName: userName,
+                        status: 'Invited',
+                        id: '',
+                        fcmToken: '');
+                    AppWidget.toast(text: 'Invited');
 
-          await sendSMS(
-              message:
-              'Bondio app  \nPlease use this invite code to get points ${authController
-                  .userModel.value.user?.referCode
-                  .toString()} \nhttps://play.google.com/store/apps/details?id=com.app.bondiomeet',
-              recipients: [phoneNumber.toString()],
-              sendDirect: false)
-              .then((value) {
-            log('PhoneNUmber $phoneNumber');
-            chatController.addContactToFirebase(
-                mobileNumber: phoneNumber,
-                userName: userName,
-                status: 'Invited',
-                id: '',
-                fcmToken: '');
-            AppWidget.toast(text: 'Invited');
-
-            /*
+                    /*
         }).catchError((onError) {
           log(onError.toString());
         });*/
-          });
-        },
+                  });
+                }
+                // if (await Permission.sms.status) {
+                // await FlutterContacts.requestPermission(readonly: true);
+                // AppWidget.toast(
+                // text: 'Please give contact permission to find you friends',
+                // toastLength: Toast.LENGTH_LONG);
+                // openAppSettings();
+                // } else {
+              },
         child: Container(
           width: 20.w,
           height: 4.h,
@@ -532,7 +547,7 @@ class _ContactScreenState extends State<ContactScreen> {
               borderRadius: BorderRadius.circular(2.w),
               color: ColorConstant.backGroundColorOrange),
           child:
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             Icon(Icons.person_add_alt_1_outlined,
                 color: Colors.white, size: 5.w),
             Text(
@@ -543,111 +558,119 @@ class _ContactScreenState extends State<ContactScreen> {
         ),
       );
 
-  invitedButton() =>
-      Container(
-          width: 20.w,
-          height: 4.h,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
+  invitedButton() => Container(
+      width: 20.w,
+      height: 4.h,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(2.w),
+          color: ColorConstant.greyBorder),
+      child: Text(
+        'Invited',
+        style: AppStyles.smallerTextStyle.copyWith(color: Colors.grey),
+      ));
+
+  chatButton({required phoneNumber}) => ElevatedButton(
+      onPressed: SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
+              false
+          ? () {
+              AppWidget.toast(text: 'Please sign up first');
+              Get.toNamed(RouteHelper.signUpPage);
+            }
+          : () async {
+              DocumentSnapshot<Map<String, dynamic>> data =
+                  await chatController.contactCollection.doc(phoneNumber).get();
+
+              log("pp ${data.get(ApiConstant.id)}");
+              String peerId = data.get(ApiConstant.id);
+              chatController.peerId.value = peerId;
+              chatController.update();
+
+              if (authController.userModel.value.user!.id.toString() ==
+                  peerId.toString()) {
+                AppWidget.toast(
+                    text:
+                        'Sorry, you can\'t create chat room with same phone number you add at login time');
+              } else {
+                String roomId = createRoom(
+                  userId: authController.userModel.value.user!.id.toString(),
+                  peerId: peerId,
+                );
+
+                chatController.personalChatListCollection
+                    .doc(authController.userModel.value.user!.id.toString())
+                    .collection(
+                        authController.userModel.value.user!.id.toString())
+                    .doc(roomId)
+                    .set({
+                  ApiConstant.id: roomId,
+                  ApiConstant.peerId: peerId,
+                  ApiConstant.timestamp:
+                      DateTime.now().millisecondsSinceEpoch.toString(),
+                  ApiConstant.isPinned: false
+                });
+
+                chatController.personalChatListCollection
+                    .doc(peerId.toString())
+                    .collection(peerId.toString())
+                    .doc(roomId)
+                    .set({
+                  ApiConstant.id: roomId,
+                  ApiConstant.peerId:
+                      authController.userModel.value.user!.id.toString(),
+                  ApiConstant.timestamp:
+                      DateTime.now().millisecondsSinceEpoch.toString(),
+                  ApiConstant.isPinned: false
+                });
+
+                chatController.collectionId.value = roomId.toString();
+                chatController.peerId.value = peerId.toString();
+
+                chatController.update();
+                log('AAA ${chatController.peerId.toString()}');
+                Get.toNamed(RouteHelper.chatPage);
+              }
+            },
+      style: ButtonStyle(
+        maximumSize: MaterialStateProperty.all(Size(20.w, 4.h)),
+        minimumSize: MaterialStateProperty.all(Size(20.w, 4.h)),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(2.w),
-              color: ColorConstant.greyBorder),
-          child: Text(
-            'Invited',
-            style: AppStyles.smallerTextStyle.copyWith(color: Colors.grey),
-          ));
-
-  chatButton({required phoneNumber}) =>
-      GestureDetector(
-        onTap: SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
-            false
-            ? () {
-          AppWidget.toast(text: 'Please sign up first');
-          Get.toNamed(RouteHelper.signUpPage);
-        }
-            : () async {
-          DocumentSnapshot<Map<String, dynamic>> data =
-          await chatController.contactCollection
-              .doc(phoneNumber)
-              .get();
-
-          String peerId = data.get(ApiConstant.id);
-          chatController.peerId.value = peerId;
-          chatController.update();
-          log('PEERID ${peerId}');
-          DocumentSnapshot<Map<String, dynamic>> peerInfo =
-          await chatController.userCollection.doc(peerId).get();
-
-          if (authController.userModel.value.user!.id.toString() ==
-              peerId.toString()) {
-            AppWidget.toast(
-                text:
-                'Sorry, you can\'t create chat room with same phone number you add at login time');
-          } else {
-            String roomId = createRoom(
-              userId: authController.userModel.value.user!.id.toString(),
-              peerId: peerId,
-            );
-
-            chatController.personalChatListCollection
-                .doc(authController.userModel.value.user!.id.toString())
-                .collection(
-                authController.userModel.value.user!.id.toString())
-                .doc(roomId)
-                .set(
-                {ApiConstant.id: roomId, ApiConstant.peerId: peerId});
-
-            chatController.personalChatListCollection
-                .doc(peerId.toString())
-                .collection(peerId.toString())
-                .doc(roomId)
-                .set({
-              ApiConstant.id: roomId,
-              ApiConstant.peerId:
-              authController.userModel.value.user!.id.toString()
-            });
-
-            chatController.collectionId.value = roomId.toString();
-            chatController.peerId.value = peerId.toString();
-
-            chatController.update();
-            log('AAA ${chatController.peerId.toString()}');
-            Get.toNamed(RouteHelper.chatPage);
-          }
-        },
-        child: Container(
-            width: 20.w,
-            height: 4.h,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                border: Border.all(color: ColorConstant.lightOrange),
-                borderRadius: BorderRadius.circular(2.w),
-                color: const Color(0xffFFEFE0)),
-            child: Text(
-              'Chat',
-              style: AppStyles.smallerTextStyle
-                  .copyWith(color: ColorConstant.darkOrange),
-            )),
-      );
+              side: BorderSide(color: ColorConstant.lightOrange)),
+        ),
+        backgroundColor: MaterialStateProperty.all(
+          Color(0xffFFEFE0),
+        ),
+        overlayColor: MaterialStateProperty.resolveWith<Color?>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.pressed))
+              return ColorConstant.lightOrange; //<-- SEE HERE
+            return null; // Defer to the widget's default.
+          },
+        ),
+      ),
+      child: Text(
+        'Chat',
+        style: AppStyles.smallerTextStyle
+            .copyWith(color: ColorConstant.darkOrange),
+      ));
 
   _searchData({String? searchString}) {
     log('Search String ${searchString.toString()}');
-    if (searchString
-        .toString()
-        .isEmpty) {
+    if (searchString.toString().isEmpty) {
       chatController.searchContactListModel.value = [];
       chatController.searchContactListModel.refresh();
     } else {
-      if (searchString
-          .toString()
-          .length >= 3) {
+      if (searchString.toString().length >= 3) {
         chatController.searchContactListModel.value = [];
         chatController.searchContactListModel.refresh();
 
         for (var contactList in chatController.contacts) {
           if (contactList.name
-              .toString()
-              .toLowerCase()
-              .contains(searchString.toString()) ||
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchString.toString()) ||
               contactList.name
                   .toString()
                   .toUpperCase()

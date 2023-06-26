@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //controller
   HomeController homeController = Get.put(HomeController());
+  ChatController chatController = Get.put(ChatController());
 
   // void getChatList() async {
   //   QuerySnapshot<Map<String, dynamic>> isChatListAvailable =
@@ -46,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
       InviteFriend(),
     ];
 
-    log('BB ${Get.arguments}');
     if (Get.arguments != null) {
       homeController.selectedIndex.value = Get.arguments[0];
       homeController.update();
@@ -106,7 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             imageString: AppAssets.home,
                             index: 0),
                         bottomItem(
-                            text: 'Chat',
+                            text:
+                                'Chat ${SharedPrefClass.getInt(SharedPrefStrings.totalChatCount) != 0 ? '(${SharedPrefClass.getInt(SharedPrefStrings.totalChatCount)})' : ''}',
                             imageString: AppAssets.chat,
                             index: 1),
                         bottomItem(

@@ -670,6 +670,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    log('${chatController.getFirebaseMessagingToken()}');
     chatController.currentUserId.value =
         authController.userModel.value.user!.id.toString();
     chatController.update();
@@ -681,11 +682,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       chatController.userCollection
           .doc(authController.userModel.value.user?.id.toString())
-          .update({'online_status': 'Online'});
+          .update({ApiConstant.onlineStatus: 'Online'});
     } else {
       chatController.userCollection
           .doc(authController.userModel.value.user?.id.toString())
-          .update({'online_status': 'Offline'});
+          .update({ApiConstant.onlineStatus: 'Offline'});
     }
   }
 
@@ -796,17 +797,25 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       stream: chatController.personalChatRoomCollection
           .doc(chatController.collectionId.value)
           .collection(chatController.collectionId.value)
-          .orderBy('timestamp', descending: true)
+          .orderBy(ApiConstant.timestamp, descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return AppWidget.progressIndicator(color: Colors.transparent);
+          return const SizedBox();
         } else if (snapshot.connectionState == ConnectionState.waiting ||
             snapshot.connectionState == ConnectionState.none) {
-          return AppWidget.progressIndicator();
+          return const SizedBox();
         }
         listMessage = snapshot.data!.docs;
-        return ListView.builder(
+        log('${listMessage.length}');
+        return listMessage.isEmpty
+            ? Center(
+          child: Text(
+            'Say hi!! 👋',
+            style: AppStyles.mediumTextStyle,
+          ),
+        )
+            : ListView.builder(
           padding: paddingAll(paddingAll: 10.0),
           itemBuilder: (context, index) =>
               buildItem(index, snapshot.data?.docs[index]),
@@ -824,8 +833,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             .doc(chatController.peerId.toString())
             .snapshots(),
         builder: (context, snapshot) {
-          Map<String, dynamic>? data = snapshot.data?.data();
-
           return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -853,8 +860,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   maxRadius: 6.w,
                   minRadius: 2.w,
                   backgroundImage: ChatWidget.displayImage(
-                      image: snapshot.data?.get('photo') ?? '',
-                      socialImage: snapshot.data?.get('photo_social') ?? ''),
+                      image: snapshot.data?.get(ApiConstant.photo) ?? '',
+                      socialImage:
+                      snapshot.data?.get(ApiConstant.photoSocial) ?? ''),
                 ),
                 SizedBox(
                   width: 4.w,
@@ -863,13 +871,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(snapshot.data?.get('name') ?? '',
+                    Text(snapshot.data?.get(ApiConstant.name) ?? '',
                         style: AppStyles.mediumTextStyle),
-                    // Text(snapshot.data?.get('online_status') ?? '',
-                    //     style: AppStyles.smallerTextStyle),
+                    Text(snapshot.data?.get(ApiConstant.onlineStatus) ?? '',
+                        style: AppStyles.smallerTextStyle),
                   ],
                 ),
-                Spacer(),
+                const Spacer(),
                 Align(
                   alignment: Alignment.centerRight,
                   child: PopupMenuButton(
@@ -898,7 +906,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             builder: (context) =>
                                 AlertDialog(
                                   title: Text(
-                                      chatController.chatInfo.value.isPinned ==
+                                      chatController.peerInfo.value.isPinned ==
                                           true
                                           ? 'Remove from Archive'
                                           : 'Add to Archive',
@@ -908,34 +916,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                   actions: [
                                     AppWidget.elevatedButton(
                                         text: 'Yes',
-                                        onTap: () {
-                                          log('COll ${chatController
-                                              .collectionId.toString()}');
-                                          chatController
-                                              .personalChatRoomCollection
-                                              .doc(chatController.collectionId
-                                              .toString())
-                                              .update({
-                                            ApiConstant.isPinned: chatController
-                                                .chatInfo.value.isPinned ==
-                                                true
-                                                ? false
-                                                : true
-                                          }).then((value) {
-                                            Get.back();
-                                            if (chatController
-                                                .chatInfo.value.isPinned ==
-                                                true) {
-                                              chatController.chatInfo.value
-                                                  .isPinned = false;
-                                              chatController.chatInfo.refresh();
-                                            } else {
-                                              chatController.chatInfo.value
-                                                  .isPinned = true;
-                                              chatController.chatInfo.refresh();
-                                            }
-                                          });
-                                        }),
+                                        onTap: () =>
+                                            chatController
+                                                .addOrRemoveFromArchive(
+                                                pinned: chatController
+                                                    .peerInfo.value.isPinned)),
                                     smallSizedBox,
                                     AppWidget.elevatedButton(
                                         text: 'No', onTap: () => Get.back()),
@@ -981,6 +966,14 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         );
       } else {
         // Left (peer message)
+
+        if (messageChat.isRead == false) {
+          chatController.updateMessageReadStatus(messages: messageChat);
+          int chat = SharedPrefClass.getInt(SharedPrefStrings.totalChatCount);
+          chat = chat - 1;
+          SharedPrefClass.setInt(SharedPrefStrings.totalChatCount, chat);
+          chatController.totalChatMessages.value = chat;
+        }
         return Container(
           margin: EdgeInsets.only(bottom: 1.w),
           child: Column(

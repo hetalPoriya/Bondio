@@ -6,9 +6,12 @@ import 'package:bondio/controller/controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../model/contact_list.dart';
@@ -18,14 +21,12 @@ class ChatWidget {
   static ChatController chatController = Get.put(ChatController());
   static AuthController authController = Get.put(AuthController());
   static HomeController homeController = Get.put(HomeController());
+  static EventController eventController = Get.put(EventController());
 
   static Future<void> getUserInfo() async {
     AuthController authController = Get.put(AuthController());
     var response = await SharedPrefClass.getUserData();
-    log('Response $response');
-    if (response
-        .toString()
-        .isNotEmpty) {
+    if (response.toString().isNotEmpty) {
       authController
           .userModel(LoginData.fromMap(jsonDecode(response.toString())));
       authController.userModel.refresh();
@@ -46,17 +47,25 @@ class ChatWidget {
       authController.imageController.value.text =
           authController.userModel.value.user?.photoSocial.toString() ?? '';
       authController.update();
+      chatController.userCollection
+          .doc(authController.userModel.value.user?.id.toString())
+          .update({
+        ApiConstant.deviceToken:
+            await chatController.getFirebaseMessagingToken()
+      });
       log('UserResponse ${authController.userModel.value.toMap()}');
-      log('UserResponse ${authController.userModel.value.user?.id.toString()}');
     }
   }
 
-  static Widget chatContainer({String? imageString,
-    String? photoSocial,
-    String? titleText,
-    String? subText,
-    String? time,
-    bool? isPinned}) =>
+  static Widget chatContainer(
+          {String? imageString,
+          String? photoSocial,
+          String? titleText,
+          String? subText,
+          String? time,
+          int? chatCount,
+          bool? isNotRead,
+          bool? isPinned}) =>
       Material(
         elevation: 2.w,
         borderRadius: BorderRadius.circular(4.w),
@@ -100,7 +109,10 @@ class ChatWidget {
                                   style: AppStyles.mediumTextStyle
                                       .copyWith(color: Colors.black))),
                           Expanded(
-                              child: Text(time.toString(),
+                              child: Text(
+                                  DateFormat('kk:mm a').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          int.parse(time.toString()))),
                                   style: AppStyles.smallerTextStyle.copyWith(
                                       fontSize: 8.sp, color: Colors.black))),
                         ],
@@ -117,11 +129,24 @@ class ChatWidget {
                                   .copyWith(color: Colors.grey.shade800),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            if (isPinned == true)
-                              Icon(
-                                Icons.archive,
-                                color: ColorConstant.greyBorder,
-                              )
+                            Row(
+                              children: [
+                                if (isNotRead == false)
+                                  CircleAvatar(
+                                      minRadius: 12,
+                                      maxRadius: 12,
+                                      backgroundColor: Colors.green,
+                                      child: Text(
+                                        chatCount.toString(),
+                                        style: AppStyles.smallTextStyle,
+                                      )),
+                                if (isPinned == true)
+                                  Icon(
+                                    Icons.archive,
+                                    color: ColorConstant.greyBorder,
+                                  ),
+                              ],
+                            )
                           ],
                         ),
                       )
@@ -130,13 +155,14 @@ class ChatWidget {
         ),
       );
 
-  static Widget eventContainer({String? imageString,
-    required String title,
-    required String description,
-    required String date,
-    required String time,
-    required String invitedBy,
-    required String memberList}) =>
+  static Widget eventContainer(
+          {String? imageString,
+          required String title,
+          required String description,
+          required String date,
+          required String time,
+          required String invitedBy,
+          required String memberList}) =>
       Material(
         elevation: 2.w,
         borderRadius: BorderRadius.circular(4.w),
@@ -215,9 +241,7 @@ class ChatWidget {
                                 color: ColorConstant.backGroundColorOrange),
                           ),
                           SizedBox(height: 1.w),
-                          if (invitedBy
-                              .toString()
-                              .isNotEmpty)
+                          if (invitedBy.toString().isNotEmpty)
                             Text(
                               invitedBy,
                               style: AppStyles.smallerTextStyle.copyWith(
@@ -233,22 +257,21 @@ class ChatWidget {
 
   static Widget customDrawer() => Container();
 
-  static Widget appBarWidget({String? userName, String? status}) =>
-      SizedBox(
+  static Widget appBarWidget({String? userName, String? status}) => SizedBox(
         height: 10.h,
         child: Row(
           children: [
             Expanded(
                 child: CircleAvatar(
-                  maxRadius: 4.h,
-                  minRadius: 4.h,
-                  backgroundColor: Colors.black38,
-                )),
+              maxRadius: 4.h,
+              minRadius: 4.h,
+              backgroundColor: Colors.black38,
+            )),
             Expanded(
                 flex: 4,
                 child: Padding(
                     padding:
-                    paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
+                        paddingSymmetric(horizontalPad: 2.w, verticalPad: 00),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -268,26 +291,22 @@ class ChatWidget {
       );
 
   static Widget imageCircleAvatar(
-      {Uint8List? imageString, required BuildContext context}) =>
+          {Uint8List? imageString, required BuildContext context}) =>
       SizedBox(
         height: 6.h,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         child: (imageString != null && imageString.isNotEmpty)
             ? CircleAvatar(
-          backgroundImage: MemoryImage(imageString),
-        )
+                backgroundImage: MemoryImage(imageString),
+              )
             : CircleAvatar(
-          backgroundColor: ColorConstant.backGroundColorOrange,
-          child: Image.asset(AppAssets.user,
-              height: 3.h, color: Colors.white),
-        ),
+                backgroundColor: ColorConstant.backGroundColorOrange,
+                child: Image.asset(AppAssets.user,
+                    height: 3.h, color: Colors.white),
+              ),
       );
 
-  static Widget noConversionFound() =>
-      Column(
+  static Widget noConversionFound() => Column(
         children: [
           largeSizedBox,
           largeSizedBox,
@@ -309,34 +328,31 @@ class ChatWidget {
         content: Padding(
           padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 0),
           child: SizedBox(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
                   onTap: () {
                     Get.back();
-                    _pickFromGalley();
+                    pickFromGalley();
                   },
                   child: Text(
                     'Gallery',
                     style:
-                    AppStyles.smallTextStyle.copyWith(color: Colors.black),
+                        AppStyles.smallTextStyle.copyWith(color: Colors.black),
                   ),
                 ),
                 smallerSizedBox,
                 GestureDetector(
                   onTap: () {
                     Get.back();
-                    _pickFromCamera();
+                    pickFromCamera();
                   },
                   child: Text(
                     'Camera',
                     style:
-                    AppStyles.smallTextStyle.copyWith(color: Colors.black),
+                        AppStyles.smallTextStyle.copyWith(color: Colors.black),
                   ),
                 )
               ],
@@ -345,7 +361,7 @@ class ChatWidget {
         ));
   }
 
-  static _pickFromGalley() async {
+  static pickFromGalley() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) return;
     chatController.pickedImage?.value = File(image.path);
@@ -356,7 +372,7 @@ class ChatWidget {
     chatController.update();
   }
 
-  static _pickFromCamera() async {
+  static pickFromCamera() async {
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null) return;
     chatController.pickedImage?.value = File(image.path);
@@ -370,11 +386,9 @@ class ChatWidget {
   static displayImage({String? image, String? socialImage}) {
     return (socialImage?.isNotEmpty == true && socialImage.toString() != 'null')
         ? NetworkImage(socialImage.toString())
-        : ((image
-        .toString()
-        .isEmpty || image.toString() == ' '))
-        ? AssetImage(AppAssets.addContact) as ImageProvider
-        : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
+        : ((image.toString().isEmpty || image.toString() == ' '))
+            ? AssetImage(AppAssets.addContact) as ImageProvider
+            : NetworkImage('${ApiConstant.imageBaseUrl}${image.toString()}');
   }
 
   static Future fetchContacts() async {
@@ -384,6 +398,7 @@ class ChatWidget {
     chatController.searchContactListModel.value = [];
     chatController.searchContactListModel.refresh();
     chatController.availableChatPersonFromContacts.value = [];
+    eventController.eventPeopleList.value = [];
     chatController.availableChatPersonFromContacts.refresh();
     chatController.update();
 
@@ -434,17 +449,74 @@ class ChatWidget {
     //     // });
     //   });
     // }
+    // List<Contact> loadedList =
+    //     await SharedPrefClass.getListFromSharedPreferences();
+    //
+    // // chatController.contacts.value = loadedList;
+    // // chatController.update();
+    // //
+    // // log(loadedList.length.toString());
+    // // log('${chatController.contacts.length}');
+    // // log('${chatController.contacts.toString()}');
+    // if (!await FlutterContacts.requestPermission(readonly: true)) {
+    // } else {
+    //   FlutterContacts.getContacts(withProperties: true, withPhoto: true)
+    //       .then((contacts) {
+    //     chatController.contacts.addAll(contacts);
+    //     chatController.contacts.asMap().entries.map((e) async {
+    //       if (chatController.contacts[e.key].phones.isNotEmpty) {
+    //         await chatController.contactCollection
+    //             .doc(chatController
+    //                 .contacts[e.key].phones.first.normalizedNumber
+    //                 .toString())
+    //             .get()
+    //             .then((value) {
+    //           if (value.exists) {
+    //             chatController.contacts[e.key].status = value.get('status');
+    //             chatController.contacts[e.key].loginId = value.get('id');
+    //             chatController.contacts.refresh();
+    //             chatController.update();
+    //             if (chatController.contacts[e.key].status == 'Chat') {
+    //               chatController.availableChatPersonFromContacts
+    //                   .add(chatController.contacts[e.key]);
+    //               chatController.availableChatPersonFromContacts.refresh();
+    //             }
+    //             chatController.contacts.refresh();
+    //           }
+    //         });
+    //       }
+    //     }).toList();
+    //   }).then((value) async {
+    //     SharedPrefClass.saveListToSharedPreferences(
+    //         chatController.contacts.value);
+    //
+    //     // List<Contact> loadedList = await SharedPrefClass.getListFromSharedPreferences();
+    //     // setState(() {
+    //     //   persons = loadedList;
+    //     // });
+    //   });
+    // }
 
     List<ContactListModel> loadedList =
-    await SharedPrefClass.getListFromSharedPreferences(
-        sharedPrefString: SharedPrefStrings.myContacts);
+        await SharedPrefClass.getListFromSharedPreferences(
+            sharedPrefString: SharedPrefStrings.myContacts);
     List<ContactListModel> availableList =
-    await SharedPrefClass.getListFromSharedPreferences(
-        sharedPrefString: SharedPrefStrings.availableContacts);
+        await SharedPrefClass.getListFromSharedPreferences(
+            sharedPrefString: SharedPrefStrings.availableContacts);
 
-    //log('MY SHERED ${loadedList.first.toMap()}');
+    log(' RERRERERER ${await FlutterContacts.requestPermission(readonly: true)}');
 
-    if (!await FlutterContacts.requestPermission(readonly: true)) {} else {
+    if (await FlutterContacts.requestPermission(readonly: true) == false) {
+      await FlutterContacts.requestPermission(readonly: true);
+      AppWidget.toast(
+          text: 'Please give contact permission to find you friends',
+          toastLength: Toast.LENGTH_LONG);
+      openAppSettings();
+    } else {
+      chatController.isLoading.value = true;
+      chatController.update();
+      log('Contact Get');
+
       if (loadedList.isNotEmpty) {
         chatController.contacts.value = loadedList;
         chatController.availableChatPersonFromContacts.value = availableList;
@@ -456,11 +528,9 @@ class ChatWidget {
             .then((contacts) async {
           contacts.map((data) {
             String phone = data.phones.isNotEmpty
-                ? data.phones.first.normalizedNumber
-                .toString()
-                .isNotEmpty
-                ? data.phones.first.normalizedNumber.toString()
-                : 'none'
+                ? data.phones.first.normalizedNumber.toString().isNotEmpty
+                    ? data.phones.first.normalizedNumber.toString()
+                    : 'none'
                 : 'none';
 
             chatController.contactCollection.doc(phone).get().then((value) {
@@ -579,16 +649,18 @@ class ChatWidget {
         //       }
         //     });
       }
-      // }).toList();
+
+      chatController.isLoading.value = false;
+      chatController.update();
     }
   }
 
-  static tabContainer({required String text,
-    required int index,
-    required List<Color> color,
-    required Color textColor,
-    required VoidCallback onTap}) =>
-
+  static tabContainer(
+          {required String text,
+          required int index,
+          required List<Color> color,
+          required Color textColor,
+          required VoidCallback onTap}) =>
       GestureDetector(
         onTap: onTap,
         child: Container(
@@ -608,6 +680,4 @@ class ChatWidget {
               style: AppStyles.smallerTextStyle.copyWith(color: textColor),
             )),
       );
-
-
 }

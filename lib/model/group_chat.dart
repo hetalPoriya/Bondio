@@ -10,6 +10,10 @@ class GroupChat {
   List<dynamic>? members;
   List<dynamic>? membersId;
   List<dynamic>? isAdmin;
+  List<dynamic>? isArchive;
+
+  // List<Map<String, String>>? userToken;
+
   String? groupId;
   String? lastMessage;
   String? lastMessageSender;
@@ -23,11 +27,13 @@ class GroupChat {
     this.members,
     this.groupId,
     this.isAdmin,
+
     this.lastMessage,
     this.lastMessageSender,
     this.membersId,
     this.timestamp,
     this.eventDate,
+    this.isArchive,
     this.isEvent = false});
 
   Map<String, dynamic> toJson() {
@@ -43,7 +49,9 @@ class GroupChat {
       ApiConstant.lastMessageSender: lastMessageSender,
       ApiConstant.timestamp: timestamp,
       ApiConstant.isEvent: isEvent,
-      ApiConstant.eventDate: eventDate
+      ApiConstant.eventDate: eventDate,
+      ApiConstant.isArchive: isArchive,
+
     };
   }
 
@@ -54,6 +62,8 @@ class GroupChat {
     List<dynamic> members = doc.get(ApiConstant.members);
     List<dynamic> membersId = doc.get(ApiConstant.membersId);
     List<dynamic> isAdmin = doc.get(ApiConstant.isAdmin);
+    List<dynamic> isArchive = doc.get(ApiConstant.isArchive);
+
     String groupId = doc.get(ApiConstant.groupId);
     String lastMessage = doc.get(ApiConstant.lastMessage);
     String lastMessageSender = doc.get(ApiConstant.lastMessageSender);
@@ -67,6 +77,7 @@ class GroupChat {
       groupId: groupId,
       members: members,
       membersId: membersId,
+      isArchive: isArchive,
       isAdmin: isAdmin,
       lastMessage: lastMessage,
       lastMessageSender: lastMessageSender,

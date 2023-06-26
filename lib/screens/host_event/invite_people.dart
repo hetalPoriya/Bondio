@@ -1,9 +1,11 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:bondio/controller/controller.dart';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
 import '../chat/chat.dart';
@@ -23,14 +25,29 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
   AuthController authController = Get.put(AuthController());
 
   @override
+  void initState() {
+    ChatWidget.fetchContacts();
+    eventController.eventPeopleList.value = [];
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(
       () {
         return Scaffold(
-          floatingActionButton: FloatingActionButton(
-              onPressed: () => eventController.createEventApiCall(),
-              backgroundColor: ColorConstant.darkOrange,
-              child: Icon(Icons.arrow_forward, size: 4.h)),
+          floatingActionButton: Obx(
+            () => FloatingActionButton(
+                onPressed: () async {
+                  eventController.eventPeopleList.isEmpty
+                      ? AppWidget.toast(text: 'Please add people')
+                      : eventController.createEventApiCall();
+                },
+                backgroundColor: ColorConstant.darkOrange,
+                child: chatController.isLoading.value == true
+                    ? AppWidget.progressIndicator(color: Colors.white)
+                    : Icon(Icons.arrow_forward, size: 4.h)),
+          ),
           body: ListView(
               shrinkWrap: true,
               physics: const ClampingScrollPhysics(),
@@ -42,6 +59,7 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                   child: AppWidget.searchField(
                       controller: chatController.searchController.value,
                       onChanged: (v) {
+                        log('Cl');
                         chatController.availableChatPersonSearchList.value =
                             chatController.availableChatPersonFromContacts
                                 .where((x) => (x.name
@@ -56,8 +74,9 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                                             .toUpperCase())))
                                 .toList();
                         chatController.availableChatPersonSearchList.refresh();
-                        chatController.availableChatPersonFromContacts
-                            .refresh();
+                        chatController.update();
+                        // chatController.availableChatPersonFromContacts
+                        //     .refresh();
                       }),
                 ),
                 smallerSizedBox,
@@ -178,6 +197,7 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
         itemCount: availableChatPersonFromContacts!.length,
         physics: const ClampingScrollPhysics(),
         itemBuilder: ((context, index) {
+          log('Person ${availableChatPersonFromContacts.length}');
           return GestureDetector(
             onTap: () {
               if (eventController.eventPeopleList.contains(

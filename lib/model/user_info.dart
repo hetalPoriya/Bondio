@@ -7,19 +7,16 @@ class UserInfo {
   String? id;
   String? lastMessage;
   String? timestamp;
-  bool? isPinned;
   List<dynamic>? user1;
   List<dynamic>? user2;
   List<dynamic>? members;
 
-  UserInfo(
-      {this.id,
-      this.timestamp,
-      this.lastMessage,
-      this.members,
-      this.user1,
-      this.user2,
-      this.isPinned = false});
+  UserInfo({this.id,
+    this.timestamp,
+    this.lastMessage,
+    this.members,
+    this.user1,
+    this.user2,});
 
   Map<String, dynamic> toJson() {
     return {
@@ -29,7 +26,7 @@ class UserInfo {
       ApiConstant.user1: user1,
       ApiConstant.user2: user2,
       ApiConstant.members: members,
-      ApiConstant.isPinned: isPinned,
+
     };
   }
 
@@ -38,7 +35,7 @@ class UserInfo {
     String id = doc.get(ApiConstant.id);
     String timestamp = doc.get(ApiConstant.timestamp);
     String lastMessage = doc.get(ApiConstant.lastMessage);
-    bool isPinned = doc.get(ApiConstant.isPinned);
+
     List<dynamic>? user1 = doc.get(ApiConstant.user1);
     List<dynamic>? user2 = doc.get(ApiConstant.user2);
     List<dynamic>? members = doc.get(ApiConstant.members);
@@ -50,7 +47,7 @@ class UserInfo {
       user1: user1,
       user2: user2,
       members: members,
-      isPinned: isPinned,
+
     );
   }
 }

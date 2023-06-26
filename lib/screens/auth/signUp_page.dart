@@ -429,6 +429,8 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:sizer/sizer.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -494,47 +496,94 @@ class _SignUpPageState extends State<SignUpPage> {
                           style: AppStyles.mediumTextStyle),
                       smallerSizedBox,
 
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(3.w)),
-                              child: CountryCodePicker(
-                                initialSelection: 'US',
-                                onChanged: ((value) {
-                                  authController.countryCodeController.value
-                                      .text = value.dialCode.toString();
-                                  authController.update();
-                                  log('Auth ${authController.countryCodeController.value.text}');
-                                }),
-                                textStyle: AppStyles.smallTextStyle
-                                    .copyWith(color: Colors.white),
-                                padding: paddingSymmetric(
-                                    horizontalPad: 00, verticalPad: 2),
-                                showDropDownButton: true,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 2.w,
-                          ),
-                          Flexible(
-                            flex: 2,
-                            child: AppWidget.textFormFiledWhite(
-                                textEditingController:
-                                    authController.mobileController.value,
-                                hintText: AppStrings.mobileNumber,
-                                validator:
-                                    FormValidation.mobileNumberValidation(
-                                        value: authController
-                                            .mobileController.value.text),
-                                textInputType: TextInputType.number),
-                          ),
-                        ],
+                      // Row(
+                      //   crossAxisAlignment: CrossAxisAlignment.start,
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Flexible(
+                      //       child: Container(
+                      //         decoration: BoxDecoration(
+                      //             border: Border.all(color: Colors.white),
+                      //             borderRadius: BorderRadius.circular(3.w)),
+                      //         child: CountryCodePicker(
+                      //           initialSelection: 'US',
+                      //           onChanged: ((value) {
+                      //             authController.countryCodeController.value
+                      //                 .text = value.dialCode.toString();
+                      //             authController.update();
+                      //             log('Auth ${authController.countryCodeController.value.text}');
+                      //           }),
+                      //           textStyle: AppStyles.smallTextStyle
+                      //               .copyWith(color: Colors.white),
+                      //           padding: paddingSymmetric(
+                      //               horizontalPad: 00, verticalPad: 2),
+                      //           showDropDownButton: true,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     SizedBox(
+                      //       width: 2.w,
+                      //     ),
+                      //     Flexible(
+                      //       flex: 2,
+                      //       child: AppWidget.textFormFiledWhite(
+                      //           textEditingController:
+                      //               authController.mobileController.value,
+                      //           hintText: AppStrings.mobileNumber,
+                      //           validator:
+                      //               FormValidation.mobileNumberValidation(
+                      //                   value: authController
+                      //                       .mobileController.value.text),
+                      //           textInputType: TextInputType.number),
+                      //     ),
+                      //   ],
+                      // ),
+                      IntlPhoneField(
+                        initialCountryCode: '+91',
+                        dropdownDecoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.w)),
+                        dropdownTextStyle: AppStyles.smallTextStyle
+                            .copyWith(color: Colors.white),
+                        dropdownIconPosition: IconPosition.trailing,
+                        dropdownIcon: const Icon(Icons.arrow_drop_down_sharp,
+                            color: Colors.white),
+                        disableLengthCheck: false,
+                        style: AppStyles.smallTextStyle
+                            .copyWith(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: AppStrings.mobileNumber,
+                          hintStyle: AppStyles.smallTextStyle
+                              .copyWith(color: Colors.white),
+                          labelStyle: AppStyles.smallTextStyle
+                              .copyWith(color: Colors.white),
+                          errorStyle: AppStyles.smallTextStyle
+                              .copyWith(color: Colors.white, fontSize: 10.sp),
+                          errorMaxLines: 2,
+                          contentPadding: paddingAll(paddingAll: 4.w),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(3.w),
+                              borderSide: const BorderSide(color: Colors.white),
+                              gapPadding: 00),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(3.w),
+                              borderSide: const BorderSide(color: Colors.white),
+                              gapPadding: 00),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(3.w),
+                              borderSide: const BorderSide(color: Colors.white),
+                              gapPadding: 00),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(3.w),
+                              borderSide: const BorderSide(color: Colors.white),
+                              gapPadding: 00),
+                        ),
+                        languageCode: "IN",
+                        onChanged: (phone) {
+                          print(phone.completeNumber);
+                        },
+                        onCountryChanged: (country) {
+                          print('Country changed to: ${country.name}');
+                        },
                       ),
 
                       // Text(
