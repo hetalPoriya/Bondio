@@ -1,17 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:bondio/controller/controller.dart';
-import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/host_event/add_event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
@@ -34,18 +28,20 @@ class _RewardsScreenState extends State<RewardsScreen> {
   ChatController chatController = Get.put(ChatController());
 
   getFriendCount() async {
-    log('UserId ${authController.userModel.value.user?.id.toString()}');
     QuerySnapshot<Map<String, dynamic>> count = await chatController
         .personalChatListCollection
         .doc(authController.userModel.value.user?.id.toString())
         .collection(authController.userModel.value.user?.id.toString() ?? '')
         .get();
 
-    log(count.docs.length.toString());
-    // log('SIZE ${authController.friend.value}');
-    authController.friend.value = count.docs.length;
-    authController.update();
-    log('Friends ${authController.friend.value}');
+    if (count.docs.isNotEmpty) {
+      log(count.docs.length.toString());
+      authController.friend.value = count.docs.length;
+      authController.update();
+    } else {
+      authController.friend.value = 0;
+      authController.update();
+    }
   }
 
   @override
@@ -55,7 +51,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
     }
     if (SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) == true) {
       Timer(
-          Duration(seconds: 1),
+          const Duration(seconds: 1),
           () => authController.checkInviteCodeApi(
               referCode:
                   authController.userModel.value.user?.referCode ?? '00001'));
@@ -101,21 +97,6 @@ class _RewardsScreenState extends State<RewardsScreen> {
                   'text': 'Host an Event'
                 }
               ];
-
-    // List<Map<String, dynamic>> gridViewList = [
-    //   {'imageString': AppAssets.gold, 'text': 'Earned', 'count': 0},
-    //   {'imageString': AppAssets.chatMessage, 'text': 'Friends', 'count': 0},
-    //   {
-    //     'imageString': AppAssets.partyAttendance,
-    //     'text': 'Party Attendance',
-    //     'count': 0
-    //   },
-    //   {
-    //     'imageString': AppAssets.upcomingEvent,
-    //     'text': 'Upcoming Events',
-    //     'count': 0
-    //   },
-    // ];
 
     return Obx(() => homeController.hostEvent.value == 0
         ? ChatBackground(
@@ -416,7 +397,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                 smallSizedBox,
               ],
             ))
-        : AddEvent());
+        : const AddEvent());
   }
 
   Widget containerListWidget(
@@ -427,11 +408,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
       String? image2,
       String? count2}) {
     return Expanded(
-        child:
-            // (SharedPrefClass.getBool(SharedPrefStrings.isLogin, false) ==
-            //         false)
-            //     ?
-            Row(children: [
+        child: Row(children: [
       SizedBox(
         width: 2.w,
       ),
@@ -443,25 +420,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
       SizedBox(
         width: 2.w,
       ),
-    ])
-        //:
-        // Obx(
-        //       () =>
-        //       Row(children: [
-        //         SizedBox(
-        //           width: 2.w,
-        //         ),
-        //         commanContainer(text: text1, image: image1, count: count1),
-        //         SizedBox(
-        //           width: 4.w,
-        //         ),
-        //         commanContainer(text: text2, image: image2, count: count2),
-        //         SizedBox(
-        //           width: 2.w,
-        //         ),
-        //       ]),
-        // )
-        );
+    ]));
   }
 
   Widget commanContainer({String? text, String? image, String? count}) {

@@ -12,7 +12,7 @@ class UpdateEvent extends StatelessWidget {
     EventController eventController = Get.put(EventController());
     return ListView(
       shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       padding: paddingSymmetric(horizontalPad: 6.w, verticalPad: 2.h),
       children: [
         Material(
@@ -24,7 +24,7 @@ class UpdateEvent extends StatelessWidget {
           ),
         ),
         mediumSizedBox,
-        Container(
+        SizedBox(
           height: 5.h,
           width: 100.w,
           child: Row(children: [
@@ -33,7 +33,8 @@ class UpdateEvent extends StatelessWidget {
                 backgroundColor: Colors.grey.shade300,
                 child: IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.camera_alt_sharp, color: Colors.black38),
+                  icon:
+                  const Icon(Icons.camera_alt_sharp, color: Colors.black38),
                 )),
             Flexible(
               child: AppWidget.textFormFiledForEvent(
@@ -47,19 +48,11 @@ class UpdateEvent extends StatelessWidget {
         smallSizedBox,
         AppWidget.textFormFiledForEvent(
           hintText: AppStrings.description,
-          iconWidget: Icon(Icons.description, color: const Color(0xffFFB574)),
-
+          iconWidget: const Icon(Icons.description, color: Color(0xffFFB574)),
           textEditingController: eventController.eventDesController.value,
         ),
         smallSizedBox,
-        AppWidget.textFormFiledForEvent(
-          hintText: AppStrings.location,
-          iconWidget: Icon(
-              Icons.location_on_outlined, color: const Color(0xffFFB574)),
 
-          textEditingController: eventController.eventLocationController.value,
-        ),
-        smallSizedBox,
         Container(
           height: 7.h,
           width: MediaQuery
@@ -165,14 +158,24 @@ class UpdateEvent extends StatelessWidget {
                 ))
           ]),
         ),
+        smallSizedBox,
+        AppWidget.textFormFiledForEvent(
+          hintText: AppStrings.location,
+          iconWidget:
+          const Icon(Icons.location_on_outlined, color: Color(0xffFFB574)),
+          textEditingController: eventController.eventLocationController.value,
+        ),
+
         mediumSizedBox,
-        Obx(() =>
-            AppWidget.elevatedButton(
-                text: AppStrings.update,
-                loading: eventController.isLoading.value,
-                onTap: () async {
-                  await eventController.updateEventApiCall();
-                }),),
+        Obx(
+              () =>
+              AppWidget.elevatedButton(
+                  text: AppStrings.update,
+                  loading: eventController.isLoading.value,
+                  onTap: () async {
+                    await eventController.updateEventApiCall();
+                  }),
+        ),
         mediumSizedBox,
       ],
     );

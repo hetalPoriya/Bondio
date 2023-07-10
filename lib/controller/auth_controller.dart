@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
@@ -34,10 +33,6 @@ class AuthController extends GetxController {
 
   //forgotPassword string
   RxString emailOrPhone = ''.obs;
-
-  // //for login remember
-  // var emailLoginController = TextEditingController().obs;
-  // var passLoginController = TextEditingController().obs;
 
   var fullNameController = TextEditingController().obs;
   var lastNameController = TextEditingController().obs;
@@ -91,28 +86,23 @@ class AuthController extends GetxController {
   RxInt upcomingEvent = 0.obs;
   Rx<CustomerDetails> customerDetails = CustomerDetails().obs;
 
-  FirebaseController firebaseController = Get.put(FirebaseController());
   ChatController chatController = Get.put(ChatController());
 
   registerOtpApiCall() async {
     try {
       isLoading(true);
 
-      if (countryCodeController.value.text.isEmpty) {
-        countryCodeController.value.text = '+1';
-      }
       OtpMap otpMap = OtpMap(
           email: emailController.value.text,
           name: fullNameController.value.text,
-          mobile:
-          '${countryCodeController.value.text}${mobileController.value.text}');
+          mobile: mobileController.value.text.toString());
 
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.registerOtpApi),
         data: otpModelToMap(otpMap),
         //options: NetworkHandler.options,
       );
-      log('OtpResponse ${response.data}');
+
       if (response.data['Status'] == true) {
         OtpModel data = OtpModel.fromMap(response.data);
         otpValue.value = data.data!.service.toString();
@@ -131,9 +121,6 @@ class AuthController extends GetxController {
   registerApiCall() async {
     try {
       isLoading(true);
-      String? token = await chatController.getFirebaseMessagingToken();
-      log('Token $token');
-
 
       String fileName =
           chatController.pickedImage?.value?.path
@@ -240,12 +227,8 @@ class AuthController extends GetxController {
         data: loginBodyToMap(loginBody),
         options: NetworkHandler.options,
       );
-
-      log('LoginResponse ${response.data.toString()}');
       if (response.data['Status'] == true) {
         LoginModel data = LoginModel.fromMap(response.data);
-        log('Re ${await chatController.getFirebaseMessagingToken()}');
-
         SharedPrefClass.setUserData(json.encode(response.data['Data']));
         AppWidget.toast(text: data.msg.toString());
         SharedPrefClass.setBool(SharedPrefStrings.isLogin, true);
@@ -275,9 +258,6 @@ class AuthController extends GetxController {
 
       if (response.data['Status'] == true) {
         LoginModel data = LoginModel.fromMap(response.data);
-        log('AA ${data.data?.user}');
-        String? toekn = await chatController.getFirebaseMessagingToken();
-        log('TOKEN ${toekn}');
         chatController.addUserInfoToFirebase(userInfo: data.data?.user);
         SharedPrefClass.setUserData(json.encode(response.data['Data']));
         AppWidget.toast(text: data.msg.toString());
@@ -289,10 +269,7 @@ class AuthController extends GetxController {
         Get.toNamed(RouteHelper.socialSignUpPage);
       }
     } on DioError catch (e) {
-      AppWidget.toast(text: '${e.toString()}');
-      // if (e.response?.statusCode == 404) {
-      //   AppWidget.toast(text: 'Unauthenticated');
-      // }
+      AppWidget.toast(text: e.toString());
     } finally {
       isLoading(false);
     }
@@ -312,12 +289,11 @@ class AuthController extends GetxController {
 
         if (customerDetails.value.data?.referCode !=
             userModel.value.user?.referCode) {
-          //AppWidget.toast(text: 'Code applied successfully');
           Timer(const Duration(seconds: 2),
                   () => Get.toNamed(RouteHelper.signUpPage));
         }
       } else {
-        //  AppWidget.toast(text: 'Entered invite code is not valid');
+
       }
     } finally {
       isLoading(false);
@@ -497,9 +473,6 @@ class AuthController extends GetxController {
     try {
       isLoading(true);
 
-      log('username ${emailOrPhone}');
-      log('username ${enterOtpByUser.value}');
-      log('username ${otpValue.value}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.forgotPasswordVerifyOtpApi),
         data: {
@@ -507,9 +480,9 @@ class AuthController extends GetxController {
           "otp": enterOtpByUser.value,
           "service": otpValue.value,
         },
-        //options: NetworkHandler.options,
+
       );
-      log('ForgotPassVerifyOtpResponse ${response.data}');
+
 
       AppWidget.toast(text: response.data['Msg']);
       if (response.data['Status'] == true) {
@@ -528,9 +501,6 @@ class AuthController extends GetxController {
   forgotPasswordUpdateApiCall() async {
     try {
       isLoading(true);
-      log('username ${emailOrPhone}');
-      log('username ${newPassController.value.text.trim()}');
-      log('username ${conPassController.value.text.trim()}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.forgotPasswordUpdateApi),
         data: {
@@ -538,9 +508,9 @@ class AuthController extends GetxController {
           "password": newPassController.value.text.trim(),
           "cpassword": conPassController.value.text.trim(),
         },
-        //options: NetworkHandler.options,
+
       );
-      log('ForgotPassVerifyOtpResponse ${response.data}');
+
 
       if (response.data['Status'] == true) {
         AppWidget.toast(text: response.data['Msg']);

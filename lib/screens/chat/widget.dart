@@ -85,12 +85,12 @@ class ChatWidget {
                     padding: paddingAll(paddingAll: 4.w),
                     height: 6.h,
                     decoration: BoxDecoration(
-                        color: Colors.black26,
+                        color: Colors.black12,
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             image: ChatWidget.displayImage(
                                 image: imageString, socialImage: photoSocial),
-                            fit: BoxFit.cover)),
+                            fit: BoxFit.contain)),
                   ),
                 ],
               ),
@@ -535,7 +535,7 @@ class ChatWidget {
 
             chatController.contactCollection.doc(phone).get().then((value) {
               if (value.exists) {
-                chatController.contacts.value.add(ContactListModel(
+                chatController.contacts.add(ContactListModel(
                     id: value.get('id'),
                     name: data.displayName,
                     phoneNumber: phone,
@@ -543,7 +543,7 @@ class ChatWidget {
                 chatController.contacts.refresh();
                 chatController.update();
                 SharedPrefClass.saveListToSharedPreferences(
-                    con: chatController.contacts.value,
+                    con: chatController.contacts,
                     sharedPrefString: SharedPrefStrings.myContacts);
                 if (value.get('status') == 'Chat') {
                   chatController.availableChatPersonFromContacts.add(
@@ -555,11 +555,11 @@ class ChatWidget {
                   chatController.availableChatPersonFromContacts.refresh();
                   chatController.update();
                   SharedPrefClass.saveListToSharedPreferences(
-                      con: chatController.availableChatPersonFromContacts.value,
+                      con: chatController.availableChatPersonFromContacts,
                       sharedPrefString: SharedPrefStrings.availableContacts);
                 }
               } else {
-                chatController.contacts.value.add(ContactListModel(
+                chatController.contacts.add(ContactListModel(
                     id: data.loginId,
                     name: data.displayName,
                     phoneNumber: phone,
@@ -567,7 +567,7 @@ class ChatWidget {
                 chatController.contacts.refresh();
                 chatController.update();
                 SharedPrefClass.saveListToSharedPreferences(
-                    con: chatController.contacts.value,
+                    con: chatController.contacts,
                     sharedPrefString: SharedPrefStrings.myContacts);
               }
             });

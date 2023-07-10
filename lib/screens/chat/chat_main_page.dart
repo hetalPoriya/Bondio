@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
@@ -19,8 +16,6 @@ class ChatMainPage extends StatefulWidget {
 }
 
 class _ChatMainPageState extends State<ChatMainPage> {
-  // for which data display on title and screen
-  //Widget? titleWidget;
   Widget displayScreen = Container();
 
   List<Widget> displayTab = [
@@ -35,8 +30,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() =>
-    (homeController.onTapOnAddContact.value == true)
+    return Obx(() => (homeController.onTapOnAddContact.value == true)
         ? const ContactScreen()
         : _chatAndGroupTabScreen());
   }
@@ -77,7 +71,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   Widget _chatAndGroupTabScreen() {
     if (SharedPrefClass.getBool(
-        SharedPrefStrings.isDisplayContactScreenFirstTime, true) ==
+            SharedPrefStrings.isDisplayContactScreenFirstTime, true) ==
         true) {
       homeController.titleWidget.value = Text('Add Contact',
           style: AppStyles.extraLargeTextStyle.copyWith(fontSize: 18.sp));
@@ -92,7 +86,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
       homeController.update();
     }
     return Obx(
-          () {
+      () {
         return ChatBackground(
             onBackButtonPressed: () {
               homeController.selectedIndex.value = 0;
@@ -100,87 +94,81 @@ class _ChatMainPageState extends State<ChatMainPage> {
             },
             appBarWidget: homeController.titleWidget.value,
             bodyWidget: SizedBox(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              width: MediaQuery.of(context).size.width,
               //color: Colors.grey,
               child: Column(
                 children: [
                   smallSizedBox,
                   Padding(
                     padding:
-                    paddingSymmetric(horizontalPad: 6.w, verticalPad: 00),
+                        paddingSymmetric(horizontalPad: 6.w, verticalPad: 00),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Obx(
-                              () =>
-                              Row(
-                                children: [
-                                  ChatWidget.tabContainer(
-                                    textColor: homeController
-                                        .innerTabSelectedIndex.value ==
+                          () => Row(
+                            children: [
+                              ChatWidget.tabContainer(
+                                textColor: homeController
+                                            .innerTabSelectedIndex.value ==
                                         0
-                                        ? Colors.white
-                                        : Colors.grey,
-                                    color: homeController
-                                        .innerTabSelectedIndex.value ==
+                                    ? Colors.white
+                                    : Colors.grey,
+                                color: homeController
+                                            .innerTabSelectedIndex.value ==
                                         0
-                                        ? [
-                                      ColorConstant.darkRed,
-                                      ColorConstant.lightRed
-                                    ]
-                                        : [Colors.white, Colors.white],
-                                    text: 'Chats',
-                                    index: 0,
-                                    onTap: () {
-                                      homeController.innerTabSelectedIndex
-                                          .value =
+                                    ? [
+                                        ColorConstant.darkRed,
+                                        ColorConstant.lightRed
+                                      ]
+                                    : [Colors.white, Colors.white],
+                                text: 'Chats',
+                                index: 0,
+                                onTap: () {
+                                  homeController.innerTabSelectedIndex.value =
                                       0;
-                                      homeController
-                                          .innerTabForActiveAndArchiveIndex
-                                          .value = 0;
-                                      homeController.update();
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 4.w,
-                                  ),
-                                  ChatWidget.tabContainer(
-                                    textColor: homeController
-                                        .innerTabSelectedIndex.value ==
-                                        1
-                                        ? Colors.white
-                                        : Colors.grey,
-                                    color: homeController
-                                        .innerTabSelectedIndex.value ==
-                                        1
-                                        ? [
-                                      ColorConstant.darkRed,
-                                      ColorConstant.lightRed
-                                    ]
-                                        : [Colors.white, Colors.white],
-                                    text: 'Groups',
-                                    index: 1,
-                                    onTap: () {
-                                      homeController.innerTabSelectedIndex
-                                          .value =
-                                      1;
-                                      homeController
-                                          .innerTabForActiveAndArchiveIndexForGroup
-                                          .value = 0;
-                                      homeController.update();
-                                    },
-                                  ),
-                                ],
+                                  homeController
+                                      .innerTabForActiveAndArchiveIndex
+                                      .value = 0;
+                                  homeController.update();
+                                },
                               ),
+                              SizedBox(
+                                width: 4.w,
+                              ),
+                              ChatWidget.tabContainer(
+                                textColor: homeController
+                                            .innerTabSelectedIndex.value ==
+                                        1
+                                    ? Colors.white
+                                    : Colors.grey,
+                                color: homeController
+                                            .innerTabSelectedIndex.value ==
+                                        1
+                                    ? [
+                                        ColorConstant.darkRed,
+                                        ColorConstant.lightRed
+                                      ]
+                                    : [Colors.white, Colors.white],
+                                text: 'Groups',
+                                index: 1,
+                                onTap: () {
+                                  homeController.innerTabSelectedIndex.value =
+                                      1;
+                                  homeController
+                                      .innerTabForActiveAndArchiveIndexForGroup
+                                      .value = 0;
+                                  homeController.update();
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         if (homeController.innerTabSelectedIndex.value == 0)
                           GestureDetector(
                             onTap: () {
                               if (SharedPrefClass.getBool(
-                                  SharedPrefStrings.isLogin, false) ==
+                                      SharedPrefStrings.isLogin, false) ==
                                   false) {
                                 _showDialogToGuest();
                               } else {
@@ -218,23 +206,17 @@ class _ChatMainPageState extends State<ChatMainPage> {
                       ],
                     ),
                   ),
-                  // if (SharedPrefClass.getBool(
-                  //         SharedPrefStrings.isDisplayContactScreenFirstTime,
-                  //         true) ==
-                  //     true) ...[
                   if (SharedPrefClass.getBool(
-                      SharedPrefStrings.isDisplayContactScreenFirstTime,
-                      true) ==
+                          SharedPrefStrings.isDisplayContactScreenFirstTime,
+                          true) ==
                       true) ...[
                     _addContactContainer(),
-                  ] else
-                    ...[
-                      Obx(
-                            () =>
-                            displayTab.elementAt(
-                                homeController.innerTabSelectedIndex.value),
-                      ),
-                    ]
+                  ] else ...[
+                    Obx(
+                      () => displayTab.elementAt(
+                          homeController.innerTabSelectedIndex.value),
+                    ),
+                  ]
                 ],
               ),
             ));
@@ -248,12 +230,10 @@ class _ChatMainPageState extends State<ChatMainPage> {
     } else {
       PermissionStatus permissionStatus = await _getContactPermission();
       if (permissionStatus == PermissionStatus.granted) {
-        // setState(() {
         SharedPrefClass.setBool(
             SharedPrefStrings.isDisplayContactScreenFirstTime, false);
         homeController.onTapOnAddContact.value = true;
         homeController.update();
-        // });
       } else {
         _handleInvalidPermissions(permissionStatus);
       }
@@ -273,13 +253,8 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   void _handleInvalidPermissions(PermissionStatus permissionStatus) {
     if (permissionStatus == PermissionStatus.denied) {
-      //final snackno Bar = SnackBar(content: Text('Access to contact data denied'));
-      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else if (permissionStatus == PermissionStatus.permanentlyDenied) {
       openAppSettings();
-      // final snackBar =
-      //     SnackBar(content: Text('Contact data not available on device'));
-      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 

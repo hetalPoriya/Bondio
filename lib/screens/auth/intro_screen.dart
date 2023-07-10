@@ -1,12 +1,8 @@
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:linkedin_login/linkedin_login.dart';
-import 'package:linkwell/linkwell.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sizer/sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -18,10 +14,7 @@ class IntroScreen extends StatefulWidget {
   State<IntroScreen> createState() => _IntroScreenState();
 }
 
-class _IntroScreenState extends State<IntroScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
+class _IntroScreenState extends State<IntroScreen> {
   AuthController authController = Get.put(AuthController());
 
   List<DisplayOptions> displayOptions = [
@@ -35,15 +28,6 @@ class _IntroScreenState extends State<IntroScreen>
     DisplayOptions(
         text: AppStrings.enterAsAGuest, routeString: RouteHelper.homeScreen),
   ];
-
-  @override
-  void initState() {
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2))
-          ..reverse();
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,51 +98,10 @@ class _IntroScreenState extends State<IntroScreen>
                                                   .fullName,
                                             ],
                                           );
-
-                                          print(credential);
                                         },
                                       ),
                                     ),
-
-                                  // _socialButton(
-                                  //     text: AppStrings.signInWithGoogle,
-                                  //     icon: AppAssets.google,
-                                  //     color: Colors.white,
-                                  //     textColor: Colors.black,
-                                  //     onTap: () async => await socialLoginController
-                                  //         .signInWithGoogle()),
-                                  // smallSizedBox,
-                                  // _socialButton(
-                                  //     text: AppStrings.signInWithFacebook,
-                                  //     icon: AppAssets.facebook,
-                                  //     onTap: () async => await socialLoginController
-                                  //         .signInWithFacebook()),
-                                  // smallSizedBox,
-                                  // _socialButton(
-                                  //     text: AppStrings.signInWithLinkedIn,
-                                  //     icon: AppAssets.facebook,
-                                  //     onTap: () async => await socialLoginController
-                                  //         .signInWithFacebook()),
-                                  // smallSizedBox,
-                                  // _socialButton(
-                                  //     text: AppStrings.signInWithInstagram,
-                                  //     icon: AppAssets.facebook,
-                                  //     onTap: () async => await socialLoginController
-                                  //         .signInWithFacebook()),
-                                  // smallSizedBox,
-                                  // _socialButton(
-                                  //     text: AppStrings.signInWithOutlook,
-                                  //     icon: AppAssets.facebook,
-                                  //     onTap: () async => await socialLoginController
-                                  //         .signInWithFacebook()),
-                                  // smallSizedBox,
-                                  // _socialButton(
-                                  //     text: AppStrings.signInWithTwitter,
-                                  //     icon: AppAssets.facebook,
-                                  //     onTap: () async => await socialLoginController
-                                  //         .signInWithFacebook()),
                                   smallerSizedBox,
-
                                   const Divider(thickness: 2),
                                   ListView.builder(
                                     shrinkWrap: true,
@@ -194,7 +137,6 @@ class _IntroScreenState extends State<IntroScreen>
                                       );
                                     },
                                   ),
-
                                   Wrap(
                                     alignment: WrapAlignment.center,
                                     children: [
@@ -225,16 +167,6 @@ class _IntroScreenState extends State<IntroScreen>
                                           )),
                                     ],
                                   ),
-                                  // LinkWell(AppStrings.acceptPrivacyPolicy,
-                                  //     textAlign: TextAlign.center,
-                                  //     style: AppStyles.smallTextStyle.copyWith(
-                                  //       color: Colors.grey,
-                                  //     ),
-                                  //     linkStyle:
-                                  //         AppStyles.smallTextStyle.copyWith(
-                                  //       color: Colors.blue,
-                                  //     )),
-
                                   smallSizedBox
                                 ],
                               ),
@@ -271,14 +203,6 @@ class _IntroScreenState extends State<IntroScreen>
     );
   }
 
-  // Future<void> _onOpen(LinkableElement link) async {
-  //   if (await canLaunchUrl(Uri.parse(link.url))) {
-  //     await launchUrl(Uri.parse(link.url));
-  //   } else {
-  //     throw 'Could not launch $link';
-  //   }
-  // }
-
   buttonText({required String text, required VoidCallback onTap}) => SizedBox(
         width: 100.w,
         child: TextButton(
@@ -301,7 +225,7 @@ class _IntroScreenState extends State<IntroScreen>
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)),
         contentPadding: EdgeInsets.zero,
-        content: Container(
+        content: SizedBox(
           height: 70.h,
           width: 100.w,
           child: WebViewWidget(
@@ -328,7 +252,7 @@ class _IntroScreenState extends State<IntroScreen>
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)),
         contentPadding: EdgeInsets.zero,
-        content: Container(
+        content: SizedBox(
           height: 70.h,
           width: 100.w,
           child: WebViewWidget(
@@ -348,26 +272,6 @@ class _IntroScreenState extends State<IntroScreen>
       ),
     );
   }
-
-  static normalText({String? text}) => Text(
-        text.toString(),
-        textAlign: TextAlign.justify,
-        style: AppStyles.smallerTextStyle.copyWith(
-          color: Colors.black,
-        ),
-      );
-
-  static normalTextDark({String? text}) => Text(
-        text.toString(),
-        textAlign: TextAlign.justify,
-        style: AppStyles.smallerTextStyle
-            .copyWith(color: Colors.black, fontWeight: FontWeight.w600),
-      );
-
-  static titleText({String? text}) => Text(
-        text.toString(),
-        style: AppStyles.mediumTextStyle.copyWith(color: Colors.black),
-      );
 }
 
 class DisplayOptions {

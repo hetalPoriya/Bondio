@@ -1,12 +1,6 @@
-// To parse this JSON data, do
-//
-//     final loginModel = loginModelFromMap(jsonString);
-
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../utils/utils.dart';
 
 LoginModel loginModelFromMap(String str) =>
     LoginModel.fromMap(json.decode(str));
@@ -196,7 +190,7 @@ class User {
     this.updatedAt,
   });
 
-  dynamic? id;
+  dynamic id;
   String? name;
   String? lName;
   String? photoSocial;

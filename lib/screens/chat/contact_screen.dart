@@ -1,12 +1,9 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'package:bondio/model/contact_list.dart';
 
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -28,214 +25,6 @@ class _ContactScreenState extends State<ContactScreen> {
   ChatController chatController = Get.put(ChatController());
   HomeController homeController = Get.put(HomeController());
   AuthController authController = Get.put(AuthController());
-
-  //  Future fetchContacts() async {
-  //   chatController.searchControllerForContact.value.clear();
-  //   chatController.contacts.value = [];
-  //   chatController.contacts.refresh();
-  //   chatController.searchContactListModel.value = [];
-  //   chatController.searchContactListModel.refresh();
-  //   chatController.availableChatPersonFromContacts.value = [];
-  //   chatController.availableChatPersonFromContacts.refresh();
-  //   chatController.update();
-  //
-  //   // List<Contact> loadedList =
-  //   //     await SharedPrefClass.getListFromSharedPreferences();
-  //   //
-  //   // // chatController.contacts.value = loadedList;
-  //   // // chatController.update();
-  //   // //
-  //   // // log(loadedList.length.toString());
-  //   // // log('${chatController.contacts.length}');
-  //   // // log('${chatController.contacts.toString()}');
-  //   // if (!await FlutterContacts.requestPermission(readonly: true)) {
-  //   // } else {
-  //   //   FlutterContacts.getContacts(withProperties: true, withPhoto: true)
-  //   //       .then((contacts) {
-  //   //     chatController.contacts.addAll(contacts);
-  //   //     chatController.contacts.asMap().entries.map((e) async {
-  //   //       if (chatController.contacts[e.key].phones.isNotEmpty) {
-  //   //         await chatController.contactCollection
-  //   //             .doc(chatController
-  //   //                 .contacts[e.key].phones.first.normalizedNumber
-  //   //                 .toString())
-  //   //             .get()
-  //   //             .then((value) {
-  //   //           if (value.exists) {
-  //   //             chatController.contacts[e.key].status = value.get('status');
-  //   //             chatController.contacts[e.key].loginId = value.get('id');
-  //   //             chatController.contacts.refresh();
-  //   //             chatController.update();
-  //   //             if (chatController.contacts[e.key].status == 'Chat') {
-  //   //               chatController.availableChatPersonFromContacts
-  //   //                   .add(chatController.contacts[e.key]);
-  //   //               chatController.availableChatPersonFromContacts.refresh();
-  //   //             }
-  //   //             chatController.contacts.refresh();
-  //   //           }
-  //   //         });
-  //   //       }
-  //   //     }).toList();
-  //   //   }).then((value) async {
-  //   //     SharedPrefClass.saveListToSharedPreferences(
-  //   //         chatController.contacts.value);
-  //   //
-  //   //     // List<Contact> loadedList = await SharedPrefClass.getListFromSharedPreferences();
-  //   //     // setState(() {
-  //   //     //   persons = loadedList;
-  //   //     // });
-  //   //   });
-  //   // }
-  //
-  //   List<ContactListModel> loadedList =
-  //       await SharedPrefClass.getListFromSharedPreferences(
-  //           sharedPrefString: SharedPrefStrings.myContacts);
-  //   List<ContactListModel> availableList =
-  //       await SharedPrefClass.getListFromSharedPreferences(
-  //           sharedPrefString: SharedPrefStrings.availableContacts);
-  //
-  //   //log('MY SHERED ${loadedList.first.toMap()}');
-  //
-  //   if (!await FlutterContacts.requestPermission(readonly: true)) {
-  //   } else {
-  //     if (loadedList.isNotEmpty) {
-  //       chatController.contacts.value = loadedList;
-  //       chatController.availableChatPersonFromContacts.value = availableList;
-  //       chatController.update();
-  //       chatController.contacts.refresh();
-  //       chatController.availableChatPersonFromContacts.refresh();
-  //     } else {
-  //       FlutterContacts.getContacts(withProperties: true, withPhoto: true)
-  //           .then((contacts) async {
-  //
-  //         contacts.map((data) {
-  //           String phone = data.phones.isNotEmpty
-  //               ? data.phones.first.normalizedNumber.toString().isNotEmpty
-  //                   ? data.phones.first.normalizedNumber.toString()
-  //                   : 'none'
-  //               : 'none';
-  //
-  //           chatController.contactCollection.doc(phone).get().then((value) {
-  //             if (value.exists) {
-  //               chatController.contacts.value.add(ContactListModel(
-  //                   id: value.get('id'),
-  //                   name: data.displayName,
-  //                   phoneNumber: phone,
-  //                   status: value.get('status')));
-  //               chatController.contacts.refresh();
-  //               chatController.update();
-  //               SharedPrefClass.saveListToSharedPreferences(
-  //                   con: chatController.contacts.value,
-  //                   sharedPrefString: SharedPrefStrings.myContacts);
-  //               if (value.get('status') == 'Chat') {
-  //                 chatController.availableChatPersonFromContacts.add(
-  //                     ContactListModel(
-  //                         id: value.get('id'),
-  //                         name: data.displayName,
-  //                         phoneNumber: phone,
-  //                         status: value.get('status')));
-  //                 chatController.availableChatPersonFromContacts.refresh();
-  //                 chatController.update();
-  //                 SharedPrefClass.saveListToSharedPreferences(
-  //                     con: chatController.availableChatPersonFromContacts.value,
-  //                     sharedPrefString: SharedPrefStrings.availableContacts);
-  //
-  //               }
-  //             } else {
-  //               chatController.contacts.value.add(ContactListModel(
-  //                   id: data.loginId,
-  //                   name: data.displayName,
-  //                   phoneNumber: phone,
-  //                   status: data.status.toString()));
-  //               chatController.contacts.refresh();
-  //               chatController.update();
-  //               SharedPrefClass.saveListToSharedPreferences(
-  //                   con: chatController.contacts.value,
-  //                   sharedPrefString: SharedPrefStrings.myContacts);
-  //
-  //             }
-  //           });
-  //           // SharedPrefClass.saveListToSharedPreferences(
-  //           //     chatController.contacts.value);
-  //
-  //           //log('contactList ${chatController.contacts.value.first.toMap()}');
-  //           // log('ISEXITS ${isExits}');
-  //           // return ContactListModel(
-  //           //     id: data.loginId,
-  //           //     name: data.displayName,
-  //           //     phoneNumber: phone,
-  //           //     status: data.status.toString());
-  //         }).toList();
-  //
-  //         // SharedPrefClass.saveListToSharedPreferences(
-  //         //     chatController.contacts.value);
-  //         // log('contactList ${chatController.contacts.value.length}');
-  //         // log('contactList ${chatController.contacts.value.first.toMap()}');
-  //
-  //         // chatController.contacts.asMap().entries.map((data) async {
-  //         //   if (chatController.contacts[data.key].phoneNumber
-  //         //       .toString()
-  //         //       .isNotEmpty) {
-  //         //     await chatController.contactCollection
-  //         //         .doc(chatController.contacts[data.key].phoneNumber
-  //         //                 .toString()
-  //         //                 .isNotEmpty
-  //         //             ? chatController.contacts[data.key].phoneNumber
-  //         //             : 'none')
-  //         //         .get()
-  //         //         .then((value) {
-  //         //       log('ENter');
-  //         //       if (value.exists) {
-  //         //         log('MYNUMBER ${chatController.contacts[data.key].phoneNumber}');
-  //         //         chatController.contacts[data.key].status = value.get('status');
-  //         //         chatController.contacts[data.key].id = value.get('id');
-  //         //
-  //         //         chatController.contacts.refresh();
-  //         //         chatController.update();
-  //         //         SharedPrefClass.saveListToSharedPreferences(
-  //         //             chatController.contacts.value);
-  //         //
-  //         //         if (chatController.contacts[data.key].status == 'Chat') {
-  //         //           chatController.availableChatPersonFromContacts.add(data);
-  //         //           chatController.availableChatPersonFromContacts.refresh();
-  //         //           chatController.update();
-  //         //         }
-  //         //         chatController.contacts.refresh();
-  //         //       }
-  //         //     });
-  //         //     SharedPrefClass.saveListToSharedPreferences(
-  //         //         chatController.contacts.value);
-  //         //   }
-  //         // });
-  //       });
-  //       // }
-  //
-  //       // chatController.contacts.addAll(contacts);
-  //       // chatController.contacts.asMap().entries.map((e) async {
-  //       //   if (chatController.contacts[e.key].phones.isNotEmpty) {
-  //       //     await chatController.contactCollection
-  //       //         .doc(chatController
-  //       //             .contacts[e.key].phones.first.normalizedNumber
-  //       //             .toString())
-  //       //         .get()
-  //       //         .then((value) {
-  //       //       if (value.exists) {
-  //       //         chatController.contacts[e.key].status = value.get('status');
-  //       //         chatController.contacts[e.key].loginId = value.get('id');
-  //       //         chatController.contacts.refresh();
-  //       //         chatController.update();
-  //       //         if (chatController.contacts[e.key].status == 'Chat') {
-  //       //           chatController.availableChatPersonFromContacts
-  //       //               .add(chatController.contacts[e.key]);
-  //       //           chatController.availableChatPersonFromContacts.refresh();
-  //       //         }
-  //       //         chatController.contacts.refresh();
-  //       //       }
-  //       //     });
-  //     }
-  //     // }).toList();
-  //   }
-  // }
 
   @override
   void initState() {
@@ -276,20 +65,24 @@ class _ContactScreenState extends State<ContactScreen> {
                               .copyWith(fontWeight: FontWeight.w500),
                         ),
                         GestureDetector(
-                          onTap: () => AppWidget.toast(text: 'Coming soon'),
+                          onTap: () {
+                            Get.back();
+                            homeController.selectedIndex.value = 0;
+                            homeController.hostEvent.value = 1;
+                            homeController.update();
+                          },
                           child: Container(
-                            width: 15.w,
+                            width: 20.w,
                             height: 5.h,
                             alignment: Alignment.center,
-                            // padding: paddingSymmetric(
-                            //     horizontalPad: 3.w, verticalPad: 2.w),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(2.w),
                                 color: Colors.white),
                             child: Text(
-                              'Host',
-                              style: AppStyles.smallerTextStyle
-                                  .copyWith(color: Colors.black),
+                              'Host an Event',
+                              textAlign: TextAlign.center,
+                              style: AppStyles.smallerTextStyle.copyWith(
+                                  color: Colors.black, fontSize: 9.sp),
                             ),
                           ),
                         )
@@ -347,8 +140,6 @@ class _ContactScreenState extends State<ContactScreen> {
   }
 
   listViewBuilder({required List? listModel}) {
-    log('Model A${listModel?.first.toString()}');
-
     return chatController.isLoading.value == true
         ? AppWidget.progressIndicator()
         : listModel!.isEmpty
@@ -477,9 +268,6 @@ class _ContactScreenState extends State<ContactScreen> {
                 Get.toNamed(RouteHelper.signUpPage);
               }
             : () async {
-                log('Pe ${await Permission.sms.status.isDenied}');
-                log('Pe ${await Permission.sms.status.isPermanentlyDenied}');
-                // await Permission.sms.request();
                 if (await Permission.sms.status.isDenied == true) {
                   await Permission.sms.request();
                   openAppSettings();
@@ -495,7 +283,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     chatController.contacts[index].status = 'Invited';
                     chatController.contacts.refresh();
                     SharedPrefClass.saveListToSharedPreferences(
-                        con: chatController.contacts.value,
+                        con: chatController.contacts,
                         sharedPrefString: SharedPrefStrings.myContacts);
                   } else {
                     chatController.searchContactListModel[index].status =
@@ -505,7 +293,7 @@ class _ContactScreenState extends State<ContactScreen> {
                         chatController.searchContactListModel[index].status);
                     chatController.contacts.refresh();
                     SharedPrefClass.saveListToSharedPreferences(
-                        con: chatController.contacts.value,
+                        con: chatController.contacts,
                         sharedPrefString: SharedPrefStrings.myContacts);
                     chatController.searchContactListModel.refresh();
                   }
@@ -525,20 +313,8 @@ class _ContactScreenState extends State<ContactScreen> {
                         id: '',
                         fcmToken: '');
                     AppWidget.toast(text: 'Invited');
-
-                    /*
-        }).catchError((onError) {
-          log(onError.toString());
-        });*/
                   });
                 }
-                // if (await Permission.sms.status) {
-                // await FlutterContacts.requestPermission(readonly: true);
-                // AppWidget.toast(
-                // text: 'Please give contact permission to find you friends',
-                // toastLength: Toast.LENGTH_LONG);
-                // openAppSettings();
-                // } else {
               },
         child: Container(
           width: 20.w,
@@ -581,7 +357,6 @@ class _ContactScreenState extends State<ContactScreen> {
               DocumentSnapshot<Map<String, dynamic>> data =
                   await chatController.contactCollection.doc(phoneNumber).get();
 
-              log("pp ${data.get(ApiConstant.id)}");
               String peerId = data.get(ApiConstant.id);
               chatController.peerId.value = peerId;
               chatController.update();
@@ -627,7 +402,6 @@ class _ContactScreenState extends State<ContactScreen> {
                 chatController.peerId.value = peerId.toString();
 
                 chatController.update();
-                log('AAA ${chatController.peerId.toString()}');
                 Get.toNamed(RouteHelper.chatPage);
               }
             },
@@ -640,12 +414,13 @@ class _ContactScreenState extends State<ContactScreen> {
               side: BorderSide(color: ColorConstant.lightOrange)),
         ),
         backgroundColor: MaterialStateProperty.all(
-          Color(0xffFFEFE0),
+          const Color(0xffFFEFE0),
         ),
         overlayColor: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
-            if (states.contains(MaterialState.pressed))
+            if (states.contains(MaterialState.pressed)) {
               return ColorConstant.lightOrange; //<-- SEE HERE
+            }
             return null; // Defer to the widget's default.
           },
         ),
@@ -657,7 +432,6 @@ class _ContactScreenState extends State<ContactScreen> {
       ));
 
   _searchData({String? searchString}) {
-    log('Search String ${searchString.toString()}');
     if (searchString.toString().isEmpty) {
       chatController.searchContactListModel.value = [];
       chatController.searchContactListModel.refresh();

@@ -21,7 +21,7 @@ class AppStrings {
   static String login = 'Login';
   static String continueText = 'Continue';
   static String meetMineCelebrate =
-      'Meet. Dine. Celebrate.\nBeing miles apart shouldn\'t keep you apart.';
+      'Meet. Dine. Celebrate.\nBeing miles apart \nshouldn\'t keep you apart.';
 
   //social login
   static String yourName = 'Hey there! \nWhat\'s your First name?';
@@ -114,7 +114,8 @@ class AppStrings {
 //static String referAndEarn = 'REFER & EARN';
 
   //add event
-  static String inviteMemberForParty = 'Invite members to your party';
+  // static String inviteMemberForParty = 'Invite members to your party';
+  static String inviteMemberForParty = 'Invite friends for an event';
   static String hostEvent = 'Host an Event';
   static String viewEvent = 'View Event';
   static String eventTitle = 'Event title';

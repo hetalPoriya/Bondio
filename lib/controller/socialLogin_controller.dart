@@ -1,11 +1,8 @@
 import 'dart:developer';
-
-import 'package:bondio/controller/auth_controller.dart';
 import 'package:bondio/controller/controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:flutter_insta/flutter_insta.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -25,7 +22,7 @@ class SocialLoginController extends GetxController {
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication? googleAuth =
-      await userData?.authentication;
+          await userData?.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -42,7 +39,6 @@ class SocialLoginController extends GetxController {
       // Once signed in, return the UserCredential
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      log('EE ${userData?.id}');
       await authController.userExistOrNotApi(
           tokenType: 'google_token', token: userData?.id ?? '');
       authController.isLoading(false);
@@ -61,11 +57,9 @@ class SocialLoginController extends GetxController {
     final LoginResult result = await FacebookAuth.instance
         .login(permissions: ['email', 'public_profile']);
 
-    log('STATUS ${result.status}');
-
     // Create a credential from the access token
     final OAuthCredential facebookAuthCredential =
-    FacebookAuthProvider.credential(result.accessToken!.token);
+        FacebookAuthProvider.credential(result.accessToken!.token);
 
     // Once signed in, return the UserCredential
     FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
@@ -74,8 +68,6 @@ class SocialLoginController extends GetxController {
       try {
         final userInfo = await FacebookAuth.instance.getUserData();
 
-        log('USer $userInfo');
-        log('USer ${userInfo['picture']['data']['url']}');
         authController.fullNameController.value.text = userInfo['name'] ?? '';
         authController.emailController.value.text = userInfo['email'] ?? '';
         authController.imageController.value.text =
@@ -103,46 +95,39 @@ class SocialLoginController extends GetxController {
     String clientId = '77qs3v01ir4zv2';
     String clientSecret = '5ZzZmoAjn3KtZblB';
 
-    Get.to(() =>
-        SafeArea(
+    Get.to(() => SafeArea(
           child: Obx(
-                () =>
-                Stack(
-                  children: [
-                    LinkedInUserWidget(
-                      destroySession: true,
-                      redirectUrl: redirectUrl,
-                      clientId: clientId,
-                      clientSecret: clientSecret,
-                      projection: const [
-                        ProjectionParameters.id,
-                        ProjectionParameters.localizedFirstName,
-                        ProjectionParameters.localizedLastName,
-                        ProjectionParameters.firstName,
-                        ProjectionParameters.lastName,
-                        ProjectionParameters.profilePicture,
-                      ],
-                      onError: (final UserFailedAction e) {
-                        authController.isLoading(false);
-                        log('Error: ${e.toString()}');
-                      },
-                      onGetUserProfile:
-                          (final UserSucceededAction linkedInUser) async {
-                        log(
-                          'Access token ${linkedInUser.user.token.accessToken}',
-                        );
-
-                        authController.fullNameController.value.text =
-                            linkedInUser.user.firstName?.localized?.label ?? '';
-                        authController.emailController.value.text = linkedInUser
+            () => Stack(
+              children: [
+                LinkedInUserWidget(
+                  destroySession: true,
+                  redirectUrl: redirectUrl,
+                  clientId: clientId,
+                  clientSecret: clientSecret,
+                  projection: const [
+                    ProjectionParameters.id,
+                    ProjectionParameters.localizedFirstName,
+                    ProjectionParameters.localizedLastName,
+                    ProjectionParameters.firstName,
+                    ProjectionParameters.lastName,
+                    ProjectionParameters.profilePicture,
+                  ],
+                  onError: (final UserFailedAction e) {
+                    authController.isLoading(false);
+                  },
+                  onGetUserProfile:
+                      (final UserSucceededAction linkedInUser) async {
+                    authController.fullNameController.value.text =
+                        linkedInUser.user.firstName?.localized?.label ?? '';
+                    authController.emailController.value.text = linkedInUser
                             .user
                             .email
                             ?.elements
                             ?.first
                             .handleDeep
                             ?.emailAddress ??
-                            '';
-                        authController.imageController.value.text = linkedInUser
+                        '';
+                    authController.imageController.value.text = linkedInUser
                             .user
                             .profilePicture
                             ?.displayImageContent
@@ -151,77 +136,32 @@ class SocialLoginController extends GetxController {
                             .identifiers
                             ?.first
                             .identifier ??
-                            '';
-                        authController.linkedinToken.value =
-                            linkedInUser.user.userId ?? '';
-                        authController.update();
-                        await authController.userExistOrNotApi(
-                            tokenType: 'linkedin_token',
-                            token: linkedInUser.user.userId ?? '');
-                        log('User id: ${linkedInUser.user.userId}');
-                        log('User id: ${linkedInUser.user.userId}');
-                        log('User id: ${linkedInUser
-                            .user
-                            .profilePicture
-                            ?.displayImageContent
-                            ?.elements
-                            ?.first
-                            .identifiers
-                            ?.first
-                            .identifier}');
-                        log('User id: ${linkedInUser.user.email?.elements?.first
-                            .handleDeep?.emailAddress.toString()}');
-                        log('User id: ${linkedInUser.user.firstName?.localized
-                            ?.label.toString()}');
-                      },
-                    ),
-                    if (authController.isLoading.value == true)
-                      AppWidget.containerIndicator()
-                  ],
+                        '';
+                    authController.linkedinToken.value =
+                        linkedInUser.user.userId ?? '';
+                    authController.update();
+                    await authController.userExistOrNotApi(
+                        tokenType: 'linkedin_token',
+                        token: linkedInUser.user.userId ?? '');
+                  },
                 ),
+                if (authController.isLoading.value == true)
+                  AppWidget.containerIndicator()
+              ],
+            ),
           ),
         ));
-    // return LinkedInUserWidget(
-    //   redirectUrl: redirectUrl,
-    //   clientId:clientId,
-    //   clientSecret: clientSecret,
-    //   onGetUserProfile: (UserSucceededAction linkedInUser) {
-    //     log('Access token ${linkedInUser.user.token.accessToken}');
-    //     log('First name: ${linkedInUser.user.firstName?.localized?.label}');
-    //     log('Last name: ${linkedInUser.user.lastName?.localized?.label}');
-    //   },
-    //   onError: (UserFailedAction e) {
-    //     log('Error: ${e.toString()}');
-    //   },
-    // );
   }
 
   signInWithInstagram({required String userName, required String id}) async {
     authController.isLoading(true);
-    // FlutterInsta flutterInsta = new FlutterInsta();
-    // try {
-    //   await flutterInsta.getProfileData(userName);
-    //
-    //   log("Username : ${flutterInsta.username ?? ''}");
-    //   log("Followers : ${flutterInsta.followers ?? ''}");
-    //   log("Folowing : ${flutterInsta.following ?? ''}");
-    //   log("Bio : ${flutterInsta.bio ?? ''}");
-    //   log("Website : ${flutterInsta.website ?? ''}");
-    //   log("Profile Image : ${flutterInsta.imgurl ?? ''}");
-    //   log("Feed images:${flutterInsta.feedImagesUrl ?? ''}");
 
-    authController.fullNameController.value.text = userName ?? '';
-    authController.emailController.value.text = '' ?? '';
+    authController.fullNameController.value.text = userName;
+    authController.emailController.value.text = '';
     authController.imageController.value.clear();
-    //authController.imageController.value.text = '';
-    authController.instagramToken.value = id.toString() ?? '';
+    authController.instagramToken.value = id;
     await authController.userExistOrNotApi(
-        tokenType: 'instagram_token', token: id.toString() ?? '');
-    // } catch (e) {
-    //   authController.isLoading(false);
-    //   log('zas   ${e.toString()}');
-    //   AppWidget.toast(text: 'Please enter correct userName');
-    // } //instagram username;
+        tokenType: 'instagram_token', token: id);
   }
 
   signInWithTwitter() async {
@@ -243,23 +183,16 @@ class SocialLoginController extends GetxController {
         secret: authResult.authTokenSecret!,
       );
 
-      log('sdsdas ${twitterAuthCredential.asMap()}');
-
       // Once signed in, return the UserCredential
       await FirebaseAuth.instance
           .signInWithCredential(twitterAuthCredential)
           .then((value) async {
-        log('Twiter ${value.user}');
-        log('Twiter ${value.additionalUserInfo?.username}');
-        log('Twiter ${value.user?.uid}');
-        log('Twiter ${value.user?.displayName}');
         authController.fullNameController.value.text =
             value.additionalUserInfo?.username ?? '';
         authController.emailController.value.text = value.user?.email ?? '';
         authController.imageController.value.text = value.user?.photoURL ?? '';
         authController.twitterToken.value = value.user?.uid ?? '';
         authController.update();
-        log('Twiter ${authController.fullNameController.value.text}');
         await authController.userExistOrNotApi(
             tokenType: 'twitter_token', token: value.user?.uid ?? '');
       });
@@ -280,12 +213,6 @@ class SocialLoginController extends GetxController {
       await FirebaseAuth.instance
           .signInWithProvider(microsoftProvider)
           .then((value) async {
-        log('Pro ${value.user}');
-        log('Pro ${value.user?.email}');
-        log('Pro ${value.additionalUserInfo?.profile?['givenName']}');
-        log('Pro ${value.user?.photoURL}');
-        log('Pro ${value.user?.uid}');
-
         authController.fullNameController.value.text =
             value.additionalUserInfo?.profile?['givenName'] ?? '';
         authController.emailController.value.text = value.user?.email ?? '';

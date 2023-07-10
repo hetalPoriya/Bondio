@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+
 import 'package:bondio/model/contact_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -94,7 +94,6 @@ class SharedPrefClass {
     List<String> jsonList =
         con.map((contact) => jsonEncode(contact.toMap())).toList();
     await prefs.setStringList(sharedPrefString, jsonList);
-    log('Added');
   }
 
   // Retrieve the list of objects from SharedPreferences
@@ -112,21 +111,4 @@ class SharedPrefClass {
         .toList();
     return persons;
   }
-
-// static Future<void> setMargeModelData(String userData) async {
-//   final SharedPreferences prefs = await SharedPreferences.getInstance();
-//   prefs.setString(AppStrings.margeModel, userData);
-// }
-//
-// static Future<String> getMargeModelData() async {
-//   SharedPreferences pref = await SharedPreferences.getInstance();
-//   String myModel = pref.getString(AppStrings.margeModel) ?? "";
-//   log('MODEL $myModel');
-//   return myModel;
-// }
-// static UserData? getUserDetails() {
-//   String body = getString(PreferencesKey.userModel);
-//   UserModel userModel = UserModel.fromJson(jsonDecode(body));
-//   return userModel.data;
-// }
 }

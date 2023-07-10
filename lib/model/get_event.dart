@@ -107,7 +107,7 @@ class GetEventList {
   String? name;
   String? description;
   String? location;
-  dynamic? date;
+  dynamic date;
   String? time;
   String? photo;
   DateTime? createdAt;
@@ -180,7 +180,7 @@ class Customer {
   String? photo;
   String? photoSocial;
   String? company;
-  dynamic? dob;
+  dynamic dob;
   String? gender;
   String? oPassword;
   String? referCode;

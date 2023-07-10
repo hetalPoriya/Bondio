@@ -84,12 +84,6 @@ class InviteFriend extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 child: SizedBox(
                   height: 6.h,
-                  // decoration: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(10.w),
-                  //     border: Border.all(
-                  //       color: ColorConstant.lightOrange,
-                  //       style: BorderStyle.solid,
-                  //     )),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

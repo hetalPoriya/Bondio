@@ -37,7 +37,7 @@ class InstagramLogin extends StatelessWidget {
   Future<void> buildRedirectToHome(FlutterWebviewPlugin webview,
       InstagramModel instagram, BuildContext context) async {
     SocialLoginController socialLoginController =
-        Get.put(SocialLoginController());
+    Get.put(SocialLoginController());
     webview.onUrlChanged.listen((String url) async {
       log('Utl ${InstagramConstant.redirectUri}');
       if (url.contains(InstagramConstant.redirectUri)) {
@@ -69,12 +69,12 @@ class InstagramLogin extends StatelessWidget {
   }
 
   AppBar buildAppBar(BuildContext context) => AppBar(
-        centerTitle: true,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          'Instagram Login',
-          style: AppStyles.largeTextStyle.copyWith(color: Colors.white),
-        ),
-      );
+    centerTitle: true,
+    elevation: 0,
+    iconTheme: IconThemeData(color: Colors.white),
+    title: Text(
+      'Instagram Login',
+      style: AppStyles.largeTextStyle.copyWith(color: Colors.white),
+    ),
+  );
 }

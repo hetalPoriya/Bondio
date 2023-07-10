@@ -61,29 +61,24 @@ class _AddEventState extends State<AddEvent>
             }
           }
         },
-        appBarWidget: Container(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                smallSizedBox,
-                Text(
-                  'Hello ${authController.userModel.value.user?.name ?? ''},',
-                  style: AppStyles.mediumTextStyle,
-                ),
-                Text(
-                  AppStrings.inviteMemberForParty,
-                  style: AppStyles.smallerTextStyle
-                      .copyWith(fontWeight: FontWeight.w300),
-                ),
-              ]),
-        ),
-        bodyWidget: Container(
+        appBarWidget: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              smallSizedBox,
+              Text(
+                'Hello ${authController.userModel.value.user?.name ?? ''},',
+                style: AppStyles.mediumTextStyle,
+              ),
+              Text(
+                AppStrings.inviteMemberForParty,
+                style: AppStyles.smallerTextStyle
+                    .copyWith(fontWeight: FontWeight.w300),
+              ),
+            ]),
+        bodyWidget: SizedBox(
           //color: Colors.redAccent,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
+          width: MediaQuery.of(context).size.width,
           child: Column(
             children: [
               mediumSizedBox,
@@ -126,7 +121,7 @@ class _AddEventState extends State<AddEvent>
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(6.w),
                               border:
-                              Border.all(color: Colors.black12, width: 1)),
+                                  Border.all(color: Colors.black12, width: 1)),
                           child: Align(
                             alignment: Alignment.center,
                             child: Text(AppStrings.hostEvent),
@@ -138,7 +133,7 @@ class _AddEventState extends State<AddEvent>
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(6.w),
                               border:
-                              Border.all(color: Colors.black12, width: 1)),
+                                  Border.all(color: Colors.black12, width: 1)),
                           child: Align(
                             alignment: Alignment.center,
                             child: Text(AppStrings.viewEvent),
@@ -147,12 +142,8 @@ class _AddEventState extends State<AddEvent>
                       ),
                     ]),
               ),
-              Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * .60,
-                //color: Colors.black38,
+              SizedBox(
+                height: MediaQuery.of(context).size.height * .60,
                 child: TabBarView(
                     controller: tabController, children: displayPage),
               )

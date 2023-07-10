@@ -1,11 +1,14 @@
 import 'package:bondio/screens/about_us.dart';
 import 'package:bondio/screens/auth/auth.dart';
+import 'package:bondio/screens/bondio_cookies.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/dashboard.dart';
 import 'package:bondio/screens/home_screen.dart';
 import 'package:bondio/screens/host_event/add_event.dart';
 import 'package:bondio/screens/instagram_login.dart';
+import 'package:bondio/screens/privacy_policy.dart';
 import 'package:bondio/screens/profile_page.dart';
+import 'package:bondio/screens/terms_and_conditions.dart';
 import 'package:get/get.dart';
 import '../screens/reward_and_share/reward_and_share.dart';
 
@@ -38,6 +41,9 @@ class RouteHelper {
   static String forgotPassword = '/forgotPassword';
   static String profilePage = '/profilePage';
   static String aboutUs = '/aboutUs';
+  static String termsAndConditions = '/termsAndConditions';
+  static String privacyPolicy = '/privacyPolicy';
+  static String bondioCookies = '/bondioCookies';
   static String instagramLogin = '/instagramLogin';
   static String addEvent = '/addEvent';
 
@@ -48,7 +54,7 @@ class RouteHelper {
     GetPage(name: dashBoard, page: () => DashBoard()),
     GetPage(name: loginPage, page: () => const LoginPage()),
     GetPage(name: signUpPage, page: () => const SignUpPage()),
-    GetPage(name: newPassword, page: () => NewPassword()),
+    GetPage(name: newPassword, page: () => const NewPassword()),
     GetPage(name: inviteCodeSignUp, page: () => const InviteCodeSignUp()),
     GetPage(name: socialSignUpPage, page: () => const SocialLoginScreen()),
     GetPage(name: verifyEmail, page: () => const VerifyEmail()),
@@ -67,11 +73,14 @@ class RouteHelper {
 
     GetPage(name: profilePage, page: () => const ProfilePage()),
     GetPage(name: aboutUs, page: () => const AboutUs()),
+    GetPage(name: termsAndConditions, page: () => const TermsAndConditions()),
+    GetPage(name: privacyPolicy, page: () => const PrivacyPolicy()),
+    GetPage(name: bondioCookies, page: () => const BondioCookies()),
     GetPage(name: selectGroupMember, page: () => const SelectGroupMember()),
     GetPage(name: addParticipant, page: () => const AddParticipant()),
     GetPage(name: removeParticipant, page: () => const RemoveParticipant()),
     GetPage(name: createGroup, page: () => CreateGroup()),
-    GetPage(name: instagramLogin, page: () => InstagramLogin()),
-    GetPage(name: addEvent, page: () => AddEvent()),
+    GetPage(name: instagramLogin, page: () => const InstagramLogin()),
+    GetPage(name: addEvent, page: () => const AddEvent()),
   ];
 }

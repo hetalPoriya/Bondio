@@ -49,39 +49,6 @@ class CreateGroup extends StatelessWidget {
                           }
                         }),
             )),
-        // GestureDetector(
-        //   onTap: () async {
-        //     await chatController.createGroup(
-        //         userName: authController.userModel.value.user!.name.toString(),
-        //         groupName: chatController.groupNameController.value.text);
-        //     homeController.onTapOnAddContact.value = false;
-        //     homeController.onTapOnAddGroupMember.value = false;
-        //     Get.back();
-        //     homeController.selectedIndex.value = 1;
-        //     homeController.innerTabSelectedIndex.value = 1;
-        //     homeController.update();
-        //   },
-        //   child: Container(
-        //     alignment: Alignment.center,
-        //     width: 25.w,
-        //     height: 4.h,
-        //     decoration: BoxDecoration(
-        //       color: ColorConstant.backGroundColorOrange,
-        //       boxShadow: const [
-        //         BoxShadow(
-        //             blurRadius: 1,
-        //             offset: Offset(
-        //               0.0,
-        //               0.0,
-        //             ),
-        //             color: Colors.black12,
-        //             spreadRadius: 1)
-        //       ],
-        //       borderRadius: BorderRadius.circular(4.w),
-        //     ),
-        //     child: Text('done', style: AppStyles.smallTextStyle),
-        //   ),
-        // ),
         bodyWidget: ListView(
           shrinkWrap: true,
           physics: const ClampingScrollPhysics(),
@@ -107,7 +74,6 @@ class CreateGroup extends StatelessWidget {
               height: 10.h,
               alignment: Alignment.centerLeft,
               margin: paddingSymmetric(verticalPad: 1.h),
-              //color: Colors.green,
               child: Padding(
                 padding: EdgeInsets.only(left: 7.w),
                 child: SingleChildScrollView(

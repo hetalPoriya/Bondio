@@ -41,15 +41,14 @@ class _GroupChatListState extends State<GroupChatList> {
                 chatController.searchController.refresh();
                 chatController.searchGroupInfoList.value = chatController
                     .groupInfoList
-                    .where((x) =>
-                (x.groupName
-                    .toString()
-                    .toLowerCase()
-                    .contains(searchText.toString()) ||
-                    x.groupName
-                        .toString()
-                        .toUpperCase()
-                        .contains(searchText.toString())))
+                    .where((x) => (x.groupName
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toString()) ||
+                        x.groupName
+                            .toString()
+                            .toUpperCase()
+                            .contains(searchText.toString())))
                     .toList();
               }),
         ),
@@ -57,65 +56,62 @@ class _GroupChatListState extends State<GroupChatList> {
         Padding(
             padding: paddingSymmetric(horizontalPad: 6.w, verticalPad: 00),
             child: Obx(
-                  () =>
-                  Row(
-                    children: [
-                      ChatWidget.tabContainer(
-                        text: 'Active',
-                        index: 0,
-                        textColor: homeController
-                            .innerTabForActiveAndArchiveIndexForGroup
-                            .value ==
+              () => Row(
+                children: [
+                  ChatWidget.tabContainer(
+                    text: 'Active',
+                    index: 0,
+                    textColor: homeController
+                                .innerTabForActiveAndArchiveIndexForGroup
+                                .value ==
                             0
-                            ? Colors.white
-                            : Colors.grey,
-                        color: homeController
-                            .innerTabForActiveAndArchiveIndexForGroup
-                            .value ==
+                        ? Colors.white
+                        : Colors.grey,
+                    color: homeController
+                                .innerTabForActiveAndArchiveIndexForGroup
+                                .value ==
                             0
-                            ? [ColorConstant.darkRed, ColorConstant.lightRed]
-                            : [Colors.white, Colors.white],
-                        onTap: () {
-                          homeController
-                              .innerTabForActiveAndArchiveIndexForGroup.value =
-                          0;
+                        ? [ColorConstant.darkRed, ColorConstant.lightRed]
+                        : [Colors.white, Colors.white],
+                    onTap: () {
+                      homeController
+                          .innerTabForActiveAndArchiveIndexForGroup.value = 0;
 
-                          homeController.update();
-                        },
-                      ),
-                      SizedBox(
-                        width: 4.w,
-                      ),
-                      ChatWidget.tabContainer(
-                        textColor: homeController
-                            .innerTabForActiveAndArchiveIndexForGroup
-                            .value ==
-                            1
-                            ? Colors.white
-                            : Colors.grey,
-                        color: homeController
-                            .innerTabForActiveAndArchiveIndexForGroup
-                            .value ==
-                            1
-                            ? [ColorConstant.darkRed, ColorConstant.lightRed]
-                            : [Colors.white, Colors.white],
-                        text: 'Archive',
-                        index: 1,
-                        onTap: () {
-                          homeController
-                              .innerTabForActiveAndArchiveIndexForGroup.value =
-                          1;
-                          homeController.update();
-                        },
-                      ),
-                    ],
+                      homeController.update();
+                    },
                   ),
+                  SizedBox(
+                    width: 4.w,
+                  ),
+                  ChatWidget.tabContainer(
+                    textColor: homeController
+                                .innerTabForActiveAndArchiveIndexForGroup
+                                .value ==
+                            1
+                        ? Colors.white
+                        : Colors.grey,
+                    color: homeController
+                                .innerTabForActiveAndArchiveIndexForGroup
+                                .value ==
+                            1
+                        ? [ColorConstant.darkRed, ColorConstant.lightRed]
+                        : [Colors.white, Colors.white],
+                    text: 'Archive',
+                    index: 1,
+                    onTap: () {
+                      homeController
+                          .innerTabForActiveAndArchiveIndexForGroup.value = 1;
+                      homeController.update();
+                    },
+                  ),
+                ],
+              ),
             )),
         StreamBuilder(
             stream: chatController.groupChatRoomCollection
                 .where(ApiConstant.membersId,
-                arrayContains:
-                authController.userModel.value.user?.id.toString())
+                    arrayContains:
+                        authController.userModel.value.user?.id.toString())
                 .orderBy(ApiConstant.timestamp, descending: true)
                 .snapshots(),
             builder: ((context, snapshot) {
@@ -132,70 +128,70 @@ class _GroupChatListState extends State<GroupChatList> {
               return snapshot.data!.docs.isEmpty
                   ? ChatWidget.noConversionFound()
                   : Obx(() {
-                return chatController.searchController.value.text.isEmpty
-                    ? displayList(
-                    groupChatList: chatController.groupInfoList)
-                    : displayList(
-                    groupChatList:
-                    chatController.searchGroupInfoList);
-              });
+                      return chatController.searchController.value.text.isEmpty
+                          ? displayList(
+                              groupChatList: chatController.groupInfoList)
+                          : displayList(
+                              groupChatList:
+                                  chatController.searchGroupInfoList);
+                    });
             }))
       ],
     );
   }
 
-  displayList({required RxList groupChatList}) =>
-      ListView.builder(
-          padding: paddingSymmetric(verticalPad: 1.h),
-          shrinkWrap: true,
-          itemCount: groupChatList.length,
-          physics: const ClampingScrollPhysics(),
-          itemBuilder: ((context, index) {
-            GroupChat groupInfo = groupChatList[index];
-            return StreamBuilder(
-              stream: chatController.groupChatRoomCollection
-                  .doc(groupInfo.groupId.toString())
-                  .collection(groupInfo.groupId.toString())
-                  .orderBy(ApiConstant.timestamp, descending: true)
-                  .snapshots(),
-              builder: (context, messageSnap) {
-                if (!messageSnap.hasData) {
-                  return SizedBox();
-                }
-                if (messageSnap.hasData) {
-                  List<DocumentSnapshot>? documentList = messageSnap.data?.docs
-                      .where((element) =>
-                  (element.get(ApiConstant.idFrom) !=
-                      authController.userModel.value.user?.id.toString() &&
+  displayList({required RxList groupChatList}) => ListView.builder(
+      padding: paddingSymmetric(verticalPad: 1.h),
+      shrinkWrap: true,
+      itemCount: groupChatList.length,
+      physics: const ClampingScrollPhysics(),
+      itemBuilder: ((context, index) {
+        GroupChat groupInfo = groupChatList[index];
+        return StreamBuilder(
+          stream: chatController.groupChatRoomCollection
+              .doc(groupInfo.groupId.toString())
+              .collection(groupInfo.groupId.toString())
+              .orderBy(ApiConstant.timestamp, descending: true)
+              .snapshots(),
+          builder: (context, messageSnap) {
+            if (!messageSnap.hasData) {
+              return const SizedBox();
+            }
+            if (messageSnap.hasData) {
+              List<DocumentSnapshot>? documentList = messageSnap.data?.docs
+                  .where((element) => (element.get(ApiConstant.idFrom) !=
+                          authController.userModel.value.user?.id.toString() &&
                       element.get(ApiConstant.isReadFGroup).toString().contains(
                           authController.userModel.value.user?.id.toString() ??
                               '')))
-                      .toList();
+                  .toList();
 
-                  int chatInt =
+              int chatInt =
                   SharedPrefClass.getInt(SharedPrefStrings.totalChatCount);
-                  chatInt = chatInt + (documentList?.length ?? 0);
-                  SharedPrefClass.setInt(
-                      SharedPrefStrings.totalChatCount, chatInt);
-                  int innn =
+              chatInt = chatInt + (documentList?.length ?? 0);
+              SharedPrefClass.setInt(SharedPrefStrings.totalChatCount, chatInt);
+              int innn =
                   SharedPrefClass.getInt(SharedPrefStrings.totalChatCount);
-                  chatController.totalChatMessages.value = innn;
-
-                  return Obx(() =>
-                      Padding(
-                        padding:
+              chatController.totalChatMessages.value = innn;
+              var time;
+              if (groupInfo.isEvent == true) {
+                time = AppWidget.getTime(
+                    date: groupInfo.eventDate ?? '',
+                    time: DateFormat('kk:mm a').format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                                int.parse(groupInfo.timestamp.toString()))) ??
+                        '');
+              }
+              return Obx(() => Padding(
+                    padding:
                         paddingSymmetric(horizontalPad: 5.w, verticalPad: 1.h),
-                        child: ((homeController
-                            .innerTabForActiveAndArchiveIndexForGroup.value ==
-                            0 && groupInfo.isArchive?.contains(authController
-                            .userModel.value.user?.id.toString()) == false) ||
-                            (homeController
-                                .innerTabForActiveAndArchiveIndexForGroup
-                                .value == 1 &&
-                                groupInfo.isArchive?.contains(authController
-                                    .userModel.value.user?.id.toString()) ==
+                    child: ((homeController.innerTabForActiveAndArchiveIndexForGroup.value == 0 &&
+                                groupInfo.isArchive?.contains(authController.userModel.value.user?.id.toString()) ==
+                                    false) ||
+                            (homeController.innerTabForActiveAndArchiveIndexForGroup.value == 1 &&
+                                groupInfo.isArchive?.contains(authController.userModel.value.user?.id.toString()) ==
                                     true))
-                            ? GestureDetector(
+                        ? GestureDetector(
                             onTap: () async {
                               homeController.personalChatPage.value = false;
                               homeController.personalGroupChatPage.value = true;
@@ -210,42 +206,32 @@ class _GroupChatListState extends State<GroupChatList> {
                             },
                             child: groupInfo.isEvent == false
                                 ? ChatWidget.chatContainer(
-                                isPinned: groupInfo.isArchive?.contains(
-                                    authController.userModel.value.user?.id
-                                        .toString()) == true
-                                    ? true
-                                    : false,
-                                isNotRead: documentList?.length != 0
-                                    ? false
-                                    : true,
-                                chatCount: documentList?.length,
-                                titleText: groupInfo.groupName.toString(),
-                                imageString: groupInfo.groupIcon.toString(),
-                                subText:
-                                groupInfo.lastMessage.toString()
-                                ,
-                                time: groupInfo.timestamp.toString())
+                                    isPinned: groupInfo.isArchive?.contains(authController.userModel.value.user?.id.toString()) == true
+                                        ? true
+                                        : false,
+                                    isNotRead: documentList?.length != 0
+                                        ? false
+                                        : true,
+                                    chatCount: documentList?.length,
+                                    titleText: groupInfo.groupName.toString(),
+                                    imageString: groupInfo.groupIcon.toString(),
+                                    subText: groupInfo.lastMessage.toString(),
+                                    time: groupInfo.timestamp.toString())
                                 : ChatWidget.eventContainer(
-                                invitedBy: (groupInfo.isAdmin?[0] ==
-                                    authController.userModel.value.user?.id
-                                        .toString())
-                                    ? 'Invited by you'
-                                    : '',
-                                title: groupInfo.groupName.toString(),
-                                imageString: groupInfo.groupIcon.toString(),
-                                description: groupInfo.lastMessage.toString(),
-                                time: DateFormat('kk:mm a').format(DateTime
-                                    .fromMillisecondsSinceEpoch(
-                                    int.parse(groupInfo.timestamp.toString()))),
-                                date: groupInfo.eventDate.toString(),
-                                memberList: groupInfo.members!.length
-                                    .toString()))
-                            : Container(),
-                      ));
-                } else {
-                  return SizedBox();
-                }
-              },
-            );
-          }));
+                                    invitedBy:
+                                        (groupInfo.isAdmin?[0] == authController.userModel.value.user?.id.toString()) ? 'Invited by you' : '',
+                                    title: groupInfo.groupName.toString(),
+                                    imageString: groupInfo.groupIcon.toString(),
+                                    description: groupInfo.lastMessage.toString(),
+                                    time: time,
+                                    date: groupInfo.eventDate.toString(),
+                                    memberList: groupInfo.members!.length.toString()))
+                        : Container(),
+                  ));
+            } else {
+              return const SizedBox();
+            }
+          },
+        );
+      }));
 }

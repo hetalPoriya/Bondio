@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -50,44 +47,7 @@ class ForgotPassword extends StatelessWidget {
                     ],
                   ),
                   smallSizedBox,
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white),
-                              borderRadius: BorderRadius.circular(3.w)),
-                          child: CountryCodePicker(
-                            initialSelection: 'US',
-                            onChanged: ((value) {
-                              authController.countryCodeController.value.text =
-                                  value.dialCode.toString();
-                              authController.update();
-                              log('Auth ${authController.countryCodeController.value.text}');
-                            }),
-                            textStyle: AppStyles.smallTextStyle
-                                .copyWith(color: Colors.white),
-                            padding: paddingSymmetric(
-                                horizontalPad: 00, verticalPad: 2),
-                            showDropDownButton: true,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 2.w,
-                      ),
-                      Flexible(
-                        flex: 2,
-                        child: AppWidget.textFormFiledWhite(
-                            textEditingController:
-                                authController.mobileController.value,
-                            hintText: AppStrings.mobileNumber,
-                            textInputType: TextInputType.number),
-                      ),
-                    ],
-                  ),
+                  AppWidget.phoneNumberTextField(),
                   largeSizedBox,
 
                   Obx(
@@ -108,13 +68,8 @@ class ForgotPassword extends StatelessWidget {
 
                             await authController.forgotPasswordOtpApiCall();
                           } else {
-                            if (authController
-                                .countryCodeController.value.text.isEmpty) {
-                              authController.countryCodeController.value.text =
-                                  '+1';
-                            }
                             authController.emailOrPhone.value =
-                                '${authController.countryCodeController.value.text}${authController.mobileController.value.text}';
+                                authController.mobileController.value.text;
                             authController.update();
 
                             await authController.forgotPasswordOtpApiCall();

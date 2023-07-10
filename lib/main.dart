@@ -1,5 +1,8 @@
+import 'dart:developer';
 import 'dart:io';
-
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:bondio/screens/chat/chat.dart';
@@ -20,10 +23,25 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
+void convertLocalToDetroit() async {
+  tz.initializeTimeZones();
+  final String locationName = await FlutterNativeTimezone.getLocalTimezone();
+  SharedPrefClass.setString(SharedPrefStrings.locationName, locationName);
+  // DateTime indiaTime = DateTime.now(); //Emulator time is India time
+  // final detroitTime =
+  //     new tz.TZDateTime.from(indiaTime, tz.getLocation(locationName));
+  // print('Local India Time: ' + indiaTime.toString());
+  // print('Detroit Time: ' + detroitTime.toString());
+
+  // Local India Time: 2023-07-07 10:08:19.583495
+  // I/flutter ( 3844): Detroit Time: 2023-07-07 10:08:19.583495+0530
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   HttpOverrides.global = MyHttpOverrides();
+
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
   // SystemChrome.setPreferredOrientations(
   //     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
@@ -34,8 +52,11 @@ void main() async {
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await SharedPrefClass.getInstance();
   await ChatWidget.getUserInfo();
-  runApp(const MyApp());
-  // runApp(
+  tz.initializeTimeZones();
+  final String locationName = await FlutterNativeTimezone.getLocalTimezone();
+  SharedPrefClass.setString(SharedPrefStrings.locationName, locationName);
+  runApp(MyApp());
+// runApp(
   //   DevicePreview(
   //     enabled: !kReleaseMode,
   //     builder: (context) => MyApp(), // Wrap your app
@@ -53,8 +74,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   HomeController homeController = Get.put(HomeController());
   AuthController authController = Get.put(AuthController());
-
-  FirebaseController firebaseController = Get.put(FirebaseController());
 
   @override
   void initState() {
@@ -94,12 +113,11 @@ class _MyAppState extends State<MyApp> {
               criticalAlert: false,
               sound: true,
               provisional: false);
-      print("user granted permission : ${settings.authorizationStatus}");
     }
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('mipmap/ic_launcher');
+        const AndroidInitializationSettings('mipmap/ic_launcher');
 
     /// Note: permissions aren't requested here just to demonstrate that can be
     /// done later
@@ -140,8 +158,6 @@ class _MyAppState extends State<MyApp> {
         ?.createNotificationChannel(channel);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-      print("message received");
-      print(event.notification!.body ?? "");
       RemoteNotification? notification = event.notification;
       AndroidNotification? android = event.notification?.android;
       if (notification != null && android != null) {
@@ -161,12 +177,12 @@ class _MyAppState extends State<MyApp> {
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('Message clicked!');
+      log('Message clicked!');
     });
   }
 }
 
 Future<void> _messageHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('background message ${message.notification?.body}');
+  log('background message ${message.notification?.body}');
 }

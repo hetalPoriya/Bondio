@@ -194,8 +194,7 @@ class _SelectGroupMemberState extends State<SelectGroupMember> {
                           ),
                         ),
                       Obx(
-                        () => chatController
-                                    .availableChatPersonFromContacts.value ==
+                        () => chatController.availableChatPersonFromContacts ==
                                 []
                             ? AppWidget.progressIndicator()
                             : chatController.searchController.value.text.isEmpty

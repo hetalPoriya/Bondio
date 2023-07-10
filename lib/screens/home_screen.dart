@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/reward_and_share/reward_and_share.dart';
@@ -16,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // static int selectedIndex = 0;
+
 
   List<Widget>? homeWidget;
 
@@ -24,20 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   HomeController homeController = Get.put(HomeController());
   ChatController chatController = Get.put(ChatController());
 
-  // void getChatList() async {
-  //   QuerySnapshot<Map<String, dynamic>> isChatListAvailable =
-  //       await FirebaseFirestore.instance
-  //           .collection(AppStrings.chatUserListCollection)
-  //           .doc(SharedPrefClass.getString(SharedPrefStrings.userId))
-  //           .collection(SharedPrefClass.getString(SharedPrefStrings.userId))
-  //           .get();
-  //
-  //   // log('isChatListAvailable.docs.length ${isChatListAvailable.docs.length}');
-  //   if (isChatListAvailable.docs.isNotEmpty) {
-  //     SharedPrefClass.setBool(
-  //         SharedPrefStrings.isDisplayContactScreenFirstTime, false);
-  //   }
-  // }
 
   @override
   void initState() {
@@ -55,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
       homeController.update();
     }
 
-    //ChatWidget.fetchContacts();
     super.initState();
   }
 
@@ -65,16 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: true,
         child: Scaffold(
             drawer: AppWidget.drawerWidget(),
-            //key: scaffoldKey,
+
             backgroundColor: ColorConstant.lightGrey,
             body: Obx(
-              () {
+                  () {
                 return homeWidget!
                     .elementAt(homeController.selectedIndex.value);
               },
             ),
             bottomNavigationBar: Obx(
-              () {
+                  () {
                 return Material(
                   elevation: 4,
                   shadowColor: Colors.black,
@@ -107,7 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             index: 0),
                         bottomItem(
                             text:
-                                'Chat ${SharedPrefClass.getInt(SharedPrefStrings.totalChatCount) != 0 ? '(${SharedPrefClass.getInt(SharedPrefStrings.totalChatCount)})' : ''}',
+                            'Chat ${SharedPrefClass.getInt(
+                                SharedPrefStrings.totalChatCount) != 0
+                                ? '(${SharedPrefClass.getInt(SharedPrefStrings
+                                .totalChatCount)})'
+                                : ''}',
                             imageString: AppAssets.chat,
                             index: 1),
                         bottomItem(
@@ -122,10 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
             )));
   }
 
-  BottomNavyBarItem bottomItem(
-          {required String text,
-          required String imageString,
-          required int index}) =>
+  BottomNavyBarItem bottomItem({required String text,
+    required String imageString,
+    required int index}) =>
       BottomNavyBarItem(
         title: Text(
           text,

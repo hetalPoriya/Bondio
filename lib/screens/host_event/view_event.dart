@@ -6,7 +6,9 @@ import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/host_event/event_details.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class ViewEvent extends StatefulWidget {
   ViewEvent({Key? key}) : super(key: key);
@@ -29,6 +31,37 @@ class _ViewEventState extends State<ViewEvent> {
     super.initState();
   }
 
+  static String convertDateTimeToTimeZone(DateTime dateTime, String timeZone) {
+    // Get the target time zone
+    final targetTimeZone = tz.getLocation(timeZone);
+
+    // Convert the date and time to the target time zone
+    final convertedDateTime = tz.TZDateTime.from(dateTime, targetTimeZone);
+
+    // Format the converted date and time
+    final outputFormat = DateFormat.yMd().add_jm();
+    final formattedDateTime = outputFormat.format(convertedDateTime);
+
+    return formattedDateTime;
+
+    // final String locationName = await FlutterNativeTimezone.getLocalTimezone();
+    //
+    // log('Location ${locationName}');
+    // final originalDateTime =
+    // DateTime(2023, 7, 10, 13, 53); // Specify the original date and time
+    //
+    // final convertedDateTime1 =
+    // convertDateTimeToTimeZone(originalDateTime, locationName);
+    // final convertedDateTime2 =
+    // convertDateTimeToTimeZone(originalDateTime, 'Europe/London');
+    // final convertedDateTime3 =
+    // convertDateTimeToTimeZone(originalDateTime, 'Asia/Tokyo');
+    //
+    // log('Converted TIme ${convertedDateTime1}');
+    // log('Converted TIme ${convertedDateTime2}');
+    // log('Converted TIme ${convertedDateTime3}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() => homeController.viewEvent.value == 0
@@ -44,10 +77,13 @@ class _ViewEventState extends State<ViewEvent> {
                         itemCount:
                             eventController.getEventList.value.data?.length,
                         itemBuilder: (context, index) {
-                          log('Lengh ${eventController.getEventList.value.data?.length}');
                           var response =
                               eventController.getEventList.value.data?[index];
-
+                          log('Date ${response?.date}');
+                          log('Date ${response?.time.toString().trim().substring(0, response.time!.length - 3)}');
+                          var time = AppWidget.getTime(
+                              date: response?.date ?? '',
+                              time: response?.time ?? '');
                           return Padding(
                             padding: paddingSymmetric(
                                 horizontalPad: 5.w, verticalPad: 1.h),
@@ -73,7 +109,7 @@ class _ViewEventState extends State<ViewEvent> {
                                   title: response?.name ?? '',
                                   description: response?.description ?? '',
                                   date: response?.date ?? '',
-                                  time: response?.time ?? '',
+                                  time: time ?? '',
                                   memberList:
                                       response?.customers?.length.toString() ??
                                           '0',
@@ -89,7 +125,7 @@ class _ViewEventState extends State<ViewEvent> {
                         padding: paddingSymmetric(
                             horizontalPad: 0.w, verticalPad: 2.h),
                       )
-        : EventDetails());
+        : const EventDetails());
   }
 }
 

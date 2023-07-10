@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/route_helper/route_helper.dart';
 import 'package:flutter/material.dart';
@@ -46,22 +45,6 @@ class _SplashScreenState extends State<SplashScreen> {
                     style: AppStyles.mediumTextStyle,
                     textAlign: TextAlign.center,
                   ),
-                  // child: DefaultTextStyle(
-                  //   textAlign: TextAlign.center,
-                  //   style: AppStyles.mediumTextStyle,
-                  //   child: AnimatedTextKit(
-                  //     animatedTexts: [
-                  //       TyperAnimatedText(
-                  //       AppStrings.meetMineCelebrate,
-                  //           textStyle: AppStyles.mediumTextStyle,
-                  //           textAlign: TextAlign.center,
-                  //           speed: const Duration(milliseconds: 80)),
-                  //     ],
-                  //     onTap: () {
-                  //       print("Tap Event");
-                  //     },
-                  //   ),
-                  // ),
                 ),
               ],
             )),

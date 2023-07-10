@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:bondio/controller/controller.dart';
-import 'package:bondio/model/get_event.dart';
+import 'package:bondio/model/model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
@@ -44,11 +44,10 @@ class EventController extends GetxController {
         options: Options(headers: {
           'Accept': 'application/json',
           'Authorization':
-          'Bearer ${authController.userModel.value.token.toString()}'
+              'Bearer ${authController.userModel.value.token.toString()}'
         }),
       );
 
-      log('GetEvents ${response.data.toString()}');
       if (response.data['Status'] == true) {
         getEventList.value.data = [];
         GetEvent data = GetEvent.fromMap(response.data);
@@ -58,7 +57,7 @@ class EventController extends GetxController {
         AppWidget.toast(text: response.data['Msg'].toString());
       }
     } on DioError catch (e) {
-      log('E ${e.toString()}');
+      AppWidget.toast(text: e.toString());
     } finally {
       isLoading(false);
     }
@@ -67,25 +66,32 @@ class EventController extends GetxController {
   updateEventApiCall() async {
     try {
       isLoading(true);
-      UpdateEventBody updateEventBody = UpdateEventBody(
-          name: eventTitleController.value.text.toString(),
-          description: eventDesController.value.text.toString(),
-          date: selectedDate.toString(),
-          time: selectedTime.value.toString(),
-          location: eventLocationController.value.text.toString(),
-          photo: ' ',
-          id: eventId.toString() ?? '',
-          users: memberList.toString());
 
-      log(ApiConstant.buildUrl(ApiConstant.updateEventApi));
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.updateEventApi),
-        data: updateEventToMap(updateEventBody),
+        data: FormData.fromMap({
+          "name": eventTitleController.value.text.toString(),
+          "description": eventDesController.value.text.toString(),
+          "date": selectedDate.toString(),
+          "time": selectedTime.value.toString(),
+          "location": eventLocationController.value.text.toString(),
+          "id": eventId.value,
+        }),
         options: NetworkHandler.options,
       );
 
       if (response.data['Status'] == true) {
-        AppWidget.toast(text: 'Event update successfully');
+        UpdateEventModel updateEvent = UpdateEventModel.fromMap(response.data);
+
+        chatController.groupChatRoomCollection
+            .doc(updateEvent.data?.id.toString())
+            .update({
+          ApiConstant.groupName: updateEvent.data?.name ?? '',
+          ApiConstant.eventDescription: updateEvent.data?.description ?? '',
+          ApiConstant.eventDate: updateEvent.data?.date ?? '',
+          ApiConstant.eventTimeChat: updateEvent.data?.time ?? '',
+          ApiConstant.eventLocation: updateEvent.data?.location ?? '',
+        });
         homeController.hostEvent.value = 0;
         eventId.value = '';
         eventTitleController.value.clear();
@@ -101,23 +107,69 @@ class EventController extends GetxController {
     }
   }
 
+  updateEventNameApiCall(
+      {required String eventId, required String name}) async {
+    try {
+      isLoading(true);
+
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.updateEventApi),
+        data: FormData.fromMap({
+          "name": name,
+          "id": eventId,
+        }),
+        options: NetworkHandler.options,
+      );
+
+      if (response.data['Status'] == true) {
+        UpdateEventModel updateEvent = UpdateEventModel.fromMap(response.data);
+
+        chatController.groupChatRoomCollection
+            .doc(chatController.groupInfo.value.groupId.toString())
+            .update({ApiConstant.groupName: updateEvent.data?.name.toString()});
+      } else {
+        AppWidget.toast(text: response.data['Msg'].toString());
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  updateEventMembersApiCall(
+      {required String eventMembers, required String eventId}) async {
+    try {
+      isLoading(true);
+      log(ApiConstant.buildUrl(ApiConstant.updateEventApi));
+      var response = await dio.post(
+        ApiConstant.buildUrl(ApiConstant.updateEventApi),
+        data:
+            FormData.fromMap({'id': eventId, 'users': eventMembers.toString()}),
+        options: NetworkHandler.options,
+      );
+
+      if (response.data['Status'] == true) {
+      } else {
+        AppWidget.toast(text: response.data['Msg'].toString());
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
+
   createEventApiCall() async {
     try {
       isLoading(true);
-      List<String> member = [];
-      String memberString = '';
-      eventPeopleList.map((element) {
-        member.add(element.id.toString());
-      }).toList();
+      String members = '';
+      var value = eventPeopleList.map((e) => e.id.toString()).toList();
+      members = value.join(',');
 
+      log('Memerrs ${members}');
       var response = await dio.post(
         ApiConstant.buildUrl(ApiConstant.createEventApi),
         data: FormData.fromMap({
           'name': eventTitleController.value.text.toString(),
           'description': eventDesController.value.text.toString(),
-          'date': selectedDate
-              .toString()
-              .isEmpty
+          'date': selectedDate.toString().isEmpty
               ? DateFormat('dd-MM-yyyy').format(DateTime.now())
               : selectedDate.value.toString(),
           'time': selectedTime.value.isEmpty
@@ -125,26 +177,30 @@ class EventController extends GetxController {
               : selectedTime.value.toString(),
           'location': eventLocationController.value.text.toString(),
           'photo': ' ',
-          'users': member
+          'users': members.toString()
         }),
         options: Options(headers: {
           'Accept': 'application/json',
           'Authorization':
-          'Bearer ${authController.userModel.value.token.toString()}'
+              'Bearer ${authController.userModel.value.token.toString()}'
         }),
       );
 
-      log('RE ${response.data}');
       if (response.data['Status'] == true) {
         AppWidget.toast(text: 'Event added successfully');
-
+        UpdateEventModel updateEvent = UpdateEventModel.fromMap(response.data);
+        log("Update Event ${updateEvent.data?.id}");
+        log("Update Event ${updateEvent.data?.toMap()}");
         chatController
-            .createGroup(
-            userName: authController.userModel.value.user?.name ?? '',
-            groupName: eventTitleController.value.text,
-            eventDes: eventDesController.value.text,
-            isEvent: true,
-            eventDate: selectedDate.value.toString())
+            .createGroupEvent(
+                userName: authController.userModel.value.user?.name ?? '',
+                eventTitle: updateEvent.data?.name ?? '',
+                eventDes: updateEvent.data?.description ?? '',
+                isEvent: true,
+                eventLocation: updateEvent.data?.location ?? '',
+                eventId: updateEvent.data?.id.toString(),
+                eventTime: updateEvent.data?.time ?? '',
+                eventDate: updateEvent.data?.date ?? '')
             .then((value) {
           homeController.selectedIndex.value = 1;
           homeController.innerTabSelectedIndex.value = 1;

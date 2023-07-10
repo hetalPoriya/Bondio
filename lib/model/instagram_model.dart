@@ -29,7 +29,6 @@ class InstagramModel {
       'grant_type': 'authorization_code'
     });
     accessToken = json.decode(response.body)['access_token'];
-    print(accessToken);
     userID = json.decode(response.body)['user_id'].toString();
     return (accessToken != null && userID != null) ? true : false;
   }
@@ -44,9 +43,6 @@ class InstagramModel {
     };
 
     username = json.decode(responseNode.body)['username'];
-    print('username: ${json.decode(responseNode.body)}');
-    print('username: $username');
-    print('id: ${json.decode(responseNode.body)['id'].toString()}');
     return instaProfile != null ? true : false;
   }
 }

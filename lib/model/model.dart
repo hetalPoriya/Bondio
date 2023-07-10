@@ -8,3 +8,4 @@ export 'instagram_model.dart';
 export 'customer_details.dart';
 export 'get_event.dart';
 export 'peer_info_model.dart';
+export 'update_event.dart';

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bondio/controller/controller.dart';
 import 'package:bondio/screens/chat/chat.dart';
 import 'package:bondio/screens/auth/bigPolygon_background.dart';
@@ -21,7 +19,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     ChatWidget.getUserInfo();
-    log('ass ${authController.userModel.value.user?.toMap()}');
     super.initState();
   }
 
@@ -83,19 +80,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   () => Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Text(
-                      //   'My profile',
-                      //   style: AppStyles.mediumTextStyle.copyWith(
-                      //       fontSize: 20.sp,
-                      //       color: ColorConstant.backGroundColorOrange),
-                      // ),
-                      // smallSizedBox,
                       smallerSizedBox,
                       AppWidget.textFormFiledProfilePage(
                           textEditingController:
                               authController.fullNameController.value,
                           hintText: AppStrings.firstName,
-                          validator: FormValidation.emptyValidation(
+                          validator: FormValidation.firstNameVlidation(
                               value:
                                   authController.fullNameController.value.text),
                           textInputType: TextInputType.name),
@@ -104,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           textEditingController:
                               authController.lastNameController.value,
                           hintText: AppStrings.lastName,
-                          validator: FormValidation.emptyValidation(
+                          validator: FormValidation.lastNameValidation(
                               value:
                                   authController.lastNameController.value.text),
                           textInputType: TextInputType.name),
@@ -151,15 +141,4 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ));
   }
-
-// Future<PermissionStatus> _getImagePickerPermission() async {
-//   PermissionStatus permission = await Permission.camera.status;
-//   if (permission != PermissionStatus.granted &&
-//       permission != PermissionStatus.permanentlyDenied) {
-//     PermissionStatus permissionStatus = await Permission.camera.request();
-//     return permissionStatus;
-//   } else {
-//     return permission;
-//   }
-// }
 }

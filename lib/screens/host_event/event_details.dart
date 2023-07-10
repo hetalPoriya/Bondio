@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../utils/utils.dart';
-
 class EventDetails extends StatelessWidget {
   const EventDetails({Key? key}) : super(key: key);
 
@@ -69,7 +67,7 @@ class EventDetails extends StatelessWidget {
                       )
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   if (eventController.customerList.value.customerId ==
                       authController.userModel.value.user?.id)
                     IconButton(
@@ -91,12 +89,6 @@ class EventDetails extends StatelessWidget {
 
                           eventController.update();
                           home.update();
-
-                          // home.hostEvent.value = 0;
-                          //
-                          //
-                          //
-                          // home.update();
                         },
                         icon: Icon(
                           Icons.edit,
@@ -118,35 +110,42 @@ class EventDetails extends StatelessWidget {
                           spreadRadius: 1,
                           blurRadius: 10)
                     ]),
-                child: Row(children: [
-                  SizedBox(
-                    width: 4.w,
-                  ),
-                  Stack(
-                    alignment: Alignment.centerRight,
-                    children: [
-                      Image.asset(
-                        AppAssets.eventMembers,
-                        height: 5.h,
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  padding: paddingSymmetric(horizontalPad: 2.w),
+                  child: Row(children: [
+                    SizedBox(
+                      width: 4.w,
+                    ),
+                    ListView.builder(
+                      itemCount:
+                          eventController.customerList.value.customers?.length,
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) => Container(
+                        height: 2.h,
+                        width: 10.w,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: ChatWidget.displayImage(
+                                    image: eventController.customerList.value
+                                        .customers?[index].photo,
+                                    socialImage: eventController.customerList
+                                        .value.customers?[index].photoSocial))),
                       ),
-                      CircleAvatar(
-                        maxRadius: 5.w,
-                        backgroundColor: ColorConstant.backGroundColorOrange,
-                        child: Text(
-                            eventController.customerList.value.customers?.length
-                                    .toString() ??
-                                '0',
-                            style: AppStyles.smallTextStyle),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    width: 3.w,
-                  ),
-                  Text('Will come',
-                      style: AppStyles.smallerTextStyle
-                          .copyWith(color: Colors.black)),
-                ]),
+                    ),
+                    SizedBox(
+                      width: 3.w,
+                    ),
+                    Text(
+                        ' ${eventController.customerList.value.customers?.length ?? 0} Will come',
+                        style: AppStyles.smallerTextStyle
+                            .copyWith(color: Colors.black)),
+                  ]),
+                ),
               ),
               smallSizedBox,
               Container(
@@ -173,7 +172,7 @@ class EventDetails extends StatelessWidget {
                           ],
                         ),
                       ),
-                      VerticalDivider(thickness: 1),
+                      const VerticalDivider(thickness: 1),
                       Flexible(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -210,7 +209,7 @@ class EventDetails extends StatelessWidget {
               smallerSizedBox,
               ListView.builder(
                 shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 itemCount: eventController.customerList.value.customers?.length,
                 itemBuilder: (context, index) => Column(
                   children: [
@@ -237,7 +236,7 @@ class EventDetails extends StatelessWidget {
               mediumSizedBox,
             ],
           )
-        : UpdateEvent());
+        : const UpdateEvent());
   }
 
   rowText({required String title, required IconData icon}) => Container(

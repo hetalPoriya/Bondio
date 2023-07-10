@@ -14,5 +14,7 @@ class InstagramConstant {
   static const String scope = 'user_profile,user_media';
   static const String responseType = 'code';
   final String url =
-      'https://api.instagram.com/oauth/authorize?client_id=$clientID&redirect_uri=$redirectUri&scope=user_profile,user_media&response_type=$responseType';
+      // "https://instagram.com/oauth/authorize/?client_id=$clientID&redirect_uri=$redirectUri&response_type=$responseType&scope=basic+likes";
+      'https://api.instagram.com/oauth/authorize?client_id=$clientID&redirect_uri=$redirectUri&response_type=$responseType';
+// 'https://api.instagram.com/oauth/authorize?client_id=$clientID&redirect_uri=$redirectUri&scope=user_profile,user_media&response_type=$responseType';
 }

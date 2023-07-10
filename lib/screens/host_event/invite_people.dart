@@ -1,11 +1,8 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:bondio/controller/controller.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
 import '../chat/chat.dart';
@@ -34,19 +31,20 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () {
+          () {
         return Scaffold(
           floatingActionButton: Obx(
-            () => FloatingActionButton(
-                onPressed: () async {
-                  eventController.eventPeopleList.isEmpty
-                      ? AppWidget.toast(text: 'Please add people')
-                      : eventController.createEventApiCall();
-                },
-                backgroundColor: ColorConstant.darkOrange,
-                child: chatController.isLoading.value == true
-                    ? AppWidget.progressIndicator(color: Colors.white)
-                    : Icon(Icons.arrow_forward, size: 4.h)),
+                () =>
+                FloatingActionButton(
+                    onPressed: () async {
+                      eventController.eventPeopleList.isEmpty
+                          ? AppWidget.toast(text: 'Please add people')
+                          : eventController.createEventApiCall();
+                    },
+                    backgroundColor: ColorConstant.darkOrange,
+                    child: chatController.isLoading.value == true
+                        ? AppWidget.progressIndicator(color: Colors.white)
+                        : Icon(Icons.arrow_forward, size: 4.h)),
           ),
           body: ListView(
               shrinkWrap: true,
@@ -55,28 +53,26 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                 smallSizedBox,
                 Padding(
                   padding:
-                      paddingSymmetric(horizontalPad: 8.w, verticalPad: 0.0),
+                  paddingSymmetric(horizontalPad: 8.w, verticalPad: 0.0),
                   child: AppWidget.searchField(
                       controller: chatController.searchController.value,
                       onChanged: (v) {
-                        log('Cl');
                         chatController.availableChatPersonSearchList.value =
                             chatController.availableChatPersonFromContacts
-                                .where((x) => (x.name
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(chatController
-                                            .searchController.value.text
-                                            .toLowerCase()) ||
-                                    x.name.toString().toUpperCase().contains(
-                                        chatController
-                                            .searchController.value.text
-                                            .toUpperCase())))
+                                .where((x) =>
+                            (x.name
+                                .toString()
+                                .toLowerCase()
+                                .contains(chatController
+                                .searchController.value.text
+                                .toLowerCase()) ||
+                                x.name.toString().toUpperCase().contains(
+                                    chatController
+                                        .searchController.value.text
+                                        .toUpperCase())))
                                 .toList();
                         chatController.availableChatPersonSearchList.refresh();
                         chatController.update();
-                        // chatController.availableChatPersonFromContacts
-                        //     .refresh();
                       }),
                 ),
                 smallerSizedBox,
@@ -84,7 +80,7 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                   Container(
                     height: 10.h,
                     alignment: Alignment.centerLeft,
-                    //color: Colors.green,
+
                     child: Padding(
                       padding: EdgeInsets.only(left: 7.w),
                       child: SingleChildScrollView(
@@ -92,7 +88,8 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                         child: Row(
                           children: List.generate(
                               eventController.eventPeopleList.length, (index) {
-                            log('LoginId ${eventController.eventPeopleList[index].id}');
+                            log('LoginId ${eventController
+                                .eventPeopleList[index].id}');
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -147,7 +144,7 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                                       ),
                                       Text(
                                           eventController.eventPeopleList[index]
-                                                  .name ??
+                                              .name ??
                                               '',
                                           overflow: TextOverflow.ellipsis,
                                           style: AppStyles.smallerTextStyle
@@ -169,20 +166,21 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
                 if (eventController.eventPeopleList.isNotEmpty)
                   Padding(
                     padding:
-                        paddingSymmetric(horizontalPad: 5.w, verticalPad: 0.0),
+                    paddingSymmetric(horizontalPad: 5.w, verticalPad: 0.0),
                     child: Divider(
                       color: Colors.grey.shade300,
                       thickness: 1,
                     ),
                   ),
                 Obx(
-                  () => chatController.searchController.value.text.isEmpty
+                      () =>
+                  chatController.searchController.value.text.isEmpty
                       ? buildListView(
-                          availableChatPersonFromContacts:
-                              chatController.availableChatPersonFromContacts)
+                      availableChatPersonFromContacts:
+                      chatController.availableChatPersonFromContacts)
                       : buildListView(
-                          availableChatPersonFromContacts:
-                              chatController.availableChatPersonSearchList),
+                      availableChatPersonFromContacts:
+                      chatController.availableChatPersonSearchList),
                 )
               ]),
         );
@@ -191,70 +189,67 @@ class _InvitePeopleForEventState extends State<InvitePeopleForEvent> {
   }
 
   buildListView({RxList? availableChatPersonFromContacts}) {
-    return Obx(() => ListView.builder(
-        shrinkWrap: true,
-        padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 1.h),
-        itemCount: availableChatPersonFromContacts!.length,
-        physics: const ClampingScrollPhysics(),
-        itemBuilder: ((context, index) {
-          log('Person ${availableChatPersonFromContacts.length}');
-          return GestureDetector(
-            onTap: () {
-              if (eventController.eventPeopleList.contains(
+    return Obx(() =>
+        ListView.builder(
+            shrinkWrap: true,
+            padding: paddingSymmetric(horizontalPad: 5.w, verticalPad: 1.h),
+            itemCount: availableChatPersonFromContacts!.length,
+            physics: const ClampingScrollPhysics(),
+            itemBuilder: ((context, index) {
+              log('Person ${availableChatPersonFromContacts.length}');
+              return GestureDetector(
+                onTap: () {
+                  if (eventController.eventPeopleList.contains(
                       chatController.availableChatPersonFromContacts[index]) ==
-                  false) {
-                eventController.eventPeopleList
-                    .add(availableChatPersonFromContacts[index]);
+                      false) {
+                    eventController.eventPeopleList
+                        .add(availableChatPersonFromContacts[index]);
 
-                eventController.eventPeopleList.refresh();
-                eventController.update();
-              } else {
-                Fluttertoast.showToast(msg: 'Already added.');
-              }
-            },
-            child: Container(
-              height: 8.h,
-              margin: paddingSymmetric(verticalPad: 1.0),
-              child: Row(children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ChatWidget.imageCircleAvatar(context: context),
-                    ],
-                  ),
-                ),
-                Expanded(
-                    flex: 4,
-                    child: Column(
+                    eventController.eventPeopleList.refresh();
+                    eventController.update();
+                  } else {
+                    Fluttertoast.showToast(msg: 'Already added.');
+                  }
+                },
+                child: Container(
+                  height: 8.h,
+                  margin: paddingSymmetric(verticalPad: 1.0),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                                availableChatPersonFromContacts[index].name ??
-                                    '',
-                                style: AppStyles.mediumTextStyle
-                                    .copyWith(color: Colors.black),
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                          // if (availableChatPersonFromContacts[index]
-                          //         .phoneNumber
-                          //         .isNotEmpty ==
-                          //     true)
-                          Text(
-                            availableChatPersonFromContacts[index]
+                          ChatWidget.imageCircleAvatar(context: context),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                        flex: 4,
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                    availableChatPersonFromContacts[index]
+                                        .name ??
+                                        '',
+                                    style: AppStyles.mediumTextStyle
+                                        .copyWith(color: Colors.black),
+                                    overflow: TextOverflow.ellipsis),
+                              ), Text(
+                                availableChatPersonFromContacts[index]
                                     .phoneNumber ??
-                                '(none)',
-                            style: AppStyles.smallTextStyle.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ])),
-              ]),
-            ),
-          );
-        })));
+                                    '(none)',
+                                style: AppStyles.smallTextStyle.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ])),
+                  ]),
+                ),
+              );
+            })));
   }
 }

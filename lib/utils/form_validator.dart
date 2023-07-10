@@ -14,25 +14,26 @@ class FormValidation {
   static String? Function(String?)? emptyValidation({String? value}) =>
       (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter valid value';
+          return 'This field is required';
         }
         return null;
       };
 
-// static String? Function(String?)? passwordValidation({String? value}) =>
-//     (value) {
-//       if (value == null || value.isEmpty) {
-//         return 'Please enter password';
-//       }
-//       return null;
-//     };
-//
-// static String? Function(String?)? nameValidation({String? value}) => (value) {
-//       if (value == null || value.isEmpty) {
-//         return 'Please enter your name';
-//       }
-//       return null;
-//     };
+  static String? Function(String?)? firstNameVlidation({String? value}) =>
+      (value) {
+        if (value == null || value.isEmpty) {
+          return 'please enter the first Name';
+        }
+        return null;
+      };
+
+  static String? Function(String?)? lastNameValidation({String? value}) =>
+      (value) {
+        if (value == null || value.isEmpty) {
+          return 'please enter the last Name';
+        }
+        return null;
+      };
 
   static String? Function(String?)? mobileNumberValidation({String? value}) =>
       (value) {
@@ -44,26 +45,10 @@ class FormValidation {
         return null;
       };
 
-// static String? Function(String?)? addressValidation({String? value}) =>
-//         (value) {
-//       if (value == null || value.isEmpty) {
-//         return 'Please enter your address';
-//       }
-//       return null;
-//     };
-
-// static String? Function(String?)? classValidation({String? value}) =>
-//     (value) {
-//       print('Value $value');
-//       if (value == null || value.isEmpty) {
-//         return 'Please select any one';
-//       }
-//       return null;
-//     };
-
   static String? Function(String?)? passwordValidation({String? value}) =>
       (value) {
-        RegExp regExp = RegExp(r'^(?=.*?[A-Za-z])(?=.*?[!@#\$&*~]).{8,}$');
+        RegExp regExp =
+            RegExp(r'^(?=.*?[A-Za-z])(?=.*?[A-Z])(?=.*?[!@#\$&*~]).{8,}$');
         if (value == null || value.isEmpty) {
           return 'Please enter your password';
         } else if (!regExp.hasMatch(value)) {

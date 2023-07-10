@@ -1,8 +1,6 @@
 class ApiConstant {
   //apis
   static String buildUrl(String endpoint) {
-    // String host =
-    //     'http://sh021.hostgator.tempwebhost.net/~synraiar/bondio/api/v1/';
     String host = 'https://bondiomeet.com/';
 
     final apiPath = host + endpoint;
@@ -10,11 +8,8 @@ class ApiConstant {
   }
 
   //api
-  //static String registerOtpApi = 'register-otp';
   static String imageBaseUrl = 'https://bondiomeet.com/storage/app/';
   static String registerOtpApi = 'api/v1/registration-otp';
-
-  //static String registerApi = 'api/v1/register';
   static String registerApi = 'api/v1/register-user';
   static String isRegisterApi = 'api/v1/is-registered';
   static String loginApi = 'api/v1/login';
@@ -50,6 +45,10 @@ class ApiConstant {
   static String lastMessageSender = 'last_message_sender';
   static String timestamp = 'timestamp';
   static String eventDate = 'event_date';
+  static String eventId = 'event_id';
+  static String eventLoc = 'event_location';
+  static String eventTimeChat = 'event_time';
+  static String eventDescription = 'event_des';
   static String isEvent = 'isEvent';
   static String isPinned = 'isPinned';
   static String isArchive = 'isArchive';

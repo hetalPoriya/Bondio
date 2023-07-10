@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:bondio/model/contact_list.dart';
-import 'package:bondio/model/peer_info_model.dart';
-import 'package:bondio/model/user_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart' as d;
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -15,7 +13,6 @@ import 'controller.dart';
 
 class ChatController extends GetxController {
   RxBool isLoading = false.obs;
-  FirebaseController firebaseController = Get.put(FirebaseController());
   FirebaseFirestore fireStoreInstant = FirebaseFirestore.instance;
 
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
@@ -87,8 +84,6 @@ class ChatController extends GetxController {
 
   RxInt totalChatMessages = 0.obs;
 
-  // Rx<User> peerInfo = User().obs;
-
   //add users
   addUserInfoToFirebase({User? userInfo}) {
     String data = userInfoBodyToMap(userInfo!);
@@ -152,8 +147,6 @@ class ChatController extends GetxController {
     required String peerId,
     required String roomId,
   }) async {
-    log('Perr Id ${userId}');
-    log('Perr Id ${peerId}');
     DocumentSnapshot<Map<String, dynamic>> userInfo =
         await userCollection.doc(userId).get();
 
@@ -217,12 +210,10 @@ class ChatController extends GetxController {
   }
 
   // create group
-  Future createGroup(
-      {required String userName,
-      required String groupName,
-      bool? isEvent,
-      String? eventDate,
-      String? eventDes}) async {
+  Future createGroup({
+    required String userName,
+    required String groupName,
+  }) async {
     try {
       isLoading(true);
       AuthController authController = Get.put(AuthController());
@@ -234,24 +225,10 @@ class ChatController extends GetxController {
         authController.userModel.value.user!.id.toString()
       ];
 
-      // List<Map<String, String>> userToken = [
-      //   {
-      //     'uid': authController.userModel.value.user?.id.toString() ?? '',
-      //     'token':
-      //         authController.userModel.value.user?.deviceToken.toString() ?? ''
-      //   },
-      // ];
-
       for (var element in selectedGroupMember) {
         userCollection.doc(element.id.toString()).get().then((value) {
           userInfo.add('${element.id}_${element.name ?? ''}');
           userId.add('${element.id}');
-          // userToken.add(
-          //   {
-          //     'uid': value.get(ApiConstant.id).toString() ?? '',
-          //     'token': value.get(ApiConstant.deviceToken).toString() ?? ''
-          //   },
-          // );
         });
       }
 
@@ -262,15 +239,17 @@ class ChatController extends GetxController {
           membersId: [],
           isAdmin: [],
           isArchive: [],
-          //'messages': ,
           groupId: '',
           isPinned: false,
-          lastMessage: eventDes ?? '',
+          lastMessage: '',
           lastMessageSender: '',
           timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
-          isEvent: isEvent ?? false,
-          eventDate:
-              eventDate ?? DateFormat('dd-MM-yyyy').format(DateTime.now()));
+          isEvent: false,
+          eventDes: '',
+          eventId: '',
+          eventLocation: '',
+          eventTime: '',
+          eventDate: '');
 
       DocumentReference groupDocRef =
           await groupChatRoomCollection.add(groupChat.toJson());
@@ -279,7 +258,6 @@ class ChatController extends GetxController {
         ApiConstant.members: FieldValue.arrayUnion(userInfo),
         ApiConstant.groupId: groupDocRef.id,
         ApiConstant.membersId: FieldValue.arrayUnion(userId),
-        // ApiConstant.userToken: userToken.toSet(),
         ApiConstant.isAdmin: FieldValue.arrayUnion(
             [authController.userModel.value.user?.id.toString()]),
       });
@@ -290,6 +268,78 @@ class ChatController extends GetxController {
 
         userDocRef.set({
           ApiConstant.groupId: FieldValue.arrayUnion([groupDocRef.id])
+        }, SetOptions(merge: true));
+
+        return true;
+      });
+
+      selectedGroupMember.clear();
+      selectedGroupMember.value = [];
+      groupNameController.value.clear();
+      selectedGroupMember.refresh();
+      isLoading(false);
+    } catch (e) {
+      isLoading(false);
+    }
+  }
+
+  // create group  event
+  Future createGroupEvent({
+    required String userName,
+    required String eventTitle,
+    bool? isEvent,
+    String? eventDate,
+    String? eventDes,
+    String? eventLocation,
+    String? eventId,
+    String? eventTime,
+  }) async {
+    try {
+      isLoading(true);
+      AuthController authController = Get.put(AuthController());
+      List<String> userInfo = [
+        '${authController.userModel.value.user!.id.toString()}_${authController.userModel.value.user!.name.toString()}'
+      ];
+
+      List<String> userId = [
+        authController.userModel.value.user!.id.toString()
+      ];
+
+      for (var element in selectedGroupMember) {
+        userCollection.doc(element.id.toString()).get().then((value) {
+          userInfo.add('${element.id}_${element.name ?? ''}');
+          userId.add('${element.id}');
+        });
+      }
+
+      await groupChatRoomCollection.doc(eventId.toString()).set({
+        ApiConstant.groupName: eventTitle,
+        ApiConstant.groupIcon: '',
+        ApiConstant.isArchive: [],
+        ApiConstant.groupId: eventId.toString(),
+        ApiConstant.isPinned: false,
+        ApiConstant.lastMessage: '',
+        ApiConstant.lastMessageSender: '',
+        ApiConstant.timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+        ApiConstant.isEvent: true,
+        ApiConstant.eventDescription: eventDes ?? '',
+        ApiConstant.eventId: eventId ?? '',
+        ApiConstant.eventLoc: eventLocation ?? '',
+        ApiConstant.eventTimeChat: eventTime ?? '',
+        ApiConstant.eventDate:
+            eventDate ?? DateFormat('dd-MM-yyyy').format(DateTime.now()),
+        ApiConstant.members: FieldValue.arrayUnion(userInfo),
+        ApiConstant.membersId: FieldValue.arrayUnion(userId),
+        ApiConstant.isAdmin: FieldValue.arrayUnion(
+            [authController.userModel.value.user?.id.toString()]),
+      });
+
+      selectedGroupMember.every((element) {
+        DocumentReference<Map<String, dynamic>> userDocRef =
+            groupChatListCollection.doc(element.id);
+
+        userDocRef.set({
+          ApiConstant.groupId: FieldValue.arrayUnion([eventId.toString()])
         }, SetOptions(merge: true));
 
         return true;
@@ -353,6 +403,8 @@ class ChatController extends GetxController {
 
   //add participant to group
   Future addParticipant() async {
+    log('Event ${groupInfo.value.isEvent}');
+    log('Event ${groupInfo.value.groupId.toString()}');
     for (int i = 0; i < addParticipantList.length; i++) {
       await groupChatRoomCollection
           .doc(groupInfo.value.groupId.toString())
@@ -378,10 +430,22 @@ class ChatController extends GetxController {
 
     docSnap.listen((DocumentSnapshot snap) {
       groupInfo.value = GroupChat.fromDocument(snap);
-      log('Info ${groupInfo.value.groupId}');
-      log('Info ${groupInfo.value.membersId}');
       groupInfo.refresh();
     });
+
+    if (groupInfo.value.isEvent == true) {
+      EventController eventController = Get.put(EventController());
+      DocumentSnapshot<Map<String, dynamic>> value =
+          await groupChatRoomCollection
+              .doc(groupInfo.value.eventId.toString())
+              .get();
+      List members = value.get(ApiConstant.membersId);
+      String m = members.join(',');
+      eventController.updateEventMembersApiCall(
+          eventMembers: m.toString(),
+          eventId: groupInfo.value.eventId.toString());
+    }
+
     AppWidget.toast(text: 'Participant Added');
     Get.back();
   }
@@ -415,17 +479,25 @@ class ChatController extends GetxController {
 
     docSnap.listen((DocumentSnapshot snap) {
       groupInfo.value = GroupChat.fromDocument(snap);
-      log('Info ${groupInfo.value.groupId}');
-      log('Info ${groupInfo.value.membersId}');
       groupInfo.refresh();
     });
+    if (groupInfo.value.isEvent == true) {
+      EventController eventController = Get.put(EventController());
+      DocumentSnapshot<Map<String, dynamic>> value =
+          await groupChatRoomCollection
+              .doc(groupInfo.value.eventId.toString())
+              .get();
+      List members = value.get(ApiConstant.membersId);
+      String m = members.join(',');
+      eventController.updateEventMembersApiCall(
+          eventMembers: m.toString(),
+          eventId: groupInfo.value.eventId.toString());
+    }
     AppWidget.toast(text: 'Participant Removed');
     Get.back();
   }
 
   Future<void> updateMessageReadStatus({required ChatMessages messages}) async {
-    log('Col ${collectionId.toString()}');
-    log('Col ${messages.timestamp.toString()}');
     personalChatRoomCollection
         .doc(collectionId.toString())
         .collection(collectionId.toString())
@@ -439,8 +511,6 @@ class ChatController extends GetxController {
 
   Future<void> updateMessageReadStatusForGroup(
       {required ChatMessages messages}) async {
-    log('Col ${collectionId.toString()}');
-    log('Col ${messages.timestamp.toString()}');
     groupChatRoomCollection
         .doc(collectionId.toString())
         .collection(collectionId.toString())
@@ -451,8 +521,6 @@ class ChatController extends GetxController {
   Future<void> removeIntoIsReadForGroup(
       {required ChatMessages messages}) async {
     AuthController authController = Get.put(AuthController());
-    log('Col ${collectionId.toString()}');
-    log('Col ${messages.timestamp.toString()}');
     groupChatRoomCollection
         .doc(collectionId.toString())
         .collection(collectionId.toString())
@@ -517,16 +585,6 @@ class ChatController extends GetxController {
     return 'NA';
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>? getLastMessage(
-      ChatMessages chatMessages) {
-    personalChatRoomCollection
-        .doc(collectionId.toString())
-        .collection(collectionId.toString())
-        .orderBy(ApiConstant.lastMessage, descending: true)
-        .limit(1)
-        .snapshots();
-  }
-
   addOrRemoveFromArchive({bool? pinned}) {
     AuthController authController = Get.put(AuthController());
     return personalChatListCollection
@@ -552,12 +610,6 @@ class ChatController extends GetxController {
   Future<String?> getFirebaseMessagingToken() async {
     await firebaseMessaging.requestPermission();
     String? val = await firebaseMessaging.getToken();
-    //.then((value) {
-    // if (value != null) {
-    log('Value ${val}');
-    //   return value;
-    // }
-    //});
     return val;
   }
 
@@ -569,19 +621,20 @@ class ChatController extends GetxController {
     d.Dio dio = d.Dio();
     try {
       final body = {
-        "to": peerUser.value.deviceToken.toString() ?? '',
+        "to": peerUser.value.deviceToken ?? '',
         "notification": {
-          "title": authController.userModel.value.user?.name.toString() ?? '',
+          "title": authController.userModel.value.user?.name ?? '',
           "body": msg
         }
       };
 
-      log('Body ${jsonEncode(body)}');
       var res = await dio.post('https://fcm.googleapis.com/fcm/send',
           options: d.Options(headers: {'Authorization': 'Bearer $key'}),
           data: body);
-      log('Res ${res.data}');
-    } catch (e) {}
+      log('Notification ${res.data}');
+    } on d.DioError catch (e) {
+      AppWidget.toast(text: e.toString());
+    }
   }
 
   static Future<void> sendPushNotificationForGroup(
@@ -591,35 +644,20 @@ class ChatController extends GetxController {
         'AAAA251Ulz8:APA91bGRYuyXWUgL1qC4n10qMsEcIxJ8MKlR8d6Q1YqTeWgquM8CnspYOZ3jOprjDYD4Vnfqie70yYWnae-apK0w2ciaj9f_qCWYNKdN7WjCuZLwlUtupoAdIVMhgRAT6BVMX5EyZRSu';
     d.Dio dio = d.Dio();
     try {
-      log('AA ${user.deviceToken.toString()}');
       final body = {
-        "to": user.deviceToken.toString() ?? '',
+        "to": user.deviceToken ?? '',
         "notification": {
-          "title": authController.userModel.value.user?.name.toString() ?? '',
+          "title": authController.userModel.value.user?.name ?? '',
           "body": msg.toString()
         }
       };
 
-      log('Body ${jsonEncode(body)}');
       var res = await dio.post('https://fcm.googleapis.com/fcm/send',
           options: d.Options(headers: {'Authorization': 'Bearer $key'}),
           data: body);
-      log('Res ${res.data}');
-    } catch (e) {}
+      log('Notification ${res.data}');
+    } on d.DioError catch (e) {
+      AppWidget.toast(text: e.toString());
+    }
   }
-// static String getLastMessageTime(
-//     {required BuildContext context,
-//     required String time,
-//     bool showYear = false}) {
-//   final DateTime sent = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
-//   final DateTime now = DateTime.now();
-//   if (now.day == sent.day &&
-//       now.month == sent.month &&
-//       now.year == sent.year) {
-//     return TimeOfDay.fromDateTime(sent).format(context);
-//   }
-//   return showYear
-//       ? '${sent.day} ${_getMonth(sent)} ${sent.year}'
-//       : '${sent.day} ${_getMonth(sent)}';
-// }
 }
